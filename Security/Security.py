@@ -1,7 +1,7 @@
 # Importing Important Libraries
 import os 
 import secrets 
-import math
+import argparse
 import requests 
 import random, string 
 from dotenv import load_dotenv 
@@ -14,8 +14,8 @@ class PasswordManager:
         self.site_name = site_name 
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
-        self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": False, "hasUppercase": True, "hasLowercase": True, 
-                                                                                                          "hasDigits": True, "hasPunc": True, "isLong": True}}
+        self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
+                                                                                                          "hasDigits": None, "hasPunc": None, "isLong": None}}
         self.Pure_Random_Ints = self._randomNumGen(700,0, 9999)
         
     def Check_Password(self, Password = None):
@@ -28,16 +28,16 @@ class PasswordManager:
         if Password == None:
             Password = self.password
             
-        if not self.password:
+        if not Password:
             return self.TestResult[-1]
         
         self.TestResult["Cause"] = {
-        "Breached": False,
-        "hasUppercase": True,
-        "hasLowercase": True,
-        "hasDigits": True,
-        "hasPunc": True,
-        "isLong": True
+        "Breached": None,
+        "hasUppercase": None,
+        "hasLowercase": None,
+        "hasDigits": None,
+        "hasPunc": None,
+        "isLong": None
     }
 
 
@@ -68,9 +68,16 @@ class PasswordManager:
             weak = True
         
         if weak == True:
-            print(weak)
             return self.TestResult[1]
         
+        self.TestResult["Cause"] = {
+        "Breached": False,
+        "hasUppercase": True,
+        "hasLowercase": True,
+        "hasDigits": True,
+        "hasPunc": True,
+        "isLong": True
+    }
         return self.TestResult[0]
         
     def GeneratePass(self): 
@@ -78,13 +85,13 @@ class PasswordManager:
             if (self.Length) < 12:
                 return "Invalid Lenght. It must be greater than 12"
             
-            random_num = str(random.sample(self.Pure_Random_Ints, self.Length))
+            random_num = "".join(str(n) for n in random.sample(self.Pure_Random_Ints, min(self.Length, len(self.Pure_Random_Ints))))
             alpha_char = string.ascii_letters + random_num + string.punctuation 
             run = True
             while run:
                 password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
                 result = self.Check_Password(password)
-                if result is self.TestResult[0]:
+                if result == self.TestResult[0]:
                     run = False
                     return password
                     
@@ -109,3 +116,53 @@ class PasswordManager:
             data = [rand.randrange(min, max) for _ in range(num)]
             return data 
 
+# Command Line Utility for debugging purposes
+def main():
+    parser = argparse.ArgumentParser(description="how the password managers CLI work")
+    parser.add_argument("-d", "--demo", action="store_true",help="show demo of all features")
+    parser.add_argument("--generate", action="store_true", help="Generate new password")
+    parser.add_argument("-l", "--length", type=int, default=12,help="password length when generating (default: 12)")
+    parser.add_argument("-c", "--check",type=str,help="Check password strength password strenght", nargs=1)
+    parser.add_argument("-s", "--site", type=str, default="Unknown", help="Name of the site", nargs="?")
+    parser.add_argument("--version", action="version",version="Password Manager -> 1.1.0")
+    
+    args = parser.parse_args()
+    if args.demo:
+        print()
+        print("-------------------------------------------------")
+        print("|| Illustrating how the password manager works ||")
+        print("-------------------------------------------------")
+        pw = PasswordManager("Password Manager CO.", "password123", True, 17)
+        print(f"Site Name: {pw.site_name}")
+        print(f"Password: {pw.password} and the length: {pw.Length}")
+        print(f"Password Status: {pw.Check_Password()}")
+        print("As we can see this password is not strong so what we can do 🤔??😋 We can use the built in password generator")
+        print(f"Generated Password: {pw.GeneratePass()}")
+        print()
+    elif args.generate:
+        pw = PasswordManager(args.site, shouldGeneratePass=True, Password_Length=args.length)
+        print(f"{pw.site_name}'s password is {pw.GeneratePass()}")
+        
+    elif args.check:
+        password_toCheck = "".join([_ for _ in args.check])
+        pw = PasswordManager(args.site, password_toCheck, False, args.length)
+        pw.Check_Password()
+        if pw.TestResult["Cause"]["Breached"] == True:
+            print(f"Password is {pw.Check_Password()}")
+        else:
+            print(f"Password is {pw.Check_Password()} Details: {pw.TestResult["Cause"]}")
+    
+    else:
+        print()
+        print("Use --generate or --check")
+        print("!!!Make sure you are using the latest Version!!!")
+        print("Example:")
+        print("  python password_manager.py --generate --length 20 --site netflix")
+        print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
+        print("-----------------------------------------------------------------------------------------------------")
+        parser.print_help()
+        print()
+        
+        
+if __name__ == "__main__":
+    main()

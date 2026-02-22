@@ -1,0 +1,370 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1700"
+             d:DesignHeight="800"
+             xmlns:icons="using:FluentIcons.Avalonia"
+             Foreground="{DynamicResource Primary_Button_Foreground}"
+             Background="{DynamicResource Primary_Background_Color}"
+             x:Class="Password_Manager.HomePageView">
+
+    <!-- Main Layout -->
+    <Grid RowDefinitions="Auto,Auto,Auto,auto, *"
+          Margin="10">
+
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              Margin="0,0,0,5">
+
+            <Label FontSize="26"
+                   VerticalAlignment="Center"
+                   Content="Main"/>
+
+            <TextBox Grid.Column="1"
+                     Width="600"
+                     HorizontalAlignment="Center"
+                     Watermark="Search"
+                     CornerRadius="7"/>
+        </Grid>
+
+        <!-- Top Separator -->
+        <Separator Grid.Row="1"/>
+
+        <!-- Cards Area -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="Auto,Auto,Auto"
+              ColumnSpacing="10">
+
+            <!-- ===================== -->
+            <!-- Recent Card -->
+            <!-- ===================== -->
+            <Border Classes="Card" HorizontalAlignment="Left"
+                                  VerticalAlignment="Top">
+
+                <Grid RowDefinitions="Auto,*"
+                      Margin="10">
+
+                    <Label FontSize="20"
+                           Foreground="Orange"
+                           Content="Recent"/>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Google" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="2"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Facebook" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Pornhub" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Youtube" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Instagram" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="5"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </Grid>
+            </Border>
+
+
+            <!-- ===================== -->
+            <!-- Favourite Card -->
+            <!-- ===================== -->
+            <Border Grid.Column="1" HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Top"
+                    Classes="Card">
+
+                <Grid RowDefinitions="Auto,*"
+                      Margin="10">
+
+                    <Label FontSize="20"
+                           Foreground="Orange"
+                           Content="Favourite"/>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Bank LTD." Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="10"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <Separator Classes="CardSep"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Minecraft" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <Separator Classes="CardSep"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Ubisoft" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Steam" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="1"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <Separator Classes="CardSep"/>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="Epic Games" Margin="0,7"/>
+                                <Border Grid.Column="1"
+                                        CornerRadius="10"
+                                        Padding="8,2">
+                                    <TextBlock Text="3"
+                                               FontSize="30"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </Grid>
+            </Border>
+            
+        <!-- ===================== -->
+        <!-- Password Generator Card -->
+        <!-- ===================== -->
+        <Border Grid.Column="2"
+                Margin="0"
+                Classes="Card"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top">
+
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
+                  Margin="10"
+                  RowSpacing="10">
+
+                <Label Content="Password Generator"
+                       FontSize="20"
+                       Foreground="Orange"/>
+
+                <TextBox Grid.Row="1"
+                         Text="{Binding PasswordGenerator}"
+                         IsReadOnly="True"
+                         CornerRadius="7"/>
+
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            Spacing="10">
+
+                    <TextBlock Text="Length:"
+                               VerticalAlignment="Center"/>
+
+                    <Slider Minimum="6"
+                            Maximum="32"
+                            Value="12"
+                            Width="200"/>
+
+                    <TextBlock Text="12"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3"
+                            Spacing="5">
+
+                    <CheckBox Content="Include Uppercase"/>
+                    <CheckBox Content="Include Numbers"/>
+                    <CheckBox Content="Include Symbols"/>
+                </StackPanel>
+
+                <Button Grid.Row="4"
+                        Content="Generate Password"
+                        Command="{Binding GeneratePassword}"
+                        HorizontalAlignment="Stretch"
+                        Background="Orange"
+                        Height="40"
+                        CornerRadius="7"/>
+    </Grid>
+
+</Border>
+
+
+        </Grid>
+
+        <Separator Grid.Row="3" Margin="10, 19"/>
+        <!-- Cards Area -->
+        <Grid Grid.Row="4"
+              ColumnDefinitions="auto,Auto"
+              ColumnSpacing="10">
+
+            <!-- ===================== -->
+            <!-- Status Card -->
+            <!-- ===================== -->
+            <Border Classes="Card" HorizontalAlignment="Left"
+                    Width="1000"
+                                  VerticalAlignment="Top">
+
+                <Grid Grid.ColumnSpan="1" Grid.ColumnDefinitions="Auto, auto, auto" RowDefinitions="Auto,auto,*"
+                      Margin="10">
+
+                    <Label FontSize="20"
+                           Foreground="Orange"
+                           Content="Status"/>
+                    <Separator Grid.Row="1" Margin="0 0 -100 0"></Separator>
+                    <StackPanel Grid.Column="0" Grid.Row="2" Orientation="Horizontal">
+                        <StackPanel>
+						        <TextBlock Classes="status_Text"><LineBreak/><Span FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Saved Passwords</TextBlock>
+                        </StackPanel>
+                    <Separator Classes="Vertical_Seperator"></Separator>
+                    <StackPanel>
+					    <TextBlock Classes="status_Text"><LineBreak/> <Span Foreground="LightGreen" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Strong Passwords</TextBlock>
+                    </StackPanel>
+                    <Separator Classes="Vertical_Seperator"></Separator>
+
+                    <StackPanel>
+						   <TextBlock Classes="status_Text"><LineBreak/><Span Foreground="Red" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Weak Passwords</TextBlock>
+                    </StackPanel>
+                    <Separator Classes="Vertical_Seperator"></Separator>
+                    <StackPanel>
+						   <TextBlock Classes="status_Text"><LineBreak/><Span Foreground="DarkGoldenrod" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Duplicate</TextBlock>
+                    </StackPanel>
+                    </StackPanel>
+
+                </Grid>
+            </Border>
+            
+        <!-- ===================== -->
+        <!-- Password Strength check Card -->
+        <!-- ===================== -->
+        <Border Grid.Column="2"
+                Margin="0"
+                Classes="Card"
+                VerticalAlignment="Top">
+
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
+                  Margin="10"
+                  RowSpacing="10">
+
+                <Label Content="Password Strenght checker"
+                       FontSize="20"
+                       Foreground="Orange"/>
+
+                <TextBox Grid.Row="1"
+                         Watermark="Enter you password"
+                         IsReadOnly="False"
+                         CornerRadius="7"/>
+
+                <StackPanel Grid.Row="3"
+                            Spacing="5">
+
+                    <TextBlock Text="Include Uppercase"/>
+                    <TextBlock Text="Include Uppercase"/>
+                    <TextBlock Text="Include Uppercase"/>
+                </StackPanel>
+
+                <Button Grid.Row="4"
+                        Content="Generate Password"
+                        HorizontalAlignment="Stretch"
+                        Background="Orange"
+                        Height="40"
+                        CornerRadius="7"/>
+    </Grid>
+
+</Border>
+
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>

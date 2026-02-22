@@ -1,0 +1,94 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+  <!-- Add Styles Here -->
+
+  <Style Selector="Label">
+	  <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+  </Style>
+  <Style Selector="TextBlock">
+	  <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+  </Style>
+
+  <Style Selector="Separator">
+      <Setter Property="Background" Value="{DynamicResource Primary_Seperator_Color}"></Setter>
+  </Style>
+
+    <Style Selector="Button">
+		<Setter Property="Background" Value="{DynamicResource Primary_Button_Background}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+    </Style>
+
+    <Style Selector="Button:pointerover/template/ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+    </Style>
+    <Style Selector="Button StackPanel">
+		<Setter Property="Spacing" Value="10"></Setter>
+    </Style>
+
+
+    
+    <Style Selector="Button.active">
+		<Setter Property="Background" Value="{DynamicResource Primary_Button_Background}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+    </Style>
+
+    <Style Selector="Button.active:pointerover/template/ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+    </Style>
+
+    <Style Selector="Border.Card">
+		<Setter Property="Background" Value="{DynamicResource Card_Color}"></Setter>
+		<Setter Property="Height" Value="300"></Setter>
+		<Setter Property="Width" Value="500"></Setter>
+		<Setter Property="CornerRadius" Value="10"></Setter>
+    </Style>
+
+    <Style Selector="Border.Card Label">
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Hover_Button_Background}"></Setter>
+    </Style>
+    <Style Selector="Border.Card TextBlock">
+        <Setter Property="FontSize" Value="27"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+    </Style>
+
+    <Style Selector="Separator.CardSep">
+		<Setter Property="Foreground" Value="WhiteSmoke"></Setter>
+		<Setter Property="Opacity" Value="460"></Setter>
+    </Style>
+
+    <Style Selector="CheckBox">
+		<Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+    </Style>
+    <Style Selector="CheckBox:pointerover/template/ContentPresenter">
+		<Setter Property="Foreground" Value="{DynamicResource Hover_Button_Background}"></Setter>
+    </Style>
+
+    <Style Selector="TextBlock.status_Text">
+		<Setter Property="FontSize" Value="26"></Setter>
+		<Setter Property="Padding" Value="10"></Setter>
+    </Style>
+
+    <Style Selector="Separator.Vertical_Seperator">
+		<Setter Property="Opacity" Value="960"></Setter>
+		<Setter Property="Height" Value="260"></Setter>
+		<Setter Property="Width" Value="1"></Setter>
+		<Setter Property="Margin" Value="0,05,0,0"></Setter>
+    </Style>
+</Styles>

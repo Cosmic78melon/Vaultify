@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Password_Manager.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:icons="using:FluentIcons.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+        x:Class="Password_Manager.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Password_Manager">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="Auto, *" Background="{DynamicResource Primary_Background_Color}">
+
+        <ContentControl Grid.Column="1  " Foreground="{DynamicResource Primary_Button_Foreground}" 
+                        Content="{Binding CurrentPage}"/>
+
+		<Border Grid.Column="0"
+                Background="{DynamicResource Primary_SideMenu_Color}">
+            <Grid RowDefinitions="Auto, Auto, Auto, Auto,*, Auto, Auto">
+                <icons:SymbolIcon Symbol="LockShield" 
+                                  Margin="0 0 0 20"
+                                  Grid.Column="0"
+                                  PointerPressed="DoubleClicked"
+                                  Grid.Row="0"
+                                  HorizontalAlignment="Center"
+                                  FontSize="{Binding IconSize}"
+                                  Foreground="DarkOrange">
+                </icons:SymbolIcon>
+                <Separator Grid.Column="0"
+                           Margin="0 0 0 05"
+                           HorizontalAlignment="Stretch"
+                           Grid.Row="1"></Separator>
+
+                <Button Grid.Column="0"
+                        Grid.Row="2">
+                    <StackPanel HorizontalAlignment="Stretch" 
+                                Orientation="Horizontal">
+                        <icons:SymbolIcon Symbol="Search"></icons:SymbolIcon>
+                        <Label Content="Search" IsVisible="{Binding IsExpanded}"></Label>
+                    </StackPanel>
+                </Button>
+                <Separator Grid.Column="0"
+                           Margin="0 0 0 10"
+                           Grid.Row="3">
+					
+                </Separator>
+                <StackPanel Grid.Column="0"
+                            Spacing="5"
+                            Grid.Row="4">
+
+					<Button HorizontalAlignment="Stretch"
+                            Classes.active="{Binding GoToHomeCommand}"
+                            Command="{Binding GoToHomeCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:SymbolIcon></icons:SymbolIcon>
+                            <Label Content="Home" IsVisible="{Binding IsExpanded}"></Label>
+                        </StackPanel>
+                    </Button>
+					<Button HorizontalAlignment="Stretch" 
+                            Classes.active="{Binding GoToAll_EntriesCommand}"
+                            Command="{Binding GoToAll_EntriesCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:SymbolIcon Symbol="Document"></icons:SymbolIcon>
+                            <Label Content="All Entries" IsVisible="{Binding IsExpanded}"></Label>
+                        </StackPanel>
+                    </Button>
+					<Button HorizontalAlignment="Stretch" 
+                            Classes.active="{Binding GoToSecurityCommand}"
+                            Command="{Binding GoToSecurityCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:SymbolIcon Symbol="Notepad"></icons:SymbolIcon>
+                            <Label Content="Security Notes" IsVisible="{Binding IsExpanded}"></Label>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <Separator Grid.Column="0" Grid.Row="5"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Stretch"
+                           Margin="0 0 0 10">
+                </Separator>
+
+                <StackPanel Grid.Column="0"
+                            Grid.Row="6">
+                    <Button HorizontalAlignment="Stretch" Classes.active="{Binding GoToSettingsCommand}"
+                                    Command="{Binding GoToSettingsCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:SymbolIcon Symbol="Settings"></icons:SymbolIcon>
+                            <Label Content="Settings" IsVisible="{Binding IsExpanded}"></Label>
+                        </StackPanel>
+                    </Button>
+                    <Button HorizontalAlignment="Stretch"
+                            Classes.active="{Binding GoToAccountsCommand}"
+                            Command="{Binding GoToAccountsCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <icons:SymbolIcon Symbol="PersonAccounts"></icons:SymbolIcon>
+                            <Label Content="Account" IsVisible="{Binding IsExpanded}"></Label>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+    </Grid>
+
+</Window>

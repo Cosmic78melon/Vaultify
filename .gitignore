@@ -1,0 +1,7 @@
+bin/
+.vs/
+Security/.venv/
+Security/.env
+Security/test.py
+obj/
+Assets/

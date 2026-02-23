@@ -2,7 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vw="using:Password_Manager.ViewModels"
              mc:Ignorable="d"
+             x:DataType="vw:HomePageViewModel"
              d:DesignWidth="1700"
              d:DesignHeight="800"
              xmlns:icons="using:FluentIcons.Avalonia"
@@ -269,7 +271,7 @@
 
                 <Button Grid.Row="4"
                         Content="Generate Password"
-                        Command="{Binding GeneratePassword}"
+                        Command="{Binding GeneratePasswordCommand}"
                         HorizontalAlignment="Stretch"
                         Background="Orange"
                         Height="40"

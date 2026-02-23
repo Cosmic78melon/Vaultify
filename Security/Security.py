@@ -14,7 +14,7 @@ class PasswordManager:
         self.site_name = site_name 
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
-        self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
+        self.TestResult = {0:"Strong\n", 1:"Weak\n" , 2: "Error\n", -1: "No Password\n", 80:"Breached\n", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None}}
         self.Pure_Random_Ints = self._randomNumGen(700,0, 9999)
         
@@ -85,7 +85,7 @@ class PasswordManager:
             if (self.Length) < 12:
                 return "Invalid Lenght. It must be greater than 12"
             
-            random_num = "".join(str(n) for n in random.sample(self.Pure_Random_Ints, min(self.Length, len(self.Pure_Random_Ints))))
+            random_num = str(secrets.choice(self.Pure_Random_Ints))
             alpha_char = string.ascii_letters + random_num + string.punctuation 
             run = True
             while run:
@@ -132,6 +132,12 @@ def main():
         print("-------------------------------------------------")
         print("|| Illustrating how the password manager works ||")
         print("-------------------------------------------------")
+        print()
+        print("Use --generate or --check")
+        print("!!!Make sure you are using the latest Version!!!")
+        print("Example:")
+        print("  python password_manager.py --generate --length 20 --site netflix")
+        print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
         pw = PasswordManager("Password Manager CO.", "password123", True, 17)
         print(f"Site Name: {pw.site_name}")
         print(f"Password: {pw.password} and the length: {pw.Length}")

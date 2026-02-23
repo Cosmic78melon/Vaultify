@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Password_Manager.ViewModels;
+using System;
 
 namespace Password_Manager.Views
 {

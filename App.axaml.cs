@@ -8,7 +8,9 @@ using Password_Manager.Factory;
 using Password_Manager.Models;
 using Password_Manager.ViewModels;
 using Password_Manager.Views;
+using Python.Runtime;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
@@ -29,6 +31,10 @@ namespace Password_Manager
             collections.AddTransient<SecurityPageViewModel>();
             collections.AddTransient<SettingsPageViewModel>();
             collections.AddTransient<AccountPageViewModel>();
+
+            //Initialize Python
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
 
             // Register auth service
             collections.AddSingleton<Services.IAuthServices, Services.AuthServices>();
@@ -54,6 +60,7 @@ namespace Password_Manager
                 {
                     DataContext = service.GetRequiredService<MainWindowViewModel>()
                 };
+
             }
 
             base.OnFrameworkInitializationCompleted();

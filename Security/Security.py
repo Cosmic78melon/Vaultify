@@ -14,7 +14,7 @@ class PasswordManager:
         self.site_name = site_name 
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
-        self.TestResult = {0:"Strong\n", 1:"Weak\n" , 2: "Error\n", -1: "No Password\n", 80:"Breached\n", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
+        self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None}}
         self.Pure_Random_Ints = self._randomNumGen(700,0, 9999)
         
@@ -47,9 +47,12 @@ class PasswordManager:
         has_digits = any(i in string.digits for i in Password)
         has_special_Character = any(i in string.punctuation for i in Password)
 
-        if pwend.check(Password):
-            self.TestResult["Cause"]["Breached"] = True
-            return self.TestResult[80]
+        try:
+            if pwend.check(Password, timeout=22):
+                self.TestResult["Cause"]["Breached"] = True
+                return self.TestResult[80]
+        except TimeoutError as e:
+            return self.TestResult[2]
 
         if not has_uppercase_letters:
             self.TestResult["Cause"]["hasUppercase"] = False
@@ -94,6 +97,28 @@ class PasswordManager:
                 if result == self.TestResult[0]:
                     run = False
                     return password
+                
+    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc):
+        if self.shouldGeneratePass == True:
+            if (self.Length) < 12:
+                return "Invalid Lenght. It must be greater than 12"
+            
+            random_num = ''.join(str(x) for x in random.sample(self.Pure_Random_Ints, k=min(self.Length, len(self.Pure_Random_Ints))))
+            if (hasLetters and hasNumber and hasPunc) == True:
+               result = self.GeneratePass()
+               return result
+
+            if hasLetters != True and hasNumber and hasPunc:
+                alpha_char = random_num + string.punctuation 
+            elif hasLetters and hasNumber != True and hasPunc:
+                alpha_char = string.ascii_letters + string.punctuation 
+            elif hasLetters and hasNumber and hasPunc != True:
+                alpha_char = string.ascii_letters + random_num              
+            else:
+                return "Invalid request!"
+            
+            password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
+            return password
                     
             
     def _randomNumGen(self, num: int, min: int, max: int) -> list: 
@@ -106,15 +131,21 @@ class PasswordManager:
         keys = os.getenv("API_KEY") 
         url = "https://api.random.org/json-rpc/2/invoke" 
         payload = { "jsonrpc": "2.0", "method": "generateIntegers", "params": { "apiKey": keys, "n": num, "min": min, "max": max, "replacement": True }, "id": 1 } 
-        response = requests.post(url, json=payload)
-        data = response.json() 
-        
-        if response.status_code == 200 and "error" not in data: 
-            return data["result"]["random"]["data"]
-        else: 
+        try:
+            response = requests.post(url, json=payload)
+        except response.Timeout as e:
             rand = secrets.SystemRandom(num) 
             data = [rand.randrange(min, max) for _ in range(num)]
             return data 
+            
+        data = response.json() 
+        if response.status_code == 200 and "error" not in data: 
+            return data["result"]["random"]["data"]
+            
+        rand = secrets.SystemRandom(num) 
+        data = [rand.randrange(min, max) for _ in range(num)]
+        return data 
+            
 
 # Command Line Utility for debugging purposes
 def main():

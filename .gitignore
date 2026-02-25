@@ -5,3 +5,4 @@ Security/.env
 Security/test.py
 obj/
 Assets/
+Security/__pycache__/

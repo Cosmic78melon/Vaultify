@@ -229,6 +229,7 @@
         <Border Grid.Column="2"
                 Margin="0"
                 Classes="Card"
+                Height="330"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top">
 
@@ -241,7 +242,7 @@
                        Foreground="Orange"/>
 
                 <TextBox Grid.Row="1"
-                         Text="{Binding PasswordGenerator}"
+                         Text="{Binding PasswordGenerator, Mode=OneWay}"
                          IsReadOnly="True"
                          CornerRadius="7"/>
 
@@ -252,21 +253,26 @@
                     <TextBlock Text="Length:"
                                VerticalAlignment="Center"/>
 
-                    <Slider Minimum="6"
+                    <Slider Minimum="12"
                             Maximum="32"
-                            Value="12"
+                            x:Name="slider"
+                            Value="{Binding Lenght}"
+                            TickFrequency="1"
+                            IsSnapToTickEnabled="True"
+                            SmallChange="2"
+                            LargeChange="5"
                             Width="200"/>
 
-                    <TextBlock Text="12"
+                    <TextBlock Text="{Binding #slider.Value}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="3"
                             Spacing="5">
 
-                    <CheckBox Content="Include Uppercase"/>
-                    <CheckBox Content="Include Numbers"/>
-                    <CheckBox Content="Include Symbols"/>
+                    <CheckBox Content="Include Letters" IsChecked="{Binding HasLetterCase}"/>
+                    <CheckBox Content="Include Numbers" IsChecked="{Binding HasNumCase}"/>
+                    <CheckBox Content="Include Symbols" IsChecked="{Binding HasPuncCase}"/>
                 </StackPanel>
 
                 <Button Grid.Row="4"
@@ -328,41 +334,45 @@
         <!-- ===================== -->
         <!-- Password Strength check Card -->
         <!-- ===================== -->
-        <Border Grid.Column="2"
-                Margin="0"
-                Classes="Card"
-                VerticalAlignment="Top">
+            <Border Grid.Column="2"
+            Margin="0"
+            Classes="Card"
+            Height="370"
+            VerticalAlignment="Top">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"  
+              Margin="10"
+              RowSpacing="10">
 
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
-                  Margin="10"
-                  RowSpacing="10">
+            <Label Content="Password Strength checker"
+                   FontSize="20"
+                   Foreground="Orange"/>
 
-                <Label Content="Password Strenght checker"
-                       FontSize="20"
-                       Foreground="Orange"/>
+            <TextBox Grid.Row="1"
+                     Watermark="Enter your password"
+                     Text="{Binding PasswordHaveToCheck}"
+                     CornerRadius="7"/>
 
-                <TextBox Grid.Row="1"
-                         Watermark="Enter you password"
-                         IsReadOnly="False"
-                         CornerRadius="7"/>
+            <!-- Replace StackPanel with Grid for better vertical distribution -->
+            <Grid Grid.Row="3"
+                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">   <!-- * at bottom absorbs extra space -->
 
-                <StackPanel Grid.Row="3"
-                            Spacing="5">
+                <TextBlock Grid.Row="0" Text="{Binding Password_result}" Foreground="{Binding FontC}" FontFamily="ArialBold" FontSize="20" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="1" Text="{Binding HasUpper}" Foreground="{Binding Font1}" FontFamily="Arial" TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="2" Text="{Binding HasLower}" Foreground="{Binding Font2}" FontFamily="Arial" TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="3" Text="{Binding HasNum}" Foreground="{Binding Font3}" FontFamily="Arial"  TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="4" Text="{Binding HasPunc}" Foreground="{Binding Font4}" FontFamily="Arial"  TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="5" Text="{Binding Islong}" Foreground="{Binding Font5}" FontFamily="Arial"  TextWrapping="Wrap"/>
+            </Grid>
 
-                    <TextBlock Text="Include Uppercase"/>
-                    <TextBlock Text="Include Uppercase"/>
-                    <TextBlock Text="Include Uppercase"/>
-                </StackPanel>
-
-                <Button Grid.Row="4"
-                        Content="Generate Password"
-                        HorizontalAlignment="Stretch"
-                        Background="Orange"
-                        Height="40"
-                        CornerRadius="7"/>
-    </Grid>
-
-</Border>
+            <Button Grid.Row="4"
+                    Content="Check Passoword"
+                    Command="{Binding PasswordCheckerCommand}"
+                    HorizontalAlignment="Stretch"
+                    Background="Orange"
+                    Height="40"
+                    CornerRadius="7"/>
+        </Grid>
+    </Border>
 
 
         </Grid>

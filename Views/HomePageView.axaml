@@ -270,9 +270,9 @@
                 <StackPanel Grid.Row="3"
                             Spacing="5">
 
-                    <CheckBox Content="Include Letters" IsChecked="{Binding HasLetterCase}"/>
-                    <CheckBox Content="Include Numbers" IsChecked="{Binding HasNumCase}"/>
-                    <CheckBox Content="Include Symbols" IsChecked="{Binding HasPuncCase}"/>
+                    <CheckBox Classes="CheckBoxP" Content="Include Letters" IsChecked="{Binding HasLetterCase}"/>
+                    <CheckBox Classes="CheckBoxP" Content="Include Numbers" IsChecked="{Binding HasNumCase}"/>
+                    <CheckBox Classes="CheckBoxP" Content="Include Symbols" IsChecked="{Binding HasPuncCase}"/>
                 </StackPanel>
 
                 <Button Grid.Row="4"

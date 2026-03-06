@@ -8,8 +8,16 @@ using System.Threading.Tasks;
 
 namespace Password_Manager.Factory
 {
-    public partial class PageFactory(Func<PageViewData, PageViewModel> factory)
+    public class PageFactory(Func<Type, PageViewModel> factory)
     {
-        public  PageViewModel GetPageViewModel(PageViewData pagenames) =>  factory.Invoke(pagenames);
+        public PageViewModel GetPageViewModel<T>(Action<T> dhur = null)
+            where T : PageViewModel
+        {
+            var viewmodel = factory(typeof(T));
+
+            dhur?.Invoke((T)viewmodel);
+
+            return viewmodel;
+        }
     }
 }

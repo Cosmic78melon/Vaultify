@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Password_Manager.Services;
 using Python.Runtime;
 using System;
 using System.Collections;
@@ -35,9 +36,17 @@ namespace Password_Manager.ViewModels
             using (Py.GIL())
             {
                 dynamic SecurityModule = SecurityMod();
-                using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
-                dynamic result = PwManager.GeneratePass();
-                return result;
+                try
+                {
+                    using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
+                    dynamic result = PwManager.GeneratePass();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                return null;
             }
         }
         public object CustomeGen(string site_name = null, int Length = 12, bool has_Letter = true, bool hasNum = true, bool hasPunc = true)
@@ -45,6 +54,11 @@ namespace Password_Manager.ViewModels
             using (Py.GIL())
             {
                 dynamic SecurityModule = SecurityMod();
+                if ((has_Letter && hasNum && hasPunc) == true)
+                {
+                    dynamic data = Generate_password(site_name, Length);
+                    return data;
+                }
                 using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
                 dynamic result = PwManager.Custom_GeneratePass(has_Letter, hasNum, hasPunc);
                 return result;
@@ -105,6 +119,7 @@ namespace Password_Manager.ViewModels
     }
     public partial class HomePageViewModel : PageViewModel
     {
+
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
@@ -117,7 +132,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] 
         private string _passwordHaveToCheck = string.Empty;
 
-        [ObservableProperty] private string _password_result = string.Empty;
+        [ObservableProperty] private string _password_result = "Password Status: Unknown";
         [ObservableProperty] private string _hasUpper = "Include Uppercase Letter";
         [ObservableProperty] private string _hasLower = "Include Lowercase Letter";
         [ObservableProperty] private string _hasNum = "Include Numbers";
@@ -143,20 +158,27 @@ namespace Password_Manager.ViewModels
             var details = python_helper.PassswordCheck(PasswordHaveToCheck);
             if (string.Equals(details.result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password is " + details.result;
+                Password_result = "Password Status: " + details.result;
                 FontC = "green";
                 CheckChar(details);
             }
             else if (string.Equals(details.result, "Weak", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password is " + details.result;
+                Password_result = "Password Status: " + details.result;
                 FontC = "red";
                 CheckChar(details);
             }
+            else if (string.Equals(details.result, "Breached", StringComparison.OrdinalIgnoreCase))
+            {
+                Password_result = "Password Status: " + details.result;
+                CheckChar(details);
+                FontC = "White";
+            }
             else
             {
-                Password_result = "Password is " + details.result;
+                Password_result = "Something Went Wrong⁉⁉";
                 CheckChar(details);
+                FontC = "White";
             }
         }
         private void CheckChar(dynamic details)
@@ -219,6 +241,7 @@ namespace Password_Manager.ViewModels
             if (string.Equals(details.result, "Breached", StringComparison.OrdinalIgnoreCase))
             {
                 HasUpper = HasLower = HasNum = HasPunc = Islong = null;
+                FontC = "White";
             }
             details.HasUppercase = null;
             details.HasLowercase = null;

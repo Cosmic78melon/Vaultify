@@ -14,5 +14,6 @@ namespace Password_Manager.ViewModels
     {
         [ObservableProperty]
         public PageViewData _pageNames;
+
     }
 }

@@ -6,11 +6,14 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Password_Manager.Factory;
 using Password_Manager.Models;
+using Password_Manager.Services;
 using Password_Manager.ViewModels;
 using Password_Manager.Views;
 using Python.Runtime;
 using System;
+using System.CodeDom;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
@@ -32,20 +35,33 @@ namespace Password_Manager
             collections.AddTransient<SettingsPageViewModel>();
             collections.AddTransient<AccountPageViewModel>();
 
-            //Initialize Python
+
+            // Initialize Python
+            string baseDir = AppContext.BaseDirectory;
+            string pythonHome = Path.Combine(baseDir, "python-3.12.0-embed-amd64");
+            string pythonDll = Path.Combine(pythonHome, "python312.dll");
+
+            Runtime.PythonDLL = pythonDll;
+            PythonEngine.PythonHome = pythonHome;
+
+            // Append directory, not DLL
+            string currentPath = Environment.GetEnvironmentVariable("PATH");
+            Environment.SetEnvironmentVariable("PATH", currentPath + ";" + pythonHome);
+
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
 
             // Register auth service
-            collections.AddSingleton<Services.IAuthServices, Services.AuthServices>();
+            collections.AddTransient<Services.IAuthServices, Services.AuthServices>();
 
-            collections.AddSingleton<Func<PageViewData, PageViewModel>>(x => Name => Name switch
+            collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
             {
-                PageViewData.Home => x.GetRequiredService<HomePageViewModel>(),
-                PageViewData.All_Entries => x.GetRequiredService<All_EntriesPageViewModel>(),
-                PageViewData.Security => x.GetRequiredService<SecurityPageViewModel>(),
-                PageViewData.Settings => x.GetRequiredService<SettingsPageViewModel>(),
-                PageViewData.Accounts => x.GetRequiredService<AccountPageViewModel>()
+                _ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
+                _ when type == typeof(All_EntriesPageViewModel) => x.GetRequiredService<All_EntriesPageViewModel>(),
+                _ when type == typeof(SecurityPageViewModel) => x.GetRequiredService<SecurityPageViewModel>(),
+                _ when type == typeof(SettingsPageViewModel) => x.GetRequiredService<SettingsPageViewModel>(),
+                _ when type == typeof(AccountPageViewModel) => x.GetRequiredService<AccountPageViewModel>(),
+                _ => throw new NotImplementedException()
             });
 
             collections.AddSingleton<PageFactory>();

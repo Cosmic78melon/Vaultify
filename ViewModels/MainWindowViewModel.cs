@@ -2,25 +2,74 @@
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Factory;
 using Password_Manager.Services;
+using System.Diagnostics;
+using System;
 using System.Xml.Serialization;
 
 namespace Password_Manager.ViewModels
 {
     enum iconSize
     {
-        Small = 50, Large = 100
+        Small = 13, Large = 22
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private IAuthServices _authServices;
+
+        [ObservableProperty] private string _userName;
+        [ObservableProperty] private string _password;
+        [ObservableProperty] private string _statusMessage;
+        [ObservableProperty] private string _colorsC;
+        [ObservableProperty] private bool _bg_OP = true;
+        [ObservableProperty] private bool _bg_POP = true;
+
+        const string Dummy_user = "admin";
+        const string Dummy_password = "admin";
+
+        [RelayCommand]
+        public void Register()
+        {
+            _authServices = new AuthServices();
+        }
+
+        [RelayCommand]
+        public void LoginCommand()
+        {
+            StatusMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password))
+            {
+                StatusMessage = "Please enter both username and password.";
+                Debug.WriteLine("Login failed: Empty credentials.");
+                ColorsC = "red";
+                return;
+            }
+
+            // Dummy login logic
+            if (UserName.Equals(Dummy_user, StringComparison.OrdinalIgnoreCase) && Password == Dummy_password)
+            {
+                StatusMessage = "Login successful!";
+                Debug.WriteLine($"Login successful for user: {UserName}");
+                Bg_OP = false;
+                Bg_POP = false;
+                ColorsC = "green";
+                // You can add navigation or other logic here upon successful login
+            }
+            StatusMessage = "Invalid username or password.";
+            Debug.WriteLine("Login failed: Invalid credentials.");
+            ColorsC = "red";
+        }
+
         public PageFactory _pageFactory;
-        private AuthResult _authResult;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
+        [NotifyPropertyChangedFor(nameof(SeacrhbarSize))]
         public bool _isExpanded = true;
 
         public int IconSize => (IsExpanded == true) ? (int)iconSize.Large : (int)(iconSize.Small);
 
+        public int SeacrhbarSize => (IsExpanded) ? 220 : 70;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HomePageActive))]
@@ -39,7 +88,7 @@ namespace Password_Manager.ViewModels
 
         public MainWindowViewModel()
         {
-            _currentPage = new HomePageViewModel();
+            CurrentPage = new HomePageViewModel();
         }
         public MainWindowViewModel(PageFactory pageFactory)
         {
@@ -51,28 +100,28 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public void GoToHome()
         {
-            CurrentPage = _pageFactory.GetPageViewModel(Models.PageViewData.Home);
+            CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>();
         }  
 
         [RelayCommand]
         public void GoToAll_Entries()
         {
-            CurrentPage = _pageFactory.GetPageViewModel(Models.PageViewData.All_Entries);
+            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>();
         } 
         [RelayCommand]
         public void GoToSecurity()
         {
-            CurrentPage = _pageFactory.GetPageViewModel(Models.PageViewData.Security);
+            CurrentPage = _pageFactory.GetPageViewModel<SecurityPageViewModel>();
         } 
         [RelayCommand]
         public void GoToSettings()
         {
-            CurrentPage = _pageFactory.GetPageViewModel(Models.PageViewData.Settings);
+            CurrentPage = _pageFactory.GetPageViewModel<SettingsPageViewModel>();
         } 
         [RelayCommand]
         public void GoToAccounts()
         {
-            CurrentPage = _pageFactory.GetPageViewModel(Models.PageViewData.Accounts);
+            CurrentPage = _pageFactory.GetPageViewModel<AccountPageViewModel>();
         }        
         [RelayCommand]
         public void SideMenuResize()

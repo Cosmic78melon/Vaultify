@@ -22,7 +22,7 @@
 	  <SolidColorBrush x:Key="Primary_Seperator_Color">Wheat</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Button_Background">Transparent</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Button_Foreground">White</SolidColorBrush>
-	  <SolidColorBrush x:Key="Hover_Button_Background">Orange</SolidColorBrush>
+	  <SolidColorBrush x:Key="Hover_Button_Background">#FF8C00</SolidColorBrush>
       <SolidColorBrush x:Key="Card_Color">#262a2b</SolidColorBrush>
 
       <FontFamily x:Key="Fonts">Cooper Black,Forte,Calibri,Bahnschrift SemiBold, ArialBlack</FontFamily>

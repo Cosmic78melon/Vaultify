@@ -43,6 +43,9 @@
         <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
         <Setter Property="FontSize" Value="20"></Setter>
         <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+        <Setter Property="CornerRadius" Value="8"></Setter>
     </Style>
 
     <Style Selector="Button.active:pointerover/template/ContentPresenter">
@@ -73,7 +76,7 @@
 		<Setter Property="Opacity" Value="460"></Setter>
     </Style>
 
-    <Style Selector="CheckBox">
+    <Style Selector=":is(Button).CheckBoxP">
 		<Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
     </Style>
     <Style Selector="CheckBox:pointerover/template/ContentPresenter">
@@ -90,5 +93,18 @@
 		<Setter Property="Height" Value="260"></Setter>
 		<Setter Property="Width" Value="1"></Setter>
 		<Setter Property="Margin" Value="0,05,0,0"></Setter>
+    </Style>
+
+
+    <Style Selector="Button.Vault">
+		<Setter Property="Background" Value="{DynamicResource Primary_Button_Background}"></Setter>
+		<Setter Property="BorderBrush" Value="#FF8C00"></Setter>
+		<Setter Property="BorderThickness" Value="2"></Setter>
+		<Setter Property="FontSize" Value="19"></Setter>
+		<Setter Property="FontWeight" Value="SemiBold"></Setter>
+		<Setter Property="Foreground" Value="Orange"></Setter>
+		<Setter Property="Padding" Value="28,12"></Setter>
+		<Setter Property="Height" Value="48"></Setter>
+		<Setter Property="CornerRadius" Value="0"></Setter>
     </Style>
 </Styles>

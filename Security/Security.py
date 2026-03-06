@@ -3,9 +3,13 @@ import os
 import secrets 
 import argparse
 import requests 
+import urllib.error
+import urllib.request
+import socket
 import random, string 
 from dotenv import load_dotenv 
 import pwnedpasswords as pwend
+
 load_dotenv() 
 
 class PasswordManager: 
@@ -15,10 +19,12 @@ class PasswordManager:
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
         self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
-                                                                                                          "hasDigits": None, "hasPunc": None, "isLong": None}}
-        self.Pure_Random_Ints = self._randomNumGen(700,0, 9999)
+                                                                                                          "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
+        self.min = 0
+        self.max = 9999
+        self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
         
-    def Check_Password(self, Password = None):
+    def Check_Password(self, Password = None) -> None: 
         """
         This function Checks is the password is strong or not by looking at how many characters does this have enough letters or char ect.
         and also this function checks is the password brached or not so we can ensure full safety of the password
@@ -51,8 +57,8 @@ class PasswordManager:
             if pwend.check(Password, timeout=22):
                 self.TestResult["Cause"]["Breached"] = True
                 return self.TestResult[80]
-        except TimeoutError as e:
-            return self.TestResult[2]
+        except Exception as e:
+            self.TestResult["Cause"]["Errors"] = e
 
         if not has_uppercase_letters:
             self.TestResult["Cause"]["hasUppercase"] = False
@@ -79,16 +85,23 @@ class PasswordManager:
         "hasLowercase": True,
         "hasDigits": True,
         "hasPunc": True,
-        "isLong": True
+        "isLong": True,
+        "Errors": None
     }
         return self.TestResult[0]
         
-    def GeneratePass(self): 
+    def GeneratePass(self) -> str | None: 
         if self.shouldGeneratePass == True:
             if (self.Length) < 12:
                 return "Invalid Lenght. It must be greater than 12"
+
+            if (self.Pure_Random_Ints) == None:
+                rand = secrets.SystemRandom(10) 
+                randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
+            else:
+                randoms = self.Pure_Random_Ints
             
-            random_num = str(secrets.choice(self.Pure_Random_Ints))
+            random_num = str(secrets.choice(randoms))
             alpha_char = string.ascii_letters + random_num + string.punctuation 
             run = True
             while run:
@@ -98,12 +111,18 @@ class PasswordManager:
                     run = False
                     return password
                 
-    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc):
+    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str | None:
         if self.shouldGeneratePass == True:
             if (self.Length) < 12:
                 return "Invalid Lenght. It must be greater than 12"
+
+            if (self.Pure_Random_Ints) == None:
+                rand = secrets.SystemRandom(10) 
+                randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
+            else:
+                randoms = self.Pure_Random_Ints
             
-            random_num = ''.join(str(x) for x in random.sample(self.Pure_Random_Ints, k=min(self.Length, len(self.Pure_Random_Ints))))
+            random_num = ''.join(str(x) for x in random.sample(randoms, k=min(self.Length, len(randoms))))
             if (hasLetters and hasNumber and hasPunc) == True:
                result = self.GeneratePass()
                return result
@@ -121,7 +140,7 @@ class PasswordManager:
             return password
                     
             
-    def _randomNumGen(self, num: int, min: int, max: int) -> list: 
+    def _randomNumGen(self, num: int, min: int, max: int) -> list[int] | None: 
         """Generates Random numbers purely because the random numbers are genrated by the atmospheric noise 
             Even if the the atmospheric the noise api don't work it will still give pure noise because than it will generate 
             number beacause it will generate number by looking the system noise which is also purely random
@@ -129,23 +148,30 @@ class PasswordManager:
             Status: ✔Complete
         """
         keys = os.getenv("API_KEY") 
-        url = "https://api.random.org/json-rpc/2/invoke" 
-        payload = { "jsonrpc": "2.0", "method": "generateIntegers", "params": { "apiKey": keys, "n": num, "min": min, "max": max, "replacement": True }, "id": 1 } 
-        try:
-            response = requests.post(url, json=payload)
-        except response.Timeout as e:
-            rand = secrets.SystemRandom(num) 
-            data = [rand.randrange(min, max) for _ in range(num)]
-            return data 
+        url = "https://api.random.org/json-rpc/2/invoke"
+        payload = { "jsonrpc": "2.0", "method": "generateIntegers", "params": { "apiKey": keys, "n": num, "min": min, "max": max, "replacement": True }, "id": 1}
+        
+        try: 
+            response = requests.post(url, json=payload, timeout=22)
+            response.raise_for_status()
             
-        data = response.json() 
-        if response.status_code == 200 and "error" not in data: 
-            return data["result"]["random"]["data"]
+            data = response.json() 
             
-        rand = secrets.SystemRandom(num) 
-        data = [rand.randrange(min, max) for _ in range(num)]
-        return data 
+            if response.status_code == 200 and "error" not in data: 
+                return data["result"]["random"]["data"]
+            else:
+                rand = secrets.SystemRandom() 
+                data = [rand.randrange(min, max +1) for _ in range(num)]
+                return data
+        except Exception as e:
+            self.TestResult["Cause"]["Errors"] = e
+            rand = secrets.SystemRandom() 
             
+            data = []
+            for _ in range(num):
+                data.append(rand.randrange(min, max +1))
+                
+            return data
 
 # Command Line Utility for debugging purposes
 def main():
@@ -202,4 +228,7 @@ def main():
         
         
 if __name__ == "__main__":
-    main()
+    pw_1 = PasswordManager("netflix", None, True)
+    print(pw_1.GeneratePass())
+    print(pw_1.TestResult["Cause"]["Errors"])
+    

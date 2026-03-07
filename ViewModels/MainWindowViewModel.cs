@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Factory;
-using Password_Manager.Services;
 using System.Diagnostics;
 using System;
 using System.Xml.Serialization;
@@ -9,14 +8,12 @@ using System.Runtime.CompilerServices;
 
 namespace Password_Manager.ViewModels
 {
-    enum iconSize
+    enum IconSizeList
     {
         Small = 13, Large = 22
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private IAuthServices _authServices;
-
         [ObservableProperty] private string _userName;
         [ObservableProperty] private string _email;
         [ObservableProperty] private string _password;
@@ -95,7 +92,7 @@ namespace Password_Manager.ViewModels
         [NotifyPropertyChangedFor(nameof(SeacrhbarSize))]
         public bool _isExpanded = true;
 
-        public int IconSize => (IsExpanded == true) ? (int)iconSize.Large : (int)(iconSize.Small);
+        public int IconSize => (IsExpanded) ? (int)IconSizeList.Large : (int)IconSizeList.Small;
 
         public int SeacrhbarSize => (IsExpanded) ? 220 : 70;
 

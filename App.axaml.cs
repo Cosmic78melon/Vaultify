@@ -6,7 +6,6 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Password_Manager.Factory;
 using Password_Manager.Models;
-using Password_Manager.Services;
 using Password_Manager.ViewModels;
 using Password_Manager.Views;
 using Python.Runtime;
@@ -51,9 +50,6 @@ namespace Password_Manager
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
 
-            // Register auth service
-            collections.AddTransient<Services.IAuthServices, Services.AuthServices>();
-
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
             {
                 _ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
@@ -82,7 +78,7 @@ namespace Password_Manager
             base.OnFrameworkInitializationCompleted();
         }
 
-        private void DisableAvaloniaDataAnnotationValidation()
+        private static void DisableAvaloniaDataAnnotationValidation()
         {
             // Get an array of plugins to remove
             var dataValidationPluginsToRemove =

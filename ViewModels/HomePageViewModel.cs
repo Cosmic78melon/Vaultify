@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Password_Manager.Services;
 using Python.Runtime;
 using System;
 using System.Collections;
@@ -18,21 +17,21 @@ namespace Password_Manager.ViewModels
     {
         public class PasswordCheckDetails
         {
-            public string result { get; set; } = "Unknown";
+            public string Result { get; set; } = "Unknown";
             public bool? HasUppercase { get; set; }
             public bool? HasLowercase { get; set; }
             public bool? HasDigits { get; set; }
             public bool? HasPunctuation { get; set; }
             public bool? IsLongEnough { get; set; }
         }
-        private dynamic SecurityMod()
+        private static dynamic SecurityMod()
         {
             dynamic sys = Py.Import("sys");
             sys.path.append(Path.Combine(@"C:\Users\Digital Computer\Documents\Passord Manager\Password_Manager\Password Manager\Security\"));
             dynamic SecurityModule = Py.Import("Security");
             return SecurityModule;
         }
-        public object Generate_password(string site_name = null, int Length = 12)
+        public static object Generate_password(string site_name = null, int Length = 12)
         {
             using (Py.GIL())
             {
@@ -70,7 +69,7 @@ namespace Password_Manager.ViewModels
             var details = new PasswordCheckDetails();
             if (string.IsNullOrEmpty(Password))
             {
-                details.result = "No Password";
+                details.Result = "No Password";
                 return details;
             }
             using (Py.GIL())
@@ -79,7 +78,7 @@ namespace Password_Manager.ViewModels
                 try
                 {
                     using dynamic PwManger = SecurityModule.PasswordManager("Uknown", Password, false);
-                    details.result = PwManger.Check_Password();
+                    details.Result = PwManger.Check_Password();
                     PyObject testResultPy = PwManger.TestResult;
                     if (testResultPy != null && !testResultPy.IsNone())
                     {
@@ -97,7 +96,7 @@ namespace Password_Manager.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    details.result = ex.Message;
+                    details.Result = ex.Message;
                 }
                 return details;
             }
@@ -157,21 +156,21 @@ namespace Password_Manager.ViewModels
         {
             var python_helper = new PythonHelper();
             var details = python_helper.PassswordCheck(PasswordHaveToCheck);
-            if (string.Equals(details.result, "Strong", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.result;
+                Password_result = "Password Status: " + details.Result;
                 FontC = "green";
                 CheckChar(details);
             }
-            else if (string.Equals(details.result, "Weak", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(details.Result, "Weak", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.result;
+                Password_result = "Password Status: " + details.Result;
                 FontC = "red";
                 CheckChar(details);
             }
-            else if (string.Equals(details.result, "Breached", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(details.Result, "Breached", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.result;
+                Password_result = "Password Status: " + details.Result;
                 CheckChar(details);
                 FontC = "White";
             }
@@ -239,7 +238,7 @@ namespace Password_Manager.ViewModels
                 Islong = "❌ Not Long Enough";
                 Font5 = "red";
             }
-            if (string.Equals(details.result, "Breached", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(details.Result, "Breached", StringComparison.OrdinalIgnoreCase))
             {
                 HasUpper = HasLower = HasNum = HasPunc = Islong = null;
                 FontC = "White";

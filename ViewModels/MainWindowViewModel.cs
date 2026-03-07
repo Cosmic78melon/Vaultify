@@ -5,6 +5,7 @@ using Password_Manager.Services;
 using System.Diagnostics;
 using System;
 using System.Xml.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace Password_Manager.ViewModels
 {
@@ -17,19 +18,46 @@ namespace Password_Manager.ViewModels
         private IAuthServices _authServices;
 
         [ObservableProperty] private string _userName;
+        [ObservableProperty] private string _email;
         [ObservableProperty] private string _password;
+        [ObservableProperty] private string _confirmationPassword;
         [ObservableProperty] private string _statusMessage;
         [ObservableProperty] private string _colorsC;
         [ObservableProperty] private bool _bg_OP = true;
         [ObservableProperty] private bool _bg_POP = true;
 
+        [ObservableProperty] private bool _bg_OPSignUp = false;
+        [ObservableProperty] private bool _bg_POPSignUp = false;
+
         const string Dummy_user = "admin";
         const string Dummy_password = "admin";
+
+
+        [RelayCommand]
+        public void GotRegister()
+        {
+            Bg_OP = Bg_POP = false;
+            Bg_POPSignUp = Bg_OPSignUp = true;
+        }
+        [RelayCommand]
+        public void GotLogin()
+        {
+            Bg_OP = Bg_POP = true;
+            Bg_POPSignUp = Bg_OPSignUp = false;
+        }
 
         [RelayCommand]
         public void Register()
         {
-            _authServices = new AuthServices();
+            StatusMessage = string.Empty;
+            
+            if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
+            {
+                StatusMessage = "Please Enter your Credentials";
+                Debug.WriteLine("Sign Up failed");
+                ColorsC = "red";
+                return;
+            }
         }
 
         [RelayCommand]

@@ -34,7 +34,7 @@
                             VerticalAlignment="Center">
                    
                     <!-- Add New -->
-                    <Button Classes="Vault">
+                    <Button Classes="Vault" Command="{Binding AddnewPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Add" FontSize="20"/>
                             <TextBlock Text="Add new"/>
@@ -42,7 +42,7 @@
                     </Button>
                    
                     <!-- Share -->
-                    <Button Classes="Vault">
+                    <Button Classes="Vault" Command="{Binding SharePOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Share" FontSize="20"/>
                             <TextBlock Text="Share"/>
@@ -50,7 +50,7 @@
                     </Button>
                    
                     <!-- Change passwords -->
-                    <Button Classes="Vault">
+                    <Button Classes="Vault" Command="{Binding ChangePasswordPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="ArrowSync" FontSize="20"/>
                             <TextBlock Text="Change passwords"/>
@@ -405,7 +405,7 @@
         <!-- Dimming Overlay for Add New -->
         <!-- this is The New ADD Pop up window code -->
         <Border Grid.RowSpan="2" 
-                IsVisible="False"
+                IsVisible="{Binding AddnewOP}"
                 Background="#80000000"  
                 ZIndex="1000"/>
 
@@ -413,7 +413,7 @@
         <!-- this is The New ADD Pop up window code -->
         <Border Grid.RowSpan="2"
                 ZIndex="1001"
-                IsVisible="False"
+                IsVisible="{Binding AddnewPOP}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="#1A1A1A" 
@@ -424,11 +424,11 @@
                 <TextBlock Text="Add New Entry" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="Instructions: Enter details below." Foreground="#CCCCCC"/>
                 <TextBox Watermark="Name (e.g., example.com)" />
-                <TextBox Watermark="Email" />
-                <TextBox Watermark="Category" />
+                <TextBox Watermark="Passsword" />
+                <TextBox Watermark="Confirmaiton Passowrd" />
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
                     <Button Content="Save"/>
-                    <Button Content="Cancel"/>
+                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -437,13 +437,13 @@
         <!-- this is The Share button Pop up window code -->
         <Border Grid.RowSpan="2" 
                 Background="#80000000"  
-                IsVisible="false"
+                IsVisible="{Binding ShareOP}"
                 ZIndex="1000"/>
 
         <!-- Interactive Popup for Share (small "window" centered) -->
         <!-- this is The Share button Pop up window code -->
         <Border Grid.RowSpan="2"
-                IsVisible="False"
+                IsVisible="{Binding SharePOP}"
                 ZIndex="1001"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -455,11 +455,11 @@
                 <TextBlock Text="Share Entry" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="Instructions: Select sharing options below." Foreground="#CCCCCC"/>
                 <TextBox Watermark="Recipient Email" />
-                <CheckBox Content="Share Password" />
-                <CheckBox Content="Share Read-Only" />
+                <CheckBox Content="Share Password" Classes="CheckBoxP"/>
+                <CheckBox Content="Share Read-Only" Classes="CheckBoxP"/>
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
                     <Button Content="Share"/>
-                    <Button Content="Cancel"/>
+                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -468,13 +468,13 @@
         <!-- this is The CHange Passowrd Pop up window code -->
         <Border Grid.RowSpan="2" 
                 Background="#80000000"  
-                IsVisible="False"
+                IsVisible="{Binding ChangePasswordOP}"
                 ZIndex="1000"/>
 
         <!-- Interactive Popup for Change Passwords (small "window" centered) -->
         <!-- this is The CHange Passowrd Pop up window code -->
         <Border Grid.RowSpan="2"
-                IsVisible="False" 
+                IsVisible="{Binding ChangePasswordPOP}" 
                 ZIndex="1001"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -490,7 +490,7 @@
                 <TextBox Watermark="New Password" />
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
                     <Button Content="Update"/>
-                    <Button Content="Cancel"/>
+                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -10,6 +10,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Security.Policy;
 using System.Threading;
+using System.Threading.Tasks;
 using Tmds.DBus.Protocol;
 namespace Password_Manager.ViewModels
 {

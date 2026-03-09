@@ -6,3 +6,5 @@ Security/test.py
 obj/
 Assets/
 Security/__pycache__/
+*.json
+python-3.12.0-embed-amd64/

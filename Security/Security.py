@@ -1,14 +1,19 @@
 # Importing Important Libraries
 import os 
+import re
+import json
+import uuid
+import base64
+import random 
+import string 
 import secrets 
 import argparse
 import requests 
-import urllib.error
-import urllib.request
-import socket
-import random, string 
 from dotenv import load_dotenv 
 import pwnedpasswords as pwend
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 load_dotenv() 
 
@@ -23,6 +28,7 @@ class PasswordManager:
         self.min = 0
         self.max = 9999
         self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
+        self.path = "Security/test.json"
         
     def Check_Password(self, Password = None) -> None: 
         """
@@ -164,14 +170,104 @@ class PasswordManager:
                 data = [rand.randrange(min, max +1) for _ in range(num)]
                 return data
         except Exception as e:
-            self.TestResult["Cause"]["Errors"] = e
             rand = secrets.SystemRandom() 
-            
             data = []
             for _ in range(num):
                 data.append(rand.randrange(min, max +1))
-                
             return data
+        
+    def encryptAndStoredata(self, SecureNote = "Nothing"):  
+        if self.password is None:
+            return self.TestResult[-1]
+            
+        if not os.path.exists(self.path)or os.path.getsize(self.path) == 0:
+            with open(self.path , "w") as file:
+                json.dump({"Salt": None,"Credentials": []}, file,indent=10)
+        
+        with open(self.path) as file:
+            file_data = json.load(file)
+            
+            if file_data["Salt"] is None:
+                file_data["Salt"] = base64.urlsafe_b64encode(os.urandom(16)).decode()
+            
+            iteration = 299990
+            salt = base64.urlsafe_b64decode(file_data["Salt"])
+            kdf_derived_key, kdf = self._dereived_key(salt, iteration=iteration, password=self.password)
+            key = Fernet(kdf_derived_key)
+            
+            Id = str(uuid.uuid4())
+            credentials = self._EncJson(key, SecureNote)
+            
+            temp_kdf_type = str(type(kdf))
+            kdf_type = re.findall( r'\w+|[^\s\w]+', temp_kdf_type)[-2]
+            New_entry = {
+                "Id": Id,   
+                "KDF": str(kdf_type),
+                "iteration": iteration,
+                "Vault": base64.urlsafe_b64encode(credentials).decode()
+            }
+                            
+            file_data["Credentials"].append(New_entry)
+            file.seek(0)
+        with open(self.path, "w") as f:
+            json.dump(file_data, f, indent=10)
+            
+        return "Password and Secure Note saved"
+        
+    def _EncJson(self, key, message):
+        valut_data = {
+            "Site Name": self.site_name,
+            "Secure Note": str(message),
+            "Password": self.password
+        }
+        temp_json = json.dumps(valut_data).encode()
+        encrypted_json = key.encrypt(temp_json)
+        
+        return encrypted_json
+        
+    def _dereived_key(self, salt, iteration, password):
+        if self.password is None:
+            return self.TestResult[-1]
+        
+        kdf = PBKDF2HMAC(
+            hashes.SHA256(),
+            32,
+            salt = salt,
+            iterations=iteration
+        )
+        return base64.urlsafe_b64encode(kdf.derive(password.encode())), kdf
+        
+    
+    def decryptAndStoredata(self, id):
+        
+        if self.password is None:
+            return self.TestResult[-1]
+        
+        if self.path is None:
+            return "Invalid Path"
+        
+        with open(self.path) as file:
+            file_data = json.load(file)
+            
+            salt = base64.urlsafe_b64decode(file_data["Salt"])
+            for detail in file_data["Credentials"]:
+                try:
+                    if detail["Id"] == id:
+                        vault = base64.urlsafe_b64decode(detail["Vault"])
+                        iterration = detail["iteration"]
+                except Exception as e:
+                    return "Invalid Id"
+
+            key, _ = self._dereived_key(salt=salt, iteration=iterration, password=self.password)
+            f = Fernet(key=key)
+            
+            try:
+                decrypt_data = f.decrypt(vault).decode()
+                return decrypt_data, detail
+            except Exception as e:
+                return "Decryption failed: wrong password or corrupted data"
+            
+    
 
 # Command Line Utility for debugging purposes
 def main():
@@ -228,7 +324,4 @@ def main():
         
         
 if __name__ == "__main__":
-    pw_1 = PasswordManager("netflix", None, True)
-    print(pw_1.GeneratePass())
-    print(pw_1.TestResult["Cause"]["Errors"])
-    
+    main()

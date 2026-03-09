@@ -7,7 +7,7 @@ import base64
 import random 
 import string 
 import secrets 
-import argparse
+# import argparse
 import requests 
 from dotenv import load_dotenv 
 import pwnedpasswords as pwend
@@ -28,7 +28,7 @@ class PasswordManager:
         self.min = 0
         self.max = 9999
         self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
-        self.path = "Security/test.json"
+        self.path = os.path.join(os.getcwd(), "DataBase", "encrypted-data.json")
         
     def Check_Password(self, Password = None) -> None: 
         """
@@ -61,25 +61,25 @@ class PasswordManager:
 
         try:
             if pwend.check(Password, timeout=22):
-                self.TestResult["Cause"]["Breached"] = True
+                self.TestResult["Cause"]["Breached"] = True  # type: ignore
                 return self.TestResult[80]
         except Exception as e:
-            self.TestResult["Cause"]["Errors"] = e
+            self.TestResult["Cause"]["Errors"] = e# type: ignore
 
         if not has_uppercase_letters:
-            self.TestResult["Cause"]["hasUppercase"] = False
+            self.TestResult["Cause"]["hasUppercase"] = False# type: ignore
             weak = True
         if not has_lowercase_letters:
-            self.TestResult["Cause"]["hasLowercase"] = False
+            self.TestResult["Cause"]["hasLowercase"] = False# type: ignore
             weak = True
         if not has_digits:
-            self.TestResult["Cause"]["hasDigits"] = False
+            self.TestResult["Cause"]["hasDigits"] = False# type: ignore
             weak = True
         if not has_special_Character:
-            self.TestResult["Cause"]["hasPunc"] = False
+            self.TestResult["Cause"]["hasPunc"] = False# type: ignore
             weak = True
         if len(Password) < 12:
-            self.TestResult["Cause"]["isLong"] = False
+            self.TestResult["Cause"]["isLong"] = False# type: ignore
             weak = True
         
         if weak == True:
@@ -153,11 +153,19 @@ class PasswordManager:
             
             Status: ✔Complete
         """
-        keys = os.getenv("API_KEY") 
-        url = "https://api.random.org/json-rpc/2/invoke"
-        payload = { "jsonrpc": "2.0", "method": "generateIntegers", "params": { "apiKey": keys, "n": num, "min": min, "max": max, "replacement": True }, "id": 1}
-        
+        try:
+            keys = os.getenv("API_KEY") 
+        except Exception as e:
+            rand = secrets.SystemRandom() 
+            data = []
+            for _ in range(num):
+                data.append(rand.randrange(min, max +1))
+            return data
+
         try: 
+            url = "https://api.random.org/json-rpc/2/invoke"
+            payload = { "jsonrpc": "2.0", "method": "generateIntegers", "params": { "apiKey": keys, "n": num, "min": min, "max": max, "replacement": True }, "id": 1}
+            
             response = requests.post(url, json=payload, timeout=22)
             response.raise_for_status()
             
@@ -179,8 +187,9 @@ class PasswordManager:
     def encryptAndStoredata(self, SecureNote = "Nothing"):  
         if self.password is None:
             return self.TestResult[-1]
+        
             
-        if not os.path.exists(self.path)or os.path.getsize(self.path) == 0:
+        if not os.path.exists(self.path) or os.path.getsize(self.path) == 0:
             with open(self.path , "w") as file:
                 json.dump({"Salt": None,"Credentials": []}, file,indent=10)
         
@@ -209,7 +218,7 @@ class PasswordManager:
                             
             file_data["Credentials"].append(New_entry)
             file.seek(0)
-        with open(self.path, "w") as f:
+        with open(self.path, "w", encoding="utf-8") as f:
             json.dump(file_data, f, indent=10)
             
         return "Password and Secure Note saved"
@@ -239,7 +248,6 @@ class PasswordManager:
         
     
     def decryptAndStoredata(self, id):
-        
         if self.password is None:
             return self.TestResult[-1]
         
@@ -270,58 +278,60 @@ class PasswordManager:
     
 
 # Command Line Utility for debugging purposes
-def main():
-    parser = argparse.ArgumentParser(description="how the password managers CLI work")
-    parser.add_argument("-d", "--demo", action="store_true",help="show demo of all features")
-    parser.add_argument("--generate", action="store_true", help="Generate new password")
-    parser.add_argument("-l", "--length", type=int, default=12,help="password length when generating (default: 12)")
-    parser.add_argument("-c", "--check",type=str,help="Check password strength password strenght", nargs=1)
-    parser.add_argument("-s", "--site", type=str, default="Unknown", help="Name of the site", nargs="?")
-    parser.add_argument("--version", action="version",version="Password Manager -> 1.1.0")
+# def main():
+#     parser = argparse.ArgumentParser(description="how the password managers CLI work")
+#     parser.add_argument("-d", "--demo", action="store_true",help="show demo of all features")
+#     parser.add_argument("--generate", action="store_true", help="Generate new password")
+#     parser.add_argument("-l", "--length", type=int, default=12,help="password length when generating (default: 12)")
+#     parser.add_argument("-c", "--check",type=str,help="Check password strength password strenght", nargs=1)
+#     parser.add_argument("-s", "--site", type=str, default="Unknown", help="Name of the site", nargs="?")
+#     parser.add_argument("--version", action="version",version="Password Manager -> 1.1.0")
     
-    args = parser.parse_args()
-    if args.demo:
-        print()
-        print("-------------------------------------------------")
-        print("|| Illustrating how the password manager works ||")
-        print("-------------------------------------------------")
-        print()
-        print("Use --generate or --check")
-        print("!!!Make sure you are using the latest Version!!!")
-        print("Example:")
-        print("  python password_manager.py --generate --length 20 --site netflix")
-        print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
-        pw = PasswordManager("Password Manager CO.", "password123", True, 17)
-        print(f"Site Name: {pw.site_name}")
-        print(f"Password: {pw.password} and the length: {pw.Length}")
-        print(f"Password Status: {pw.Check_Password()}")
-        print("As we can see this password is not strong so what we can do 🤔??😋 We can use the built in password generator")
-        print(f"Generated Password: {pw.GeneratePass()}")
-        print()
-    elif args.generate:
-        pw = PasswordManager(args.site, shouldGeneratePass=True, Password_Length=args.length)
-        print(f"{pw.site_name}'s password is {pw.GeneratePass()}")
+#     args = parser.parse_args()
+#     if args.demo:
+#         print()
+#         print("-------------------------------------------------")
+#         print("|| Illustrating how the password manager works ||")
+#         print("-------------------------------------------------")
+#         print()
+#         print("Use --generate or --check")
+#         print("!!!Make sure you are using the latest Version!!!")
+#         print("Example:")
+#         print("  python password_manager.py --generate --length 20 --site netflix")
+#         print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
+#         pw = PasswordManager("Password Manager CO.", "password123", True, 17)
+#         print(f"Site Name: {pw.site_name}")
+#         print(f"Password: {pw.password} and the length: {pw.Length}")
+#         print(f"Password Status: {pw.Check_Password()}")
+#         print("As we can see this password is not strong so what we can do 🤔??😋 We can use the built in password generator")
+#         print(f"Generated Password: {pw.GeneratePass()}")
+#         print()
+#     elif args.generate:
+#         pw = PasswordManager(args.site, shouldGeneratePass=True, Password_Length=args.length)
+#         print(f"{pw.site_name}'s password is {pw.GeneratePass()}")
         
-    elif args.check:
-        password_toCheck = "".join([_ for _ in args.check])
-        pw = PasswordManager(args.site, password_toCheck, False, args.length)
-        pw.Check_Password()
-        if pw.TestResult["Cause"]["Breached"] == True:
-            print(f"Password is {pw.Check_Password()}")
-        else:
-            print(f"Password is {pw.Check_Password()} Details: {pw.TestResult["Cause"]}")
+#     elif args.check:
+#         password_toCheck = "".join([_ for _ in args.check])
+#         pw = PasswordManager(args.site, password_toCheck, False, args.length)
+#         pw.Check_Password()
+#         if pw.TestResult["Cause"]["Breached"] == True:
+#             print(f"Password is {pw.Check_Password()}")
+#         else:
+#             print(f"Password is {pw.Check_Password()} Details: {pw.TestResult["Cause"]}")
     
-    else:
-        print()
-        print("Use --generate or --check")
-        print("!!!Make sure you are using the latest Version!!!")
-        print("Example:")
-        print("  python password_manager.py --generate --length 20 --site netflix")
-        print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
-        print("-----------------------------------------------------------------------------------------------------")
-        parser.print_help()
-        print()
+#     else:
+#         print()
+#         print("Use --generate or --check")
+#         print("!!!Make sure you are using the latest Version!!!")
+#         print("Example:")
+#         print("  python password_manager.py --generate --length 20 --site netflix")
+#         print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
+#         print("-----------------------------------------------------------------------------------------------------")
+#         parser.print_help()
+#         print()
         
         
 if __name__ == "__main__":
-    main()
+    pw_1 = PasswordManager("Netfilx", "findout the password", False, 32)
+    detail, _ = pw_1.decryptAndStoredata("5b5d1dc5-83b9-49d0-9b9d-c2430a9fcf14")
+    

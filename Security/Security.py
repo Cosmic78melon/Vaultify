@@ -6,8 +6,7 @@ import uuid
 import base64
 import random 
 import string 
-import secrets 
-# import argparse
+import secrets
 import requests 
 from dotenv import load_dotenv 
 import pwnedpasswords as pwend
@@ -32,6 +31,7 @@ class PasswordManager:
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
         self.min = 0
         self.max = 9999
+        self.iteration = 299990
         self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
         self.path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "DataBase", "encrypted-data.json")
         
@@ -203,10 +203,9 @@ class PasswordManager:
             
             if file_data["Salt"] is None:
                 file_data["Salt"] = base64.urlsafe_b64encode(os.urandom(16)).decode()
-            
-            iteration = 299990
+
             salt = base64.urlsafe_b64decode(file_data["Salt"])
-            kdf_derived_key, kdf = self._dereived_key(salt, iteration=iteration, password=self.password)
+            kdf_derived_key, kdf = self._derived_key(salt, iteration = self.iteration, password = self.password)
             key = Fernet(kdf_derived_key)
             
             Id = str(uuid.uuid4())
@@ -217,7 +216,7 @@ class PasswordManager:
             New_entry = {
                 "Id": Id,   
                 "KDF": str(kdf_type),
-                "iteration": iteration,
+                "iteration": self.iteration,
                 "Vault": base64.urlsafe_b64encode(credentials).decode()
             }
                             
@@ -226,7 +225,7 @@ class PasswordManager:
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(file_data, f, indent=10)
             
-        return "Password and Secure Note saved"
+        return "Password and Secure Note saved", Id
         
     def _EncJson(self, key, message):
         valut_data = {
@@ -238,10 +237,13 @@ class PasswordManager:
         encrypted_json = key.encrypt(temp_json)
         
         return encrypted_json
-        
-    def _dereived_key(self, salt, iteration, password):
+
+    def _derived_key(self, salt, iteration, password):
         if self.password is None:
-            return self.TestResult[-1]
+            return self.TestResult[-1], None
+
+        if salt is None:
+            return "Invalid Salt", None
         
         kdf = PBKDF2HMAC(
             hashes.SHA256(),
@@ -252,92 +254,36 @@ class PasswordManager:
         return base64.urlsafe_b64encode(kdf.derive(password.encode())), kdf
         
     
-    def decryptAndStoredata(self, id):
+    def decryptAndStoredata(self, id = None):
         if self.password is None:
-            return self.TestResult[-1]
+            return self.TestResult[-1], None
         
-        if self.path is None:
-            return "Invalid Path"
-        
+        if not os.path.exists(self.path) or os.path.getsize(self.path) < 50:
+            return "Invalid Path", None
+
+        if id is None:
+            return "Please enter a Id", None
+
         with open(self.path) as file:
             file_data = json.load(file)
             
             salt = base64.urlsafe_b64decode(file_data["Salt"])
             for detail in file_data["Credentials"]:
-                try:
-                    if detail["Id"] == id:
-                        vault = base64.urlsafe_b64decode(detail["Vault"])
-                        iterration = detail["iteration"]
-                except Exception as e:
-                    return "Invalid Id"
+                if id == detail["Id"]:
+                    vault = base64.urlsafe_b64decode(detail["Vault"])
+                    iterration = detail["iteration"]
+                    key, _ = self._derived_key(salt=salt, iteration = iterration, password=self.password)
+                    f = Fernet(key=key)
 
-            key, _ = self._dereived_key(salt=salt, iteration=iterration, password=self.password)
-            f = Fernet(key=key)
-            
-            try:
-                decrypt_data = f.decrypt(vault).decode()
-                return decrypt_data, detail
-            except Exception as e:
-                return "Decryption failed: wrong password or corrupted data", None
-            
-    
-
-# Command Line Utility for debugging purposes
-# def main():
-#     parser = argparse.ArgumentParser(description="how the password managers CLI work")
-#     parser.add_argument("-d", "--demo", action="store_true",help="show demo of all features")
-#     parser.add_argument("--generate", action="store_true", help="Generate new password")
-#     parser.add_argument("-l", "--length", type=int, default=12,help="password length when generating (default: 12)")
-#     parser.add_argument("-c", "--check",type=str,help="Check password strength password strenght", nargs=1)
-#     parser.add_argument("-s", "--site", type=str, default="Unknown", help="Name of the site", nargs="?")
-#     parser.add_argument("--version", action="version",version="Password Manager -> 1.1.0")
-    
-#     args = parser.parse_args()
-#     if args.demo:
-#         print()
-#         print("-------------------------------------------------")
-#         print("|| Illustrating how the password manager works ||")
-#         print("-------------------------------------------------")
-#         print()
-#         print("Use --generate or --check")
-#         print("!!!Make sure you are using the latest Version!!!")
-#         print("Example:")
-#         print("  python password_manager.py --generate --length 20 --site netflix")
-#         print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
-#         pw = PasswordManager("Password Manager CO.", "password123", True, 17)
-#         print(f"Site Name: {pw.site_name}")
-#         print(f"Password: {pw.password} and the length: {pw.Length}")
-#         print(f"Password Status: {pw.Check_Password()}")
-#         print("As we can see this password is not strong so what we can do 🤔??😋 We can use the built in password generator")
-#         print(f"Generated Password: {pw.GeneratePass()}")
-#         print()
-#     elif args.generate:
-#         pw = PasswordManager(args.site, shouldGeneratePass=True, Password_Length=args.length)
-#         print(f"{pw.site_name}'s password is {pw.GeneratePass()}")
-        
-#     elif args.check:
-#         password_toCheck = "".join([_ for _ in args.check])
-#         pw = PasswordManager(args.site, password_toCheck, False, args.length)
-#         pw.Check_Password()
-#         if pw.TestResult["Cause"]["Breached"] == True:
-#             print(f"Password is {pw.Check_Password()}")
-#         else:
-#             print(f"Password is {pw.Check_Password()} Details: {pw.TestResult["Cause"]}")
-    
-#     else:
-#         print()
-#         print("Use --generate or --check")
-#         print("!!!Make sure you are using the latest Version!!!")
-#         print("Example:")
-#         print("  python password_manager.py --generate --length 20 --site netflix")
-#         print("  python password_manager.py --check 'MyP@ssw0rd123'\n")
-#         print("-----------------------------------------------------------------------------------------------------")
-#         parser.print_help()
-#         print()
-        
+                    try:
+                        decrypt_data = f.decrypt(vault).decode()
+                        return decrypt_data, detail
+                    except Exception as e:
+                        return "Decryption failed: wrong password or corrupted data", None
+            return "Invalid Id", None
         
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netfilx", "findout the password", False, 32)
-    detail, _ = pw_1.decryptAndStoredata("5b5d1dc5-83b9-49d0-9b9d-c2430a9fcf14")
-    print(detail)
+    pw_1 = PasswordManager("Netfilx", "adol", False, 32)
+    Status, Id = pw_1.encryptAndStoredata("Important security 😤 Message")
+    vault, details = pw_1.decryptAndStoredata("75ecd09a-2014-4b70-8b43-efa87a6cdb69")
     

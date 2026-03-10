@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Password_Manager.ViewModels
 {
-    public partial class All_EntriesPageViewModel: PageViewModel
+    public partial class All_EntriesPageViewModel : PageViewModel
     {
         [ObservableProperty] private bool _addnewOP = false;
         [ObservableProperty] private bool _addnewPOP = false;
@@ -42,6 +44,24 @@ namespace Password_Manager.ViewModels
         public void CancelButton()
         {
             AddnewOP = AddnewPOP = ShareOP = SharePOP = ChangePasswordOP = ChangePasswordPOP = false;
+        }
+
+        private ObservableCollection<string> _items;
+
+        public ObservableCollection<string> Items
+        {
+            get { return _items; }
+            set { SetProperty(ref _items, value); }
+        }
+
+        public All_EntriesPageViewModel()
+        {
+            Items = new ObservableCollection<string>
+            {
+                "Item 1",
+                "Item 2",
+                "Item 3"
+            };
         }
     }
 }

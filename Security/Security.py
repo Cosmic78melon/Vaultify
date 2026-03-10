@@ -17,10 +17,15 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 load_dotenv() 
 
-class PasswordManager: 
-    def __init__(self, site_name: str = "Unknown", password = None, shouldGeneratePass: bool = False, Password_Length: int = 12): 
+class PasswordManager:
+    def __init__(self,
+                 site_name: str = "Unknown",
+                 password: str = None,
+                 shouldGeneratePass: bool = False,
+                 Password_Length: int = 12):
+
         self.password = password 
-        self.site_name = site_name 
+        self.site_name = site_name
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
         self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
@@ -28,9 +33,9 @@ class PasswordManager:
         self.min = 0
         self.max = 9999
         self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
-        self.path = os.path.join(os.getcwd(), "DataBase", "encrypted-data.json")
+        self.path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "DataBase", "encrypted-data.json")
         
-    def Check_Password(self, Password = None) -> None: 
+    def Check_Password(self, Password = None) -> None:
         """
         This function Checks is the password is strong or not by looking at how many characters does this have enough letters or char ect.
         and also this function checks is the password brached or not so we can ensure full safety of the password
@@ -273,7 +278,7 @@ class PasswordManager:
                 decrypt_data = f.decrypt(vault).decode()
                 return decrypt_data, detail
             except Exception as e:
-                return "Decryption failed: wrong password or corrupted data"
+                return "Decryption failed: wrong password or corrupted data", None
             
     
 
@@ -334,4 +339,5 @@ class PasswordManager:
 if __name__ == "__main__":
     pw_1 = PasswordManager("Netfilx", "findout the password", False, 32)
     detail, _ = pw_1.decryptAndStoredata("5b5d1dc5-83b9-49d0-9b9d-c2430a9fcf14")
+    print(detail)
     

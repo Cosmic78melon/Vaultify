@@ -1,16 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Python.Runtime;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Text;
+﻿using System;
 using System.IO;
-using System.Security.Policy;
+using Python.Runtime;
 using System.Threading;
+using System.Reflection;
+using System.Diagnostics;
+using System.Collections;
 using System.Threading.Tasks;
-using Tmds.DBus.Protocol;
+using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Reflection;
+
+
 namespace Password_Manager.ViewModels
 {
     public class PythonHelper
@@ -27,7 +28,10 @@ namespace Password_Manager.ViewModels
         private static dynamic SecurityMod()
         {
             dynamic sys = Py.Import("sys");
-            sys.path.append(Path.Combine(@"C:\Users\Digital Computer\Documents\Passord Manager\Password_Manager\Password Manager\Security\"));
+            dynamic os = Py.Import("os");
+            string cwd = os.getcwd();
+            string parent = os.path.abspath(os.path.join(cwd, os.pardir, os.pardir, os.pardir));
+            sys.path.append(Path.Combine(parent, "Security"));
             dynamic SecurityModule = Py.Import("Security");
             return SecurityModule;
         }
@@ -38,7 +42,7 @@ namespace Password_Manager.ViewModels
                 dynamic SecurityModule = SecurityMod();
                 try
                 {
-                    using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
+                    dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
                     dynamic result = PwManager.GeneratePass();
                     return result;
                 }
@@ -117,6 +121,7 @@ namespace Password_Manager.ViewModels
             }
         }
     }
+
     public partial class HomePageViewModel : PageViewModel
     {
 
@@ -144,18 +149,20 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _font3 = "White";
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
+        dynamic python_helper = new PythonHelper();
+
+
         [RelayCommand]
-        public void GeneratePassword()
+        public async Task GeneratePassword()
         {
-            var python_helper = new PythonHelper();
-            object result = python_helper.CustomeGen(has_Letter: HasLetterCase, hasNum: HasNumCase, hasPunc: HasPuncCase, Length: Lenght);
+            object result = await Task.Run(() => python_helper.CustomeGen(has_Letter: HasLetterCase, hasNum: HasNumCase, hasPunc: HasPuncCase, Length: Lenght));
             PasswordGenerator = result?.ToString() ?? string.Empty;
         }
+
         [RelayCommand]
-        public void PasswordChecker()
+        public async Task PasswordChecker()
         {
-            var python_helper = new PythonHelper();
-            var details = python_helper.PassswordCheck(PasswordHaveToCheck);
+            var details = await Task.Run(() => python_helper.PassswordCheck(PasswordHaveToCheck));
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 Password_result = "Password Status: " + details.Result;

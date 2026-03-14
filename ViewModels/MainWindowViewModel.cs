@@ -10,7 +10,7 @@ namespace Password_Manager.ViewModels
 {
     enum IconSizeList
     {
-        Small = 13, Large = 22
+        Small = 10, Large = 22
     }
     public partial class MainWindowViewModel : ViewModelBase
     {

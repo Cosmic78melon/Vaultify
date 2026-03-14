@@ -28,14 +28,16 @@ class PasswordManager:
         self.Length = Password_Length
         self.shouldGeneratePass = shouldGeneratePass 
         self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None, 
-                                                                                                          "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
+                                                                                                  "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
+
+        # This is are Constants that are not supposed to control by users
         self.min = 0
         self.max = 9999
         self.iteration = 299990
         self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
         self.path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), "DataBase", "encrypted-data.json")
         
-    def Check_Password(self, Password = None) -> None:
+    def Check_Password(self, Password = None) -> str | dict[str, None]:
         """
         This function Checks is the password is strong or not by looking at how many characters does this have enough letters or char ect.
         and also this function checks is the password brached or not so we can ensure full safety of the password
@@ -66,25 +68,25 @@ class PasswordManager:
 
         try:
             if pwend.check(Password, timeout=22):
-                self.TestResult["Cause"]["Breached"] = True  # type: ignore
+                self.TestResult["Cause"]["Breached"] = True  
                 return self.TestResult[80]
         except Exception as e:
-            self.TestResult["Cause"]["Errors"] = e# type: ignore
+            self.TestResult["Cause"]["Errors"] = e
 
         if not has_uppercase_letters:
-            self.TestResult["Cause"]["hasUppercase"] = False# type: ignore
+            self.TestResult["Cause"]["hasUppercase"] = False
             weak = True
         if not has_lowercase_letters:
-            self.TestResult["Cause"]["hasLowercase"] = False# type: ignore
+            self.TestResult["Cause"]["hasLowercase"] = False
             weak = True
         if not has_digits:
-            self.TestResult["Cause"]["hasDigits"] = False# type: ignore
+            self.TestResult["Cause"]["hasDigits"] = False
             weak = True
         if not has_special_Character:
-            self.TestResult["Cause"]["hasPunc"] = False# type: ignore
+            self.TestResult["Cause"]["hasPunc"] = False
             weak = True
         if len(Password) < 12:
-            self.TestResult["Cause"]["isLong"] = False# type: ignore
+            self.TestResult["Cause"]["isLong"] = False
             weak = True
         
         if weak == True:
@@ -123,7 +125,7 @@ class PasswordManager:
                     return password
                 
     def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str | None:
-        if self.shouldGeneratePass == True:
+        if self.shouldGeneratePass:
             if (self.Length) < 12:
                 return "Invalid Lenght. It must be greater than 12"
 
@@ -149,11 +151,11 @@ class PasswordManager:
             
             password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
             return password
-                    
-            
+        return None
+
     def _randomNumGen(self, num: int, min: int, max: int) -> list[int] | None: 
         """Generates Random numbers purely because the random numbers are genrated by the atmospheric noise 
-            Even if the the atmospheric the noise api don't work it will still give pure noise because than it will generate 
+            Even if the atmospheric the noise api don't work it will still give pure noise because than it will generate
             number beacause it will generate number by looking the system noise which is also purely random
             
             Status: ✔Complete
@@ -189,7 +191,7 @@ class PasswordManager:
                 data.append(rand.randrange(min, max +1))
             return data
         
-    def encryptAndStoredata(self, SecureNote = "Nothing"):  
+    def encryptAndStoredata(self, SecureNote = "Nothing"):
         if self.password is None:
             return self.TestResult[-1]
         
@@ -278,12 +280,12 @@ class PasswordManager:
                     try:
                         decrypt_data = f.decrypt(vault).decode()
                         return decrypt_data, detail
-                    except Exception as e:
+                    except Exception:
                         return "Decryption failed: wrong password or corrupted data", None
             return "Invalid Id", None
         
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netfilx", "adol", False, 32)
+    pw_1 = PasswordManager("Netfilx", "You Password", False, 32)
     Status, Id = pw_1.encryptAndStoredata("Important security 😤 Message")
-    vault, details = pw_1.decryptAndStoredata("75ecd09a-2014-4b70-8b43-efa87a6cdb69")
+    vault, details = pw_1.decryptAndStoredata("Password vault Id")
     

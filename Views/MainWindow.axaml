@@ -135,11 +135,11 @@
             <StackPanel Spacing="10" HorizontalAlignment="Center">
                 <TextBlock Text="Login" Margin="200, 0, 220, 0" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="UserName or Email" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Name (e.g., example.com)" Text="{Binding UserName}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Name (e.g., example.com)" Text="{Binding UserName}"/>
                 <TextBlock Text="Passoword" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"></TextBlock>
-                    <Button HorizontalAlignment="Center"  Background="Orange" Content="Sign in" Command="{Binding LoginCommandCommand}"/>
+                    <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign in" Command="{Binding LoginCommandCommand}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">
                     <TextBlock Foreground="White" FontSize="20">Don't have an Account yet?</TextBlock>
                     <Button Background="Orange" Content="Go To Sing Up" Command="{Binding GotRegisterCommand}"/>
@@ -164,16 +164,16 @@
             <StackPanel Spacing="10" HorizontalAlignment="Center">
                 <TextBlock Text="Register Form" Margin="200, 0, 220, 0" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="UserName" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Cosmic_shalala etc." Text="{Binding UserName}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Cosmic_shalala etc." Text="{Binding UserName}"/>
                 <TextBlock Text="Email address" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Your Email" Text="{Binding Email}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Your Email" Text="{Binding Email}"/>
                 <TextBlock Text="Passoword" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
                 <TextBlock Text="Confirm Passoword" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Confirm Password" PasswordChar="*" Text="{Binding ConfirmationPassword}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Confirm Password" PasswordChar="*" Text="{Binding ConfirmationPassword}"/>
 
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"/>
-                <Button HorizontalAlignment="Center"  Background="Orange" Content="Sign Up" Command="{Binding RegisterCommand}"/>
+                <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign Up" Command="{Binding RegisterCommand}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">
                     <TextBlock Foreground="White" FontSize="20">Have an Account!!!</TextBlock>
                     <Button Background="Orange" Content="Got to Login page" Command="{Binding GotLoginCommand}"/>

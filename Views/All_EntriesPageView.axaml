@@ -79,72 +79,47 @@
                
                 <Grid>
                    
-                    <!-- Table Header -->
-                    <Grid Grid.Row="0"
-                          ColumnDefinitions="72,*,220,160,140,80"
-                          Height="56"
-                          Background="#222222"
-                          VerticalAlignment="Top">
-                       
-                        <!-- Icon Column -->
-                        <TextBlock Grid.Column="0"
-                                   Text=""
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   FontSize="14"
-                                   Foreground="#777777"/>
-                       
-                        <!-- Name -->
-                        <TextBlock Grid.Column="1"
-                                   Text="NAME"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#777777"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,0,0"/>
-                       
-                        <!-- Email (sub) -->
-                        <TextBlock Grid.Column="1"
-                                   Text=""
-                                   FontSize="14"
-                                   Foreground="#777777"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,0,0"/>
-                       
-                        <!-- Category -->
-                        <TextBlock Grid.Column="2"
-                                   Text="CATEGORY"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#777777"
-                                   VerticalAlignment="Center"/>
-                       
-                        <!-- Last Used -->
-                        <TextBlock Grid.Column="3"
-                                   Text="LAST USED"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#777777"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right"
-                                   Margin="0,0,32,0"/>
-                       
-                        <!-- Actions -->
-                        <TextBlock Grid.Column="4"
-                                   Text=""
-                                   FontSize="14"
-                                   Foreground="#777777"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right"
-                                   Margin="0,0,24,0"/>
-                       
-                    </Grid>
+                   <!-- Table Header -->
+<Grid Grid.Row="0"
+      ColumnDefinitions="*,*,*,*"
+      Height="56"
+      Background="#222222"
+      VerticalAlignment="Top">
+
+    <!-- Name -->
+    <TextBlock Grid.Column="0"
+               Text="NAME"
+               FontSize="14"
+               FontWeight="SemiBold"
+               Foreground="#777777"
+               VerticalAlignment="Center"
+               Margin="12,0,0,0"/>
+
+    <!-- Email -->
+    <TextBlock Grid.Column="2"
+               Text="Email"
+               FontSize="14"
+               Foreground="#777777"
+               VerticalAlignment="Center"/>
+
+    <!-- Category -->
+    <TextBlock Grid.Column="3"
+               Text="CATEGORY"
+               FontSize="14"
+               FontWeight="SemiBold"
+               Foreground="#777777"
+               VerticalAlignment="Center"/>
+
+</Grid>
                    
                     <!-- Scrollable Entries -->
                     <ListBox Grid.Row="1" Margin="0, 56, 0, 0" Background="#1A1A1A" ItemsSource="{Binding Items}">
                         <ListBox.ItemTemplate>
                           <DataTemplate>
-                              <TextBlock Text="{Binding}" Height="35" Foreground="White"/>
+                              <StackPanel Orientation="Horizontal" Spacing="470">
+                                <TextBlock Text="{Binding Title}" Height="35" Foreground="White"/>
+                                <TextBlock Text="{Binding Password}" Height="35" Foreground="White"/>
+                              </StackPanel>
                           </DataTemplate>
                         </ListBox.ItemTemplate>						
                     </ListBox>
@@ -170,16 +145,16 @@
                 Background="#1A1A1A" 
                 CornerRadius="16" 
                 Padding="20" 
-                Width="400" Height="300">
+                Width="500" Height="300">
             <StackPanel Spacing="10">
                 <TextBlock Text="Add New Entry" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="Instructions: Enter details below." Foreground="#CCCCCC"/>
                 <TextBox Watermark="Name (e.g., example.com)" />
                 <TextBox Watermark="Passsword" />
-                <TextBox Watermark="Confirmaiton Passowrd" />
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                    <Button Content="Save"/>
-                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                    <Button  Classes="Vault" Content="New Password"/>
+                    <Button  Classes="Vault" Content="Save"/>
+                    <Button  Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -188,8 +163,8 @@
         <!-- this is The Share button Pop up window code -->
         <Border Grid.RowSpan="2" 
                 Background="#80000000"  
-                IsVisible="{Binding ShareOP}"
-                ZIndex="1000"/>
+                ZIndex="1000"
+                IsVisible="{Binding ShareOP}"/>
 
         <!-- Interactive Popup for Share (small "window" centered) -->
         <!-- this is The Share button Pop up window code -->
@@ -209,8 +184,8 @@
                 <CheckBox Content="Share Password" Classes="CheckBoxP"/>
                 <CheckBox Content="Share Read-Only" Classes="CheckBoxP"/>
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                    <Button Content="Share"/>
-                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                    <Button Classes="Vault" Content="Share"/>
+                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -240,8 +215,8 @@
                 <ComboBox PlaceholderText="Select Entry" />
                 <TextBox Watermark="New Password" />
                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                    <Button Content="Update"/>
-                    <Button Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                    <Button Classes="Vault" Content="Update"/>
+                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>

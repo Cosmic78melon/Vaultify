@@ -86,19 +86,6 @@
                             <Separator Classes="CardSep"/>
 
                             <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Pornhub" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="White"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Text="Youtube" Margin="0,7"/>
                                 <Border Grid.Column="1"
                                         CornerRadius="10"

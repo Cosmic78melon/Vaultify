@@ -128,16 +128,14 @@
                 ZIndex="1001"
                 IsVisible="{Binding Bg_OP}"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Center"
+                VerticalAlignment="Stretch"
                 Background="#1A1A1A"
                 CornerRadius="16"
                 Padding="20">
             <StackPanel Spacing="10" HorizontalAlignment="Center">
                 <TextBlock Text="Login" Margin="200, 0, 220, 0" FontSize="20" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="UserName or Email" Foreground="#CCCCCC"/>
-                <TextBox KeyDown="TextBoxKeyDown" Watermark="Name (e.g., example.com)" Text="{Binding UserName}"/>
                 <TextBlock Text="Passoword" Foreground="#CCCCCC"/>
-                <TextBox KeyDown="TextBoxKeyDown" Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
+                <TextBox Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"></TextBlock>
                     <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign in" Command="{Binding LoginCommandCommand}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">
@@ -157,7 +155,7 @@
                 ZIndex="1001"
                 IsVisible="{Binding Bg_POPSignUp}"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Center"
+                VerticalAlignment="Stretch"
                 Background="#1A1A1A"
                 CornerRadius="16"
                 Padding="20">
@@ -171,7 +169,6 @@
                 <TextBox KeyDown="TextBoxKeyDown" Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
                 <TextBlock Text="Confirm Passoword" Foreground="#CCCCCC"/>
                 <TextBox KeyDown="TextBoxKeyDown" Watermark="Confirm Password" PasswordChar="*" Text="{Binding ConfirmationPassword}"/>
-
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"/>
                 <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign Up" Command="{Binding RegisterCommand}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">

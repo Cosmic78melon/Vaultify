@@ -10,121 +10,13 @@ using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Reflection;
+using Password_Manager.Service;
 
 
 namespace Password_Manager.ViewModels
 {
-    public class PythonHelper
-    {
-        public class PasswordCheckDetails
-        {
-            public string Result { get; set; } = "Unknown";
-            public bool? HasUppercase { get; set; }
-            public bool? HasLowercase { get; set; }
-            public bool? HasDigits { get; set; }
-            public bool? HasPunctuation { get; set; }
-            public bool? IsLongEnough { get; set; }
-        }
-        private static dynamic SecurityMod()
-        {
-            dynamic sys = Py.Import("sys");
-            dynamic os = Py.Import("os");
-            string cwd = os.getcwd();
-            string parent = os.path.abspath(os.path.join(cwd, os.pardir, os.pardir, os.pardir));
-            sys.path.append(Path.Combine(parent, "Security"));
-            dynamic SecurityModule = Py.Import("Security");
-            return SecurityModule;
-        }
-        public static object Generate_password(string site_name = null, int Length = 12)
-        {
-            using (Py.GIL())
-            {
-                dynamic SecurityModule = SecurityMod();
-                try
-                {
-                    dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
-                    dynamic result = PwManager.GeneratePass();
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-                return null;
-            }
-        }
-        public object CustomeGen(string site_name = null, int Length = 12, bool has_Letter = true, bool hasNum = true, bool hasPunc = true)
-        {
-            using (Py.GIL())
-            {
-                dynamic SecurityModule = SecurityMod();
-                if ((has_Letter && hasNum && hasPunc) == true)
-                {
-                    dynamic data = Generate_password(site_name, Length);
-                    return data;
-                }
-                using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
-                dynamic result = PwManager.Custom_GeneratePass(has_Letter, hasNum, hasPunc);
-                return result;
-            }
-        }
-        public dynamic PassswordCheck(string Password = null)
-        {
-            var details = new PasswordCheckDetails();
-            if (string.IsNullOrEmpty(Password))
-            {
-                details.Result = "No Password";
-                return details;
-            }
-            using (Py.GIL())
-            {
-                dynamic SecurityModule = SecurityMod();
-                try
-                {
-                    using dynamic PwManger = SecurityModule.PasswordManager("Uknown", Password, false);
-                    details.Result = PwManger.Check_Password();
-                    PyObject testResultPy = PwManger.TestResult;
-                    if (testResultPy != null && !testResultPy.IsNone())
-                    {
-                        var dict = testResultPy["Cause"];
-                        if (dict != null && !dict.IsNone())
-                        {
-                            details.HasUppercase = GetBoolOrNull(dict["hasUppercase"]);
-                            details.HasLowercase = GetBoolOrNull(dict["hasLowercase"]);
-                            details.HasDigits = GetBoolOrNull(dict["hasDigits"]);
-                            details.HasPunctuation = GetBoolOrNull(dict["hasPunc"]);
-                            details.IsLongEnough = GetBoolOrNull(dict["isLong"]);
-                        }
-                    }
-                    return details;
-                }
-                catch (Exception ex)
-                {
-                    details.Result = ex.Message;
-                }
-                return details;
-            }
-        }
-        private static bool? GetBoolOrNull(PyObject dict)
-        {
-            if (dict == null || dict.IsNone()) return null;
-            var value = dict;
-            if (value == null || value.IsNone()) return null;
-            try
-            {
-                if (value.IsTrue()) return false;
-                else return true;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-    }
-
     public partial class HomePageViewModel : PageViewModel
     {
-
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
@@ -149,7 +41,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _font3 = "White";
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
-        dynamic python_helper = new PythonHelper();
+        PythonAPI python_helper = new PythonAPI();
 
 
         [RelayCommand]
@@ -185,7 +77,7 @@ namespace Password_Manager.ViewModels
             {
                 Password_result = "Something Went Wrong⁉⁉";
                 CheckChar(details);
-                FontC = "White";
+                FontC = "Yellow";
             }
         }
         private void CheckChar(dynamic details)

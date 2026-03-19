@@ -1,55 +1,49 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodels="using:Password_Manager.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="1700" d:DesignHeight="800"
              xmlns:icons="using:FluentIcons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1700" d:DesignHeight="800"
              x:DataType="viewmodels:All_EntriesPageViewModel"
              Background="#0A0A0A"
              x:Class="Password_Manager.All_EntriesPageView">
 
-    <!-- Main Layout: Sidebar + Content (Black & Orange Theme) -->
     <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
-       
-        <!-- ===================== -->
-        <!-- MAIN CONTENT (Black & Orange) -->
-        <!-- ===================== -->
-        <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="0,0,0,0">
-           
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,*" Margin="0">
+
             <!-- Top Bar -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="32,28,32,12">
-               
+
                 <!-- Page Title -->
                 <TextBlock Text="Your Passwords"
                            FontSize="34"
                            FontWeight="Bold"
                            Foreground="White"
                            VerticalAlignment="Center"/>
-               
+
                 <!-- Action Buttons -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="12"
                             VerticalAlignment="Center">
-                   
-                    <!-- Add New -->
+
                     <Button Classes="Vault" Command="{Binding AddnewPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Add" FontSize="20"/>
                             <TextBlock Text="Add new"/>
                         </StackPanel>
                     </Button>
-                   
-                    <!-- Share -->
+
                     <Button Classes="Vault" Command="{Binding SharePOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Share" FontSize="20"/>
                             <TextBlock Text="Share"/>
                         </StackPanel>
                     </Button>
-                   
-                    <!-- Change passwords -->
+
                     <Button Classes="Vault" Command="{Binding ChangePasswordPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="ArrowSync" FontSize="20"/>
@@ -65,156 +59,188 @@
                             </Border>
                         </StackPanel>
                     </Button>
-                   
+
                 </StackPanel>
-               
             </Grid>
-           
-            <!-- Passwords Table -->
-            <Border Grid.Row="1"
-                    Margin="32,0,32,32"
-                    Background="#1A1A1A"
-                    CornerRadius="16"
-                    ClipToBounds="True">
-               
-                <Grid>
-                   
-                   <!-- Table Header -->
-<Grid Grid.Row="0"
-      ColumnDefinitions="*,*,*,*"
-      Height="56"
-      Background="#222222"
-      VerticalAlignment="Top">
 
-    <!-- Name -->
-    <TextBlock Grid.Column="0"
-               Text="NAME"
-               FontSize="14"
-               FontWeight="SemiBold"
-               Foreground="#777777"
-               VerticalAlignment="Center"
-               Margin="12,0,0,0"/>
+            <!-- Passwords Table Container -->
+            <!-- Passwords Table Container -->
+<Border Grid.Row="1"
+        Margin="32,0,32,32"
+        Background="#1A1A1A"
+        CornerRadius="16"
+        ClipToBounds="True">
 
-    <!-- Email -->
-    <TextBlock Grid.Column="2"
-               Text="Email"
-               FontSize="14"
-               Foreground="#777777"
-               VerticalAlignment="Center"/>
+    <DockPanel LastChildFill="True">
 
-    <!-- Category -->
-    <TextBlock Grid.Column="3"
-               Text="CATEGORY"
-               FontSize="14"
-               FontWeight="SemiBold"
-               Foreground="#777777"
-               VerticalAlignment="Center"/>
+        <!-- Header – always stays at top -->
+        <Grid x:Name="HeaderGrid"
+              DockPanel.Dock="Top"
+              ColumnDefinitions="3*, 2.4*, 1.8*, 80"
+              Height="56"
+              Background="#222222">
 
-</Grid>
-                   
-                    <!-- Scrollable Entries -->
-                    <ListBox Grid.Row="1" Margin="0, 56, 0, 0" Background="#1A1A1A" ItemsSource="{Binding Items}">
-                        <ListBox.ItemTemplate>
-                          <DataTemplate>
-                              <StackPanel Orientation="Horizontal" Spacing="470">
-                                <TextBlock Text="{Binding Title}" Height="35" Foreground="White"/>
-                                <TextBlock Text="{Binding Password}" Height="35" Foreground="White"/>
-                              </StackPanel>
-                          </DataTemplate>
-                        </ListBox.ItemTemplate>						
-                    </ListBox>
-                </Grid>
-            </Border>
-           
+            <TextBlock Grid.Column="0"
+                       Text="Name or Email"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="#AAAAAA"
+                       VerticalAlignment="Center"
+                       Margin="16,0,8,0"/>
+
+            <TextBlock Grid.Column="1"
+                       Text="Password"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="#AAAAAA"
+                       VerticalAlignment="Center"
+                       Margin="16,0,8,0"/>
+
+            <TextBlock Grid.Column="2"
+                       Text="Category"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="#AAAAAA"
+                       VerticalAlignment="Center"
+                       Margin="16,0,8,0"/>
+
+            <TextBlock Grid.Column="3" Text="" />
         </Grid>
 
-        <!-- Dimming Overlay for Add New -->
-        <!-- this is The New ADD Pop up window code -->
-        <Border Grid.RowSpan="2" 
+        <!-- Scrollable list – fills remaining space -->
+        <ListBox Background="Transparent"
+                 ItemsSource="{Binding Items}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="3*, 2.4*, 1.8*, 80"
+                          Background="Transparent"
+                          Margin="0,0,0,1">
+
+                        <!-- Hover highlight -->
+                        <Border Grid.ColumnSpan="4"
+                                Background="#252525"
+                                IsVisible="{Binding}"
+                                Opacity="0.5"
+                                CornerRadius="4"/>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Title}"
+                                   Margin="16,12,8,12"
+                                   VerticalAlignment="Center"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"/>
+
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Password}"
+                                   Margin="16,12,8,12"
+                                   VerticalAlignment="Center"
+                                   Foreground="#D0D0D0"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"/>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding catagory}"
+                                   Margin="16,12,8,12"
+                                   VerticalAlignment="Center"
+                                   Foreground="#BBBBBB"
+                                   TextTrimming="CharacterEllipsis"
+                                   TextWrapping="NoWrap"/>
+
+                        <StackPanel Grid.Column="3"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Spacing="8"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <!-- Better row highlighting -->
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#2A2A3A"/>
+                </Style>
+                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#252535"/>
+                </Style>
+            </ListBox.Styles>
+        </ListBox>
+
+    </DockPanel>
+</Border>
+
+        </Grid>
+
+        <!-- ─────────────────────────────────────────────── -->
+        <!--               POPUPS (unchanged)                -->
+        <!-- ─────────────────────────────────────────────── -->
+
+        <!-- Add New Popup Overlay -->
+        <Border Grid.RowSpan="2"
                 IsVisible="{Binding AddnewOP}"
-                Background="#80000000"  
+                Background="#80000000"
                 ZIndex="1000"/>
 
-        <!-- Interactive Popup for Add New (small "window" centered) -->
-        <!-- this is The New ADD Pop up window code -->
         <Border Grid.RowSpan="2"
                 ZIndex="1001"
                 IsVisible="{Binding AddnewPOP}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="#1A1A1A" 
-                CornerRadius="16" 
-                Padding="20" 
-                Width="500" Height="300">
-            <StackPanel Spacing="10">
-                <TextBlock Text="Add New Entry" FontSize="20" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Instructions: Enter details below." Foreground="#CCCCCC"/>
-                <TextBox Watermark="Name (e.g., example.com)" />
-                <TextBox Watermark="Passsword" />
-                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                    <Button  Classes="Vault" Content="New Password"/>
-                    <Button  Classes="Vault" Content="Save"/>
-                    <Button  Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                Background="#1A1A1A"
+                CornerRadius="16"
+                Padding="24"
+                Width="550" Height="400">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Add New Entry" FontSize="22" Foreground="White" FontWeight="Bold"/>
+                <TextBlock Text="Enter the details below" Foreground="#BBBBBB" FontSize="14"/>
+                <TextBox Watermark="Website / App / Service (e.g. example.com)" />
+                <TextBox Watermark="Username / Email" />
+                <TextBox Watermark="Password" />
+                <TextBox Watermark="Category (optional)" />
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,12,0,0">
+                    <Button Classes="Vault" Content="Generate Password"/>
+                    <Button Classes="Vault" Content="Save" IsDefault="True"/>
+                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- Dimming Overlay for Share -->
-        <!-- this is The Share button Pop up window code -->
-        <Border Grid.RowSpan="2" 
-                Background="#80000000"  
-                ZIndex="1000"
-                IsVisible="{Binding ShareOP}"/>
-
-        <!-- Interactive Popup for Share (small "window" centered) -->
-        <!-- this is The Share button Pop up window code -->
-        <Border Grid.RowSpan="2"
-                IsVisible="{Binding SharePOP}"
-                ZIndex="1001"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Background="#1A1A1A" 
-                CornerRadius="16" 
-                Padding="20" 
-                Width="400" Height="300">
-            <StackPanel Spacing="10">
-                <TextBlock Text="Share Entry" FontSize="20" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Instructions: Select sharing options below." Foreground="#CCCCCC"/>
-                <TextBox Watermark="Recipient Email" />
-                <CheckBox Content="Share Password" Classes="CheckBoxP"/>
-                <CheckBox Content="Share Read-Only" Classes="CheckBoxP"/>
-                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+        <!-- Share Popup Overlay + Window (unchanged except spacing) -->
+        <Border Grid.RowSpan="2" Background="#80000000" ZIndex="1000" IsVisible="{Binding ShareOP}"/>
+        <Border Grid.RowSpan="2" IsVisible="{Binding SharePOP}" ZIndex="1001"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#1A1A1A" CornerRadius="16" Padding="24"
+                Width="440" Height="320">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Share Entry" FontSize="22" Foreground="White" FontWeight="Bold"/>
+                <TextBlock Text="Select sharing options" Foreground="#BBBBBB"/>
+                <TextBox Watermark="Recipient Email or Username"/>
+                <CheckBox Content="Share Password (full access)" Classes="CheckBoxP"/>
+                <CheckBox Content="Read-Only access" Classes="CheckBoxP"/>
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,16,0,0">
                     <Button Classes="Vault" Content="Share"/>
                     <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- Dimming Overlay for Change Passwords -->
-        <!-- this is The CHange Passowrd Pop up window code -->
-        <Border Grid.RowSpan="2" 
-                Background="#80000000"  
-                IsVisible="{Binding ChangePasswordOP}"
-                ZIndex="1000"/>
-
-        <!-- Interactive Popup for Change Passwords (small "window" centered) -->
-        <!-- this is The CHange Passowrd Pop up window code -->
-        <Border Grid.RowSpan="2"
-                IsVisible="{Binding ChangePasswordPOP}" 
-                ZIndex="1001"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Background="#1A1A1A" 
-                CornerRadius="16" 
-                Padding="20" 
-                Width="400" Height="300">
-            <StackPanel Spacing="10">
-                <TextBlock Text="Change Passwords (BETA)" FontSize="20" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Instructions: Select entries to update." Foreground="#CCCCCC"/>
-                <TextBlock Text="Warning: This is beta functionality." Foreground="#FF8C00"/>
-                <ComboBox PlaceholderText="Select Entry" />
-                <TextBox Watermark="New Password" />
-                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+        <!-- Change Password Popup (unchanged except minor spacing) -->
+        <Border Grid.RowSpan="2" Background="#80000000" ZIndex="1000" IsVisible="{Binding ChangePasswordOP}"/>
+        <Border Grid.RowSpan="2" IsVisible="{Binding ChangePasswordPOP}" ZIndex="1001"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#1A1A1A" CornerRadius="16" Padding="24"
+                Width="460" Height="340">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Change Passwords (BETA)" FontSize="22" Foreground="White" FontWeight="Bold"/>
+                <TextBlock Text="Warning: Experimental feature" Foreground="#FF8C00" FontWeight="SemiBold"/>
+                <ComboBox PlaceholderText="Select entry to update" />
+                <TextBox Watermark="New Password"/>
+                <TextBox Watermark="Confirm New Password"/>
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,16,0,0">
                     <Button Classes="Vault" Content="Update"/>
                     <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
                 </StackPanel>

@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Password_Manager.Service;
 
 namespace Password_Manager.ViewModels
 {
@@ -14,6 +16,7 @@ namespace Password_Manager.ViewModels
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private string? MasterPassword = string.Empty;
         [ObservableProperty] private string _userName;
         [ObservableProperty] private string _email;
         [ObservableProperty] private string _password;
@@ -25,9 +28,6 @@ namespace Password_Manager.ViewModels
 
         [ObservableProperty] private bool _bg_OPSignUp = false;
         [ObservableProperty] private bool _bg_POPSignUp = false;
-
-        const string Dummy_user = "admin";
-        const string Dummy_password = "admin";
 
 
         [RelayCommand]
@@ -51,37 +51,33 @@ namespace Password_Manager.ViewModels
             if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
             {
                 StatusMessage = "Please Enter your Credentials";
-                Debug.WriteLine("Sign Up failed");
                 ColorsC = "red";
                 return;
             }
         }
 
         [RelayCommand]
-        public void LoginCommand()
+        public async void LoginCommand()
         {
-            StatusMessage = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password))
+            PythonAPI pythonhelper = new PythonAPI();
+            bool password_status = await Task.Run(() => pythonhelper.check_Password(Password));
+            if (string.IsNullOrWhiteSpace(Password))
             {
-                StatusMessage = "Please enter both username and password.";
-                Debug.WriteLine("Login failed: Empty credentials.");
+                StatusMessage = "Please enter your password.";
                 ColorsC = "red";
                 return;
             }
 
             // Dummy login logic
-            if (UserName.Equals(Dummy_user, StringComparison.OrdinalIgnoreCase) && Password == Dummy_password)
+            if (password_status)
             {
-                StatusMessage = "Login successful!";
-                Debug.WriteLine($"Login successful for user: {UserName}");
+                MasterPassword = Password;
                 Bg_OP = false;
                 Bg_POP = false;
-                ColorsC = "green";
+                Password = string.Empty;
                 // You can add navigation or other logic here upon successful login
             }
-            StatusMessage = "Invalid username or password.";
-            Debug.WriteLine("Login failed: Invalid credentials.");
+            StatusMessage = "Invalid Password.";
             ColorsC = "red";
         }
 
@@ -131,7 +127,7 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public void GoToAll_Entries()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>();
+            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>(item => item.LoadData(MasterPassword));
         } 
         [RelayCommand]
         public void GoToSecurity()

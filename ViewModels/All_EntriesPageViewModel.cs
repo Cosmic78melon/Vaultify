@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Password_Manager.Service;
 using Python.Runtime;
 using System;
 using System.Collections.Generic;
@@ -15,38 +16,11 @@ using System.Threading.Tasks;
 
 namespace Password_Manager.ViewModels
 {
-
-    public class SecurityPythonCall
-    { 
-        private static dynamic SecurityMod()
-        {
-            dynamic sys = Py.Import("sys");
-            dynamic os = Py.Import("os");
-            string cwd = os.getcwd();
-            string parent = os.path.abspath(os.path.join(cwd, os.pardir, os.pardir, os.pardir));
-            sys.path.append(Path.Combine(parent, "Security"));
-            dynamic SecurityModule = Py.Import("Security");
-            return SecurityModule;
-        }
-
-        private dynamic EncryptionAndStore(string site_name, string username)
-        {
-            using (Py.GIL())
-            {
-                dynamic securityModule = SecurityMod();
-                //try
-                //{
-                //    dynamic pw_manager = securityModule.PasswordManager(site_name, null, true, Length);
-                //}
-            }
-            return null;
-        }
-    }
-
     public class Entry
     {
         public string Title { get; set; }
         public string Password { get; set; }
+        public string catagory { get; set; }
     }
     public partial class All_EntriesPageViewModel : PageViewModel
     {
@@ -58,7 +32,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _changePasswordPOP = false;
         [ObservableProperty] private string _statusMessage;
         [ObservableProperty] private string _name;
-        [ObservableProperty] private string _password;
+        [ObservableProperty] public string _password;
         [ObservableProperty] private string _confirmationPassword;
 
         [ObservableProperty] private string _homepagePassword;
@@ -92,14 +66,33 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public All_EntriesPageViewModel()
-        {
-            Items = new ObservableCollection<Entry>
+
+        public async void LoadData(string password)
+        {   
+            try
             {
-                new Entry { Title = "Google", Password = "abc123" },
-                new Entry { Title = "GitHub", Password = "xyz456" },
-                new Entry { Title = "Email", Password = "mail789" }
-            };
-        } 
+                Items = new ObservableCollection<Entry>();
+                PythonAPI pythoneHelper = new PythonAPI();
+                dynamic data = await Task.Run(() => pythoneHelper.show_all_data(password));
+                using (Py.GIL())
+                {
+
+                    foreach (dynamic item in data)
+                    {
+                        Items.Add(new Entry
+                        {
+                            Title = item["Site Name"],
+                            Password = item["Password"],
+                            catagory = "Media"
+                        });
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine("What the heck");
+            }
+            
+        }
     }
 }

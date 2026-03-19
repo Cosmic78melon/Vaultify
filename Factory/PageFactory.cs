@@ -10,12 +10,12 @@ namespace Password_Manager.Factory
 {
     public class PageFactory(Func<Type, PageViewModel> factory)
     {
-        public PageViewModel GetPageViewModel<T>(Action<T> dhur = null)
+        public PageViewModel GetPageViewModel<T>(Action<T> Item = null)
             where T : PageViewModel
         {
             var viewmodel = factory(typeof(T));
 
-            dhur?.Invoke((T)viewmodel);
+            Item?.Invoke((T)viewmodel);
 
             return viewmodel;
         }

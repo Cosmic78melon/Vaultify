@@ -8,7 +8,7 @@ import random
 import string 
 import secrets
 import requests 
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 import pwnedpasswords as pwend
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -19,7 +19,7 @@ load_dotenv()
 class PasswordManager:
     def __init__(self,
                  site_name: str = "Unknown",
-                 password: str = None,
+                 password = None,
                  shouldGeneratePass: bool = False,
                  Password_Length: int = 12):
 
@@ -107,7 +107,7 @@ class PasswordManager:
         return self.TestResult[0]
         
     def GeneratePass(self) -> str | None: 
-        if self.shouldGeneratePass and self.Length < 12:
+        if self.Length < 12:
             return "Invalid Length. It must be greater than 12"
 
         if self.Pure_Random_Ints is None:
@@ -127,34 +127,32 @@ class PasswordManager:
                 return password
         return None
 
-    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str | None:
-        if self.shouldGeneratePass:
-            if self.Length < 12:
-                return "Invalid Length. It must be greater than 12"
+    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str:
+        if self.Length < 12:
+            return "Invalid Length. It must be greater than 12"
 
-            if self.Pure_Random_Ints is None:
-                rand = secrets.SystemRandom(10) 
-                randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
-            else:
-                randoms = self.Pure_Random_Ints
+        if self.Pure_Random_Ints is None:
+            rand = secrets.SystemRandom(10) 
+            randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
+        else:
+            randoms = self.Pure_Random_Ints
             
-            random_num = ''.join(str(x) for x in random.sample(randoms, k=min(self.Length, len(randoms))))
-            if hasLetters and hasNumber and hasPunc:
-               result = self.GeneratePass()
-               return result
+        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(self.Length, len(randoms))))
+        if hasLetters and hasNumber and hasPunc:
+            result = self.GeneratePass()
+            return result
 
-            if hasLetters != True and hasNumber and hasPunc:
-                alpha_char = random_num + string.punctuation 
-            elif hasLetters and hasNumber != True and hasPunc:
-                alpha_char = string.ascii_letters + string.punctuation 
-            elif hasLetters and hasNumber and hasPunc != True:
-                alpha_char = string.ascii_letters + random_num              
-            else:
-                return "Invalid request!"
+        if hasLetters != True and hasNumber and hasPunc:
+            alpha_char = random_num + string.punctuation 
+        elif hasLetters and hasNumber != True and hasPunc:
+            alpha_char = string.ascii_letters + string.punctuation 
+        elif hasLetters and hasNumber and hasPunc != True:
+            alpha_char = string.ascii_letters + random_num              
+        else:
+            return "Invalid request!"
             
-            password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
-            return password
-        return None
+        password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
+        return password
 
     @staticmethod
     def _randomNumGen(num: int, minimum: int, maximum: int) -> list[int] | None:
@@ -195,7 +193,7 @@ class PasswordManager:
                 data.append(rand.randrange(minimum, maximum +1))
             return data
 
-    def encryptAndStoredata(self, SecureNote = "Nothing", Password = ""):
+    def encryptAndStoredata(self, SecureNote = "Nothing", Password = "", Catagory = "Unknown", user_name = "Unknown"):
         if self.password is None:
             return self.TestResult[-1]
 
@@ -217,7 +215,7 @@ class PasswordManager:
             key = Fernet(kdf_derived_key)
             
             Id = str(uuid.uuid4())
-            credentials = self._EncJson(key, self.site_name,SecureNote, Password)
+            credentials = self._EncJson(key, self.site_name,SecureNote, Password, Catagory, user_name)
             
             temp_kdf_type = str(type(kdf))
             kdf_type = re.findall( r'\w+|[^\s\w]+', temp_kdf_type)[-2]
@@ -233,10 +231,10 @@ class PasswordManager:
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(file_data, f, indent=10)
             
-        return "Password and Secure Note saved", Id
+        return True
 
 
-    def _EncJson(self, fernet, site_name, message, Password = None):
+    def _EncJson(self, fernet, site_name, message, Password = None, Catagory = "Unknown", user_name = "Unknown"):
         """
         Encrypt a JSON payload using a provided Fernet instance.
         """
@@ -254,8 +252,10 @@ class PasswordManager:
 
         vault_data = {
             "Site Name": site_name,
+            "User Name": user_name,
+            "Password": Password,
             "Secure Note": str(message),
-            "Password": Password
+            "Catagory": Catagory
         }
         temp_json = json.dumps(vault_data).encode()
         encrypted_json = fernet.encrypt(temp_json)
@@ -378,11 +378,12 @@ class PasswordManager:
             return "Invalid Id"
 
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netflix", "Your Password", False, 32)
-    # Status, ID = pw_1.encryptAndStoredata("Important security 😤 Message", "adol33454")
+    pw_1 = PasswordManager("Netflix", "adol", False, 32)
+    # Status = pw_1.encryptAndStoredata("Important security 😤 Message", "adol33v454")
     # print(Status)
     # print(pw_1.change_password("d737a2d9-9478-4cbc-800b-aa8a43fae07b", "%^ado54"))
-    # details, vault = pw_1.decryptAndStoredata("Id")
-    # print(pw_1.show_all_data())
+    details, vault = pw_1.decryptAndStoredata("719d7351-59bc-4262-b7d4-76cf2932c353")
+    print(vault)
+    print(pw_1.show_all_data())
     # print("This is the updated vault "+vault)
-    print(pw_1.check_password())
+

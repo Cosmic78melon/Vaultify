@@ -18,5 +18,7 @@ namespace Password_Manager
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace();
+
+        
     }
 }

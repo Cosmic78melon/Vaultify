@@ -33,7 +33,7 @@ namespace Password_Manager.Service
                 return SecurityModule;
             }
         }
-        public static object Generate_password(string site_name = null, int Length = 12)
+        public object Generate_password(string site_name = null, int Length = 12)
         {
             dynamic SecurityModule = SecurityMod();
             using (Py.GIL())
@@ -137,6 +137,17 @@ namespace Password_Manager.Service
             {
                 dynamic pw = SecurityModule.PasswordManager("password", Password);
                 dynamic data = pw.check_password();
+                return data;
+            }
+        }
+
+        public dynamic addCredentials(string MasterPass,string site_name, string Password, string message = "unknown", string catagory = "unknown", string user_Name = "Nothing")
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = python.PasswordManager(site_name, MasterPass);
+                dynamic data = manager.encryptAndStoredata(message, Password, catagory, user_Name);
                 return data;
             }
         }

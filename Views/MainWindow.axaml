@@ -14,19 +14,19 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    <Grid ColumnDefinitions="Auto, *" Background="{DynamicResource Primary_Background_Color}">
+    <Grid ColumnDefinitions="Auto, *" Background="{DynamicResource Primary_SideMenu_Color}">
         <ContentControl Grid.Column="1 " Foreground="{DynamicResource Primary_Button_Foreground}"
                         Content="{Binding CurrentPage}"/>
         <!-- ===================== -->
         <!-- SIDEBAR (Dark Black) -->
         <!-- ===================== -->
-        <Border Grid.Column="0" Background="#111111" CornerRadius="0,12,0,0">
+        <Border Grid.Column="0" Background="{DynamicResource Primary_SideMenu_Color}" CornerRadius="0,12,0,0">
             <Grid RowDefinitions="Auto,Auto,*,Auto">
               
                 <!-- Top: App Branding -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,16" Spacing="8" PointerPressed="DoubleClicked">
-                    <TextBlock Text="PASSWORD" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#FF8C00"/>
-                    <TextBlock Text="MANAGER" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="White" Margin="0,-8,0,0"/>
+                    <TextBlock Text="PASSWORD" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff"/>
+                    <TextBlock Text="MANAGER" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff" Margin="0,-8,0,0"/>
                 </StackPanel>
               
                 <!-- Search Bar -->
@@ -36,7 +36,7 @@
                          Width="{Binding SeacrhbarSize}"
                          Background="#1E1E1E"
                          BorderBrush="#2A2A2A"
-                         Foreground="White"
+                         Foreground="#808080"
                          FontSize="15"
                          CornerRadius="8"
                          Padding="16,12"/>
@@ -45,30 +45,31 @@
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
                     <StackPanel Spacing="4" Margin="12,0">
                       
-                        <!-- All Spaces -->
+                        <!-- Home -->
                         <Button Command="{Binding GoToHomeCommand}"
-                                Classes.active="{Binding GoToHomeCommand}">
+                                Classes.active="{Binding HomePageActive}">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
-                                <icons:SymbolIcon Symbol="Board" Foreground="#888888" FontSize="20"/>
-                                <TextBlock Text="Dashboard" Foreground="#CCCCCC" FontSize="16" IsVisible="{Binding IsExpanded}" VerticalAlignment="Center"/>
+                                <icons:SymbolIcon Symbol="Board" FontSize="20"/>
+                                <Label FontSize="16" IsVisible="{Binding IsExpanded}" VerticalAlignment="Center">Home</Label>
                             </StackPanel>
                         </Button>
                       
-                        <!-- Passwords (Selected) -->
+
+                        <!-- Vault -->
                         <Button Command="{Binding GoToAll_EntriesCommand}"
-                                Classes.active="{Binding GoToAll_EntriesCommand}">
+                                Classes.active="{Binding All_EntriesActive}">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
-                                <icons:SymbolIcon Symbol="Key" Foreground="White" FontSize="20"/>
-                                <TextBlock Text="Passwords" Foreground="White" FontSize="16" IsVisible="{Binding IsExpanded}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <icons:SymbolIcon Symbol="Key" FontSize="20"/>
+                                <Label FontSize="16" IsVisible="{Binding IsExpanded}" FontWeight="SemiBold" VerticalAlignment="Center">Passwords</Label>
                             </StackPanel>
                         </Button>
                       
                         <!-- Secure Notes -->
                         <Button Command="{Binding GoToSecurityCommand}"
-                                Classes.active="{Binding GoToSecurityCommand}">
+                                Classes.active="{Binding SecurityNotesActive}">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
-                                <icons:SymbolIcon Symbol="Note" Foreground="#888888" FontSize="20"/>
-                                <TextBlock Text="Secure Notes" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center"/>
+                                <icons:SymbolIcon Symbol="Note" FontSize="20"/>
+                                <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Secure Notes</Label>
                             </StackPanel>
                         </Button>
                       
@@ -80,18 +81,19 @@
                                    Margin="24,32,24,8"/>
                                               
                         <!-- Personal Info -->
-                        <Button Command="{Binding GoToAccountsCommand}" Classes.active="{Binding GoToAccountsCommand}">
+                        <Button Command="{Binding GoToAccountsCommand}" 
+                                Classes.active="{Binding AccountPageActive}">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
-                                <icons:SymbolIcon Symbol="Person" Foreground="#888888" FontSize="20"/>
-                                <TextBlock Text="Personal Info" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center"/>
+                                <icons:SymbolIcon Symbol="Person" FontSize="20"/>
+                                <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Personal Info</Label>
                             </StackPanel>
                         </Button>
                       
                         <!-- Settings Center -->
-                        <Button Command="{Binding GoToSettingsCommand}" Classes.active="{Binding GoToSettingsCommand}">
+                        <Button Command="{Binding GoToSettingsCommand}" Classes.active="{Binding SettingsPageActive}">
                             <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
-                                <icons:SymbolIcon Symbol="Settings" Foreground="#888888" FontSize="20"/>
-                                <TextBlock Text="Settings" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center"/>
+                                <icons:SymbolIcon Symbol="Settings" FontSize="20"/>
+                                <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Settings</Label>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -117,34 +119,84 @@
             </Grid>
         </Border>
 
-        <!-- this is Log in Pop up window code -->
-        <Border Grid.ColumnSpan="2"
-                IsVisible="{Binding Bg_POP}"
-                Background="#80000000"
-                ZIndex="1000"/>
-        <!-- Interactive Popup for Add New (small "window" centered) -->
-        <!-- this is The Log in Pop up window code -->
-        <Border Grid.ColumnSpan="2"
-                ZIndex="1001"
-                IsVisible="{Binding Bg_OP}"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Background="#1A1A1A"
-                CornerRadius="16"
-                Padding="20">
-            <StackPanel Spacing="10" HorizontalAlignment="Center">
-                <TextBlock Text="Login" Margin="200, 0, 220, 0" FontSize="20" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Passoword" Foreground="#CCCCCC"/>
-                <TextBox Watermark="Password" PasswordChar="*" Text="{Binding Password}"/>
-                <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"></TextBlock>
-                    <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign in" Command="{Binding LoginCommandCommand}"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">
-                    <TextBlock Foreground="White" FontSize="20">Don't have an Account yet?</TextBlock>
-                    <Button Background="Orange" Content="Go To Sing Up" Command="{Binding GotRegisterCommand}"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
+<!-- Background overlay -->
+<Border Grid.ColumnSpan="2"
+        IsVisible="{Binding Bg_POP}"
+        Background="#80000000"
+        ZIndex="1000"/>
 
+<!-- Centered Login Card -->
+<Grid Grid.ColumnSpan="2"
+      IsVisible="{Binding Bg_OP}"
+      ZIndex="1001">
+
+    <Border Width="420"
+            Padding="30"
+            Background="{DynamicResource Primary_Background_Color}"
+            CornerRadius="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            BoxShadow="0 10 30 #40000000">
+
+        <StackPanel Spacing="18">
+
+            <!-- Title -->
+            <TextBlock Text="Login"
+                       FontSize="36"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"/>
+
+            <TextBlock Text="Password Manager"
+                       FontSize="16"
+                       Foreground="#cccccc"
+                       HorizontalAlignment="Center"/>
+
+            <Separator Margin="0,10"/>
+
+            <!-- Password Label -->
+            <TextBlock Text="Password"
+                       FontSize="14"
+                       Foreground="#dddddd"/>
+
+            <!-- Input -->
+            <TextBox Watermark="Enter your password"
+                     PasswordChar="*"
+                     Height="40"
+                     Padding="10"
+                     BorderBrush="#444"
+                     CornerRadius="8"
+                     Text="{Binding Password}"/>
+
+            <!-- Status -->
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="{Binding ColorsC}"
+                       FontSize="12"/>
+
+            <!-- Buttons -->
+            <StackPanel Spacing="10" Margin="0,10,0,0">
+
+                <Button Content="Sign In"
+                        Height="45"
+                        CornerRadius="10"
+                        Classes="CardButton"
+                        IsDefault="True"
+                        FontWeight="SemiBold"
+                        Command="{Binding LoginCommandCommand}"/>
+
+                <Button Content="Create Account"
+                        Height="40"
+                        CornerRadius="10"
+                        BorderBrush="#666"
+                        BorderThickness="1"
+                        Classes="CardButton"
+                        Command="{Binding GotRegisterCommand}"/>
+
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</Grid>
         <!-- this is The Register Pop up window code -->
         <Border Grid.ColumnSpan="2"
                 IsVisible="{Binding Bg_OPSignUp}"

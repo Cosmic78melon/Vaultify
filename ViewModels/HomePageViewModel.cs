@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Python.Runtime;
+using Meilisearch;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
@@ -11,10 +11,23 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Reflection;
 using Password_Manager.Service;
+using CSnakes.Runtime;
+using CSnakes.Runtime.Python;
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Policy;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using Python.Runtime;
 
 
 namespace Password_Manager.ViewModels
 {
+    public class HomeCard()
+    {
+        public string title { get; set; }
+        public int number { get; set; } = 0;
+    }
+
     public partial class HomePageViewModel : PageViewModel
     {
         [ObservableProperty]
@@ -42,7 +55,6 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
         PythonAPI python_helper = new PythonAPI();
-
 
         [RelayCommand]
         public async Task GeneratePassword()
@@ -147,6 +159,19 @@ namespace Password_Manager.ViewModels
             details.HasPunctuation = null;
             details.HasDigits = null;
             details.IsLongEnough = null;
+        }
+
+        private ObservableCollection<HomeCard> _items;
+        public ObservableCollection<HomeCard> Items
+        {
+            get { return _items; }
+            set { SetProperty(ref _items, value); } 
+        }
+
+        public void load_data_recent(string MasterPassword)
+        {
+            Items = new ObservableCollection<HomeCard>();
+            return;
         }
     }
 }

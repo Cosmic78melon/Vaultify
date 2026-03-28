@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Password_Manager.Service;
+using Password_Manager.Models;
 
 namespace Password_Manager.ViewModels
 {
@@ -61,6 +62,7 @@ namespace Password_Manager.ViewModels
         {
             PythonAPI pythonhelper = new PythonAPI();
             bool password_status = await Task.Run(() => pythonhelper.check_Password(Password));
+            Debug.WriteLine(password_status);
             if (string.IsNullOrWhiteSpace(Password))
             {
                 StatusMessage = "Please enter your password.";
@@ -90,21 +92,16 @@ namespace Password_Manager.ViewModels
 
         public int IconSize => (IsExpanded) ? (int)IconSizeList.Large : (int)IconSizeList.Small;
 
-        public int SeacrhbarSize => (IsExpanded) ? 220 : 70;
+        public int SeacrhbarSize => (IsExpanded) ? 220 : 1;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(HomePageActive))]
-        [NotifyPropertyChangedFor(nameof(All_Entries))]
-        [NotifyPropertyChangedFor(nameof(SecurityNotes))]
-        [NotifyPropertyChangedFor(nameof(SettingsPageActive))]
-        [NotifyPropertyChangedFor(nameof(AccountPageActive))]
         public PageViewModel _currentPage;
 
-        public bool HomePageActive => (CurrentPage.PageNames == Models.PageViewData.Home);
-        public bool All_Entries => (CurrentPage.PageNames == Models.PageViewData.All_Entries);
-        public bool SecurityNotes => (CurrentPage.PageNames == Models.PageViewData.Security);
-        public bool SettingsPageActive => (CurrentPage.PageNames == Models.PageViewData.Settings);
-        public bool AccountPageActive => (CurrentPage.PageNames == Models.PageViewData.Accounts);
+        [ObservableProperty] public bool _homePageActive;
+        [ObservableProperty] public bool _all_EntriesActive;
+        [ObservableProperty] public bool _securityNotesActive;
+        [ObservableProperty] public bool _settingsPageActive;
+        [ObservableProperty] public bool _accountPageActive;
 
 
         public MainWindowViewModel()
@@ -114,36 +111,53 @@ namespace Password_Manager.ViewModels
         public MainWindowViewModel(PageFactory pageFactory)
         {
             _pageFactory = pageFactory;
-            
             GoToHome();
         }
 
         [RelayCommand]
         public void GoToHome()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>();
+            CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item => item.load_data_recent(MasterPassword));
+            UpdateActiveState(PageViewData.Home);
         }  
 
         [RelayCommand]
-        public void GoToAll_Entries()
+        public async void GoToAll_Entries()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>(item => item.LoadData(MasterPassword));
+            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>(async item =>
+            {
+                item.HomepagePassword = MasterPassword;
+                await Task.Run(() => item.LoadData(MasterPassword));
+            });
+            UpdateActiveState(PageViewData.All_Entries);
         } 
         [RelayCommand]
         public void GoToSecurity()
         {
             CurrentPage = _pageFactory.GetPageViewModel<SecurityPageViewModel>();
+            UpdateActiveState(PageViewData.Security);
         } 
         [RelayCommand]
         public void GoToSettings()
         {
             CurrentPage = _pageFactory.GetPageViewModel<SettingsPageViewModel>();
+            UpdateActiveState(PageViewData.Settings);
         } 
         [RelayCommand]
         public void GoToAccounts()
         {
             CurrentPage = _pageFactory.GetPageViewModel<AccountPageViewModel>();
+            UpdateActiveState(PageViewData.Accounts);
         }        
+
+        public void UpdateActiveState(PageViewData activepage)
+        {
+            HomePageActive = activepage == PageViewData.Home;
+            All_EntriesActive = activepage == PageViewData.All_Entries;
+            SecurityNotesActive = activepage == PageViewData.Security;
+            AccountPageActive = activepage == PageViewData.Accounts;
+            SettingsPageActive = activepage == PageViewData.Settings;
+        }
         [RelayCommand]
         public void SideMenuResize()
         {

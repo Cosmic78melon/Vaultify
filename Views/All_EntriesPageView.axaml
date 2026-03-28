@@ -4,9 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodels="using:Password_Manager.ViewModels"
              xmlns:icons="using:FluentIcons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="1700" d:DesignHeight="800"
+             mc:Ignorable="d"
+             d:DesignWidth="1700"
+             d:DesignHeight="800"
              x:DataType="viewmodels:All_EntriesPageViewModel"
-             Background="#0A0A0A"
+             Background="{DynamicResource Primary_Background_Color}"
+             Foreground="{DynamicResource Primary_Button_Foreground}"
              x:Class="Password_Manager.All_EntriesPageView">
 
     <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
@@ -16,38 +19,34 @@
 
             <!-- Top Bar -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="32,28,32,12">
-
-                <!-- Page Title -->
                 <TextBlock Text="Your Passwords"
                            FontSize="34"
                            FontWeight="Bold"
                            Foreground="White"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center" />
 
-                <!-- Action Buttons -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="12"
                             VerticalAlignment="Center">
-
                     <Button Classes="Vault" Command="{Binding AddnewPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <icons:SymbolIcon Symbol="Add" FontSize="20"/>
-                            <TextBlock Text="Add new"/>
+                            <icons:SymbolIcon Symbol="Add" FontSize="20" />
+                            <TextBlock Text="Add new" />
                         </StackPanel>
                     </Button>
 
                     <Button Classes="Vault" Command="{Binding SharePOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <icons:SymbolIcon Symbol="Share" FontSize="20"/>
-                            <TextBlock Text="Share"/>
+                            <icons:SymbolIcon Symbol="Share" FontSize="20" />
+                            <TextBlock Text="Share" />
                         </StackPanel>
                     </Button>
 
                     <Button Classes="Vault" Command="{Binding ChangePasswordPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <icons:SymbolIcon Symbol="ArrowSync" FontSize="20"/>
-                            <TextBlock Text="Change passwords"/>
+                            <icons:SymbolIcon Symbol="ArrowSync" FontSize="20" />
+                            <TextBlock Text="Change passwords" />
                             <Border Background="#FF8C00"
                                     CornerRadius="6"
                                     Padding="8,2"
@@ -55,135 +54,153 @@
                                 <TextBlock Text="BETA"
                                            FontSize="11"
                                            FontWeight="Bold"
-                                           Foreground="White"/>
+                                           Foreground="White" />
                             </Border>
                         </StackPanel>
                     </Button>
-
                 </StackPanel>
             </Grid>
 
             <!-- Passwords Table Container -->
-            <!-- Passwords Table Container -->
-<Border Grid.Row="1"
-        Margin="32,0,32,32"
-        Background="#1A1A1A"
-        CornerRadius="16"
-        ClipToBounds="True">
+            <Border Grid.Row="1"
+                    Margin="32,0,32,32"
+                    Background="#1A1A1A"
+                    CornerRadius="16"
+                    ClipToBounds="True">
 
-    <DockPanel LastChildFill="True">
+                <DockPanel LastChildFill="True">
 
-        <!-- Header – always stays at top -->
-        <Grid x:Name="HeaderGrid"
-              DockPanel.Dock="Top"
-              ColumnDefinitions="3*, 2.4*, 1.8*, 80"
-              Height="56"
-              Background="#222222">
-
-            <TextBlock Grid.Column="0"
-                       Text="Name or Email"
-                       FontSize="14"
-                       FontWeight="SemiBold"
-                       Foreground="#AAAAAA"
-                       VerticalAlignment="Center"
-                       Margin="16,0,8,0"/>
-
-            <TextBlock Grid.Column="1"
-                       Text="Password"
-                       FontSize="14"
-                       FontWeight="SemiBold"
-                       Foreground="#AAAAAA"
-                       VerticalAlignment="Center"
-                       Margin="16,0,8,0"/>
-
-            <TextBlock Grid.Column="2"
-                       Text="Category"
-                       FontSize="14"
-                       FontWeight="SemiBold"
-                       Foreground="#AAAAAA"
-                       VerticalAlignment="Center"
-                       Margin="16,0,8,0"/>
-
-            <TextBlock Grid.Column="3" Text="" />
-        </Grid>
-
-        <!-- Scrollable list – fills remaining space -->
-        <ListBox Background="Transparent"
-                 ItemsSource="{Binding Items}"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid ColumnDefinitions="3*, 2.4*, 1.8*, 80"
-                          Background="Transparent"
-                          Margin="0,0,0,1">
-
-                        <!-- Hover highlight -->
-                        <Border Grid.ColumnSpan="4"
-                                Background="#252525"
-                                IsVisible="{Binding}"
-                                Opacity="0.5"
-                                CornerRadius="4"/>
+                    <!-- Header – always stays at top -->
+                    <Grid x:Name="HeaderGrid"
+                          DockPanel.Dock="Top"
+                          ColumnDefinitions="3*, 2.4*, 1.8*, 1.4*, 80"
+                          Height="56"
+                          Background="#222222">
 
                         <TextBlock Grid.Column="0"
-                                   Text="{Binding Title}"
-                                   Margin="16,12,8,12"
+                                   Text="Site / App"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#AAAAAA"
                                    VerticalAlignment="Center"
-                                   Foreground="White"
-                                   TextTrimming="CharacterEllipsis"
-                                   TextWrapping="NoWrap"/>
+                                   Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="1"
-                                   Text="{Binding Password}"
-                                   Margin="16,12,8,12"
+                                   Text="Username"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#AAAAAA"
                                    VerticalAlignment="Center"
-                                   Foreground="#D0D0D0"
-                                   TextTrimming="CharacterEllipsis"
-                                   TextWrapping="NoWrap"/>
+                                   Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="2"
-                                   Text="{Binding catagory}"
-                                   Margin="16,12,8,12"
+                                   Text="Password"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#AAAAAA"
                                    VerticalAlignment="Center"
-                                   Foreground="#BBBBBB"
-                                   TextTrimming="CharacterEllipsis"
-                                   TextWrapping="NoWrap"/>
+                                   Margin="16,0,8,0" />
 
-                        <StackPanel Grid.Column="3"
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Spacing="8"/>
+                        <TextBlock Grid.Column="3"
+                                   Text="Category"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#AAAAAA"
+                                   VerticalAlignment="Center"
+                                   Margin="16,0,8,0" />
+
+                        <TextBlock Grid.Column="4" Text="" />
                     </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
 
-            <!-- Better row highlighting -->
-            <ListBox.Styles>
-                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                    <Setter Property="Background" Value="#2A2A3A"/>
-                </Style>
-                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                    <Setter Property="Background" Value="#252535"/>
-                </Style>
-            </ListBox.Styles>
-        </ListBox>
+                    <!-- Scrollable list -->
+                    <ListBox Background="Transparent"
+                             ItemsSource="{Binding Items}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
 
-    </DockPanel>
-</Border>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="3*, 2.4*, 1.8*, 1.4*, 80"
+                                      Background="Transparent"
+                                      Margin="0,0,0,1">
 
+                                    <!-- Hover highlight -->
+                                    <Border Grid.ColumnSpan="5"
+                                            Background="#252525"
+                                            IsVisible="{Binding $self.IsPointerOver}"
+                                            Opacity="0.6"
+                                            CornerRadius="4" />
+
+                                    <!-- Icon + Site/App -->
+                                    <StackPanel Grid.Column="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                Margin="16,12,8,12"
+                                                Spacing="12">
+                                        <icons:SymbolIcon Symbol="Globe"
+                                                          FontSize="20"
+                                                          Foreground="#4DA6FF" />
+                                        <TextBlock Text="{Binding Title}"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="White"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap" />
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Username}"
+                                               Margin="16,12,8,12"
+                                               VerticalAlignment="Center"
+                                               Foreground="White"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap" />
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Password}"
+                                               Margin="16,12,8,12"
+                                               VerticalAlignment="Center"
+                                               Foreground="#D0D0D0"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap" />
+
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding catagory}"
+                                               Margin="16,12,8,12"
+                                               VerticalAlignment="Center"
+                                               Foreground="#BBBBBB"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap" />
+
+                                    <!-- Actions column (empty for now) -->
+                                    <StackPanel Grid.Column="4"
+                                                Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Spacing="8" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                        <!-- Selection & hover styles -->
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#2A2A3A" />
+                            </Style>
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="#252535" />
+                            </Style>
+                        </ListBox.Styles>
+                    </ListBox>
+                </DockPanel>
+            </Border>
         </Grid>
 
-        <!-- ─────────────────────────────────────────────── -->
-        <!--               POPUPS (unchanged)                -->
-        <!-- ─────────────────────────────────────────────── -->
+        <!-- Popups / Overlays -->
 
-        <!-- Add New Popup Overlay -->
         <Border Grid.RowSpan="2"
                 IsVisible="{Binding AddnewOP}"
-                Background="#80000000"
-                ZIndex="1000"/>
+                Background="Black"
+                ZIndex="1000" />
 
         <Border Grid.RowSpan="2"
                 ZIndex="1001"
@@ -193,56 +210,120 @@
                 Background="#1A1A1A"
                 CornerRadius="16"
                 Padding="24"
-                Width="550" Height="400">
+                Width="600"
+                Height="460">
             <StackPanel Spacing="16">
-                <TextBlock Text="Add New Entry" FontSize="22" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Enter the details below" Foreground="#BBBBBB" FontSize="14"/>
-                <TextBox Watermark="Website / App / Service (e.g. example.com)" />
-                <TextBox Watermark="Username / Email" />
-                <TextBox Watermark="Password" />
-                <TextBox Watermark="Category (optional)" />
-                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,12,0,0">
-                    <Button Classes="Vault" Content="Generate Password"/>
-                    <Button Classes="Vault" Content="Save" IsDefault="True"/>
-                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                <TextBlock Text="Add New Entry"
+                           FontSize="22"
+                           Foreground="White"
+                           FontWeight="Bold" />
+                <TextBlock Text="Enter the details below"
+                           Foreground="#BBBBBB"
+                           FontSize="14" />
+                <TextBox Watermark="Website / App / Service (e.g. example.com)"
+                         Text="{Binding Webname}" />
+                <TextBox Watermark="Username / Email"
+                         Text="{Binding Name}" />
+                <TextBox Watermark="Password"
+                         Text="{Binding Password, Mode=TwoWay}"/>
+                <TextBox Watermark="Password"
+                         Text="{Binding ConfirmationPassword, Mode=TwoWay}" />
+                <TextBox Watermark="Category (optional)"
+                         Text="{Binding Catagory}" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="{Binding ColorC}" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            HorizontalAlignment="Right"
+                            Margin="0,12,0,0">
+                    <Button Classes="Vault" Command="{Binding GeneratePasswordCommand}" Content="Generate Password" />
+                    <Button Classes="Vault"
+                            Content="Save"
+                            IsDefault="True"
+                            Command="{Binding saveCommand}" />
+                    <Button Classes="Vault"
+                            Content="Cancel"
+                            Command="{Binding CancelButtonCommand}" />
                 </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- Share Popup Overlay + Window (unchanged except spacing) -->
-        <Border Grid.RowSpan="2" Background="#80000000" ZIndex="1000" IsVisible="{Binding ShareOP}"/>
-        <Border Grid.RowSpan="2" IsVisible="{Binding SharePOP}" ZIndex="1001"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#1A1A1A" CornerRadius="16" Padding="24"
-                Width="440" Height="320">
+        <!-- Share Popup -->
+        <Border Grid.RowSpan="2"
+                Background="#80000000"
+                ZIndex="1000"
+                IsVisible="{Binding ShareOP}" />
+
+        <Border Grid.RowSpan="2"
+                IsVisible="{Binding SharePOP}"
+                ZIndex="1001"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#1A1A1A"
+                CornerRadius="16"
+                Padding="24"
+                Width="440"
+                Height="320">
             <StackPanel Spacing="16">
-                <TextBlock Text="Share Entry" FontSize="22" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Select sharing options" Foreground="#BBBBBB"/>
-                <TextBox Watermark="Recipient Email or Username"/>
-                <CheckBox Content="Share Password (full access)" Classes="CheckBoxP"/>
-                <CheckBox Content="Read-Only access" Classes="CheckBoxP"/>
-                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,16,0,0">
-                    <Button Classes="Vault" Content="Share"/>
-                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                <TextBlock Text="Share Entry"
+                           FontSize="22"
+                           Foreground="White"
+                           FontWeight="Bold" />
+                <TextBlock Text="Select sharing options"
+                           Foreground="#BBBBBB" />
+                <TextBox Watermark="Recipient Email or Username" />
+                <CheckBox Content="Share Password (full access)"
+                          Classes="CheckBoxP" />
+                <CheckBox Content="Read-Only access"
+                          Classes="CheckBoxP" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            HorizontalAlignment="Right"
+                            Margin="0,16,0,0">
+                    <Button Classes="Vault" Content="Share" />
+                    <Button Classes="Vault"
+                            Content="Cancel"
+                            Command="{Binding CancelButtonCommand}" />
                 </StackPanel>
             </StackPanel>
         </Border>
 
-        <!-- Change Password Popup (unchanged except minor spacing) -->
-        <Border Grid.RowSpan="2" Background="#80000000" ZIndex="1000" IsVisible="{Binding ChangePasswordOP}"/>
-        <Border Grid.RowSpan="2" IsVisible="{Binding ChangePasswordPOP}" ZIndex="1001"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#1A1A1A" CornerRadius="16" Padding="24"
-                Width="460" Height="340">
+        <!-- Change Password Popup -->
+        <Border Grid.RowSpan="2"
+                Background="#80000000"
+                ZIndex="1000"
+                IsVisible="{Binding ChangePasswordOP}" />
+
+        <Border Grid.RowSpan="2"
+                IsVisible="{Binding ChangePasswordPOP}"
+                ZIndex="1001"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#1A1A1A"
+                CornerRadius="16"
+                Padding="24"
+                Width="460"
+                Height="340">
             <StackPanel Spacing="16">
-                <TextBlock Text="Change Passwords (BETA)" FontSize="22" Foreground="White" FontWeight="Bold"/>
-                <TextBlock Text="Warning: Experimental feature" Foreground="#FF8C00" FontWeight="SemiBold"/>
-                <ComboBox PlaceholderText="Select entry to update" />
-                <TextBox Watermark="New Password"/>
-                <TextBox Watermark="Confirm New Password"/>
-                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,16,0,0">
-                    <Button Classes="Vault" Content="Update"/>
-                    <Button Classes="Vault" Content="Cancel" Command="{Binding CancelButtonCommand}"/>
+                <TextBlock Text="Change Passwords (BETA)"
+                           FontSize="22"
+                           Foreground="White"
+                           FontWeight="Bold" />
+                <TextBlock Text="Warning: Experimental feature"
+                           Foreground="#FF8C00"
+                           FontWeight="SemiBold" />
+                <ComboBox PlaceholderText="Select entry to update">
+                </ComboBox>
+                <TextBox Watermark="New Password" />
+                <TextBox Watermark="Confirm New Password" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            HorizontalAlignment="Right"
+                            Margin="0,16,0,0">
+                    <Button Classes="Vault" Content="Update" />
+                    <Button Classes="Vault"
+                            Content="Cancel"
+                            Command="{Binding CancelButtonCommand}" />
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using CSnakes.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Password_Manager.Factory;
 using Password_Manager.Models;
@@ -37,8 +38,8 @@ namespace Password_Manager
 
             // Initialize Python
             string baseDir = AppContext.BaseDirectory;
-            string pythonHome = Path.Combine(baseDir, "python-3.12.0-embed-amd64");
-            string pythonDll = Path.Combine(pythonHome, "python312.dll");
+            string pythonHome = Path.Combine(baseDir, "python-3.13.12-embed-amd64");
+            string pythonDll = Path.Combine(pythonHome, "python313.dll");
 
             Runtime.PythonDLL = pythonDll;
             PythonEngine.PythonHome = pythonHome;

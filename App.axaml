@@ -16,15 +16,25 @@
             <StyleInclude Source="Styles/DefaulteStyel.axaml"></StyleInclude>
     </Application.Styles>
 
+    <Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="Controls/CheckBox.axaml"></MergeResourceInclude>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
   <Application.Resources>
-	  <SolidColorBrush x:Key="Primary_Background_Color">#181612</SolidColorBrush>
-	  <SolidColorBrush x:Key="Primary_SideMenu_Color">#181c1f</SolidColorBrush>
+	  <SolidColorBrush x:Key="Primary_Background_Color">#0f0c09</SolidColorBrush>
+	  <SolidColorBrush x:Key="Primary_SideMenu_Color">#2b231d</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Seperator_Color">Wheat</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Button_Background">Transparent</SolidColorBrush>
+      <SolidColorBrush x:Key="ButtonInactive">#b3b3b3</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Button_Foreground">White</SolidColorBrush>
-	  <SolidColorBrush x:Key="Hover_Button_Background">#FF8C00</SolidColorBrush>
-      <SolidColorBrush x:Key="Card_Color">#262a2b</SolidColorBrush>
+	  <SolidColorBrush x:Key="Hover_Button_Background">#e65100</SolidColorBrush>
+      <SolidColorBrush x:Key="Card_Color">#140f0a</SolidColorBrush>
+      <SolidColorBrush x:Key="CheckBox_Color">#ff8b4d</SolidColorBrush>
 
-      <FontFamily x:Key="Fonts">Cooper Black,Forte,Calibri,Bahnschrift SemiBold, ArialBlack</FontFamily>
+      <FontFamily x:Key="Fonts">SF Pro, Plus Jakarta Sans</FontFamily>
   </Application.Resources>
 </Application>

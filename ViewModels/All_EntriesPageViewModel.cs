@@ -20,6 +20,7 @@ namespace Password_Manager.ViewModels
     {
         public string Title { get; set; }
         public string Password { get; set; }
+        public string Username { get; set; }
         public string catagory { get; set; }
     }
     public partial class All_EntriesPageViewModel : PageViewModel
@@ -30,10 +31,13 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _sharePOP = false;
         [ObservableProperty] private bool _changePasswordOP = false;
         [ObservableProperty] private bool _changePasswordPOP = false;
-        [ObservableProperty] private string _statusMessage;
+        [ObservableProperty] private string _statusMessage = string.Empty;
+        [ObservableProperty] private string _colorC = "white";
         [ObservableProperty] private string _name;
+        [ObservableProperty] private string _webname;
         [ObservableProperty] public string _password;
         [ObservableProperty] private string _confirmationPassword;
+        [ObservableProperty] public string _catagory;
 
         [ObservableProperty] private string _homepagePassword;
 
@@ -66,13 +70,12 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-
         public async void LoadData(string password)
         {   
             try
             {
-                Items = new ObservableCollection<Entry>();
                 PythonAPI pythoneHelper = new PythonAPI();
+                Items = new ObservableCollection<Entry>();
                 dynamic data = await Task.Run(() => pythoneHelper.show_all_data(password));
                 using (Py.GIL())
                 {
@@ -82,17 +85,61 @@ namespace Password_Manager.ViewModels
                         Items.Add(new Entry
                         {
                             Title = item["Site Name"],
+                            Username = item["User Name"],
                             Password = item["Password"],
-                            catagory = "Media"
+                            catagory = item["Catagory"]
                         });
                     }
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
-                Debug.WriteLine("What the heck");
+                Items.Add(new Entry
+                {
+                    Title = "Nothing",
+                    Username = "Nothing",
+                    Password = "Nothing",
+                    catagory = "Nothing"
+                });
             }
             
+        }
+
+        [RelayCommand]
+        public async void save()
+        {
+            try
+            {
+                PythonAPI python = new PythonAPI();
+                bool isAuthenticated = await Task.Run(() => python.check_Password(HomepagePassword));
+                if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
+                {
+                    dynamic data = await Task.Run(() => python.addCredentials(HomepagePassword, Webname, Password, catagory: Catagory, user_Name: Name));
+                    if (data == true)
+                    {
+                        StatusMessage = "Password Saved Successfully";
+                        ColorC = "green";
+                    }
+                    else
+                    {
+                        StatusMessage = "Password Was Not Saved";
+                        ColorC = "red";
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                StatusMessage = "Something Went Wrong";
+                ColorC = "red";
+            }
+        }
+
+        [RelayCommand]
+        public void GeneratePassword()
+        {
+            PythonAPI python = new PythonAPI();
+            string password = python.Generate_password().ToString();
+            Password = ConfirmationPassword = password;
         }
     }
 }

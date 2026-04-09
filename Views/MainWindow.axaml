@@ -121,13 +121,13 @@
 
 <!-- Background overlay -->
 <Border Grid.ColumnSpan="2"
-        IsVisible="{Binding Bg_POP}"
+        IsVisible="{Binding BgPop}"
         Background="#80000000"
         ZIndex="1000"/>
 
 <!-- Centered Login Card -->
 <Grid Grid.ColumnSpan="2"
-      IsVisible="{Binding Bg_OP}"
+      IsVisible="{Binding BgOp}"
       ZIndex="1001">
 
     <Border Width="420"
@@ -199,13 +199,13 @@
 </Grid>
         <!-- this is The Register Pop up window code -->
         <Border Grid.ColumnSpan="2"
-                IsVisible="{Binding Bg_OPSignUp}"
+                IsVisible="{Binding BgOpSignUp}"
                 Background="#80000000"
                 ZIndex="1000"/>
         <!-- Interactive Popup for Add New (small "window" centered) -->
         <Border Grid.ColumnSpan="2"
                 ZIndex="1001"
-                IsVisible="{Binding Bg_POPSignUp}"
+                IsVisible="{Binding BgPopSignUp}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Background="#1A1A1A"
@@ -214,7 +214,7 @@
             <StackPanel Spacing="10" HorizontalAlignment="Center">
                 <TextBlock Text="Register Form" Margin="200, 0, 220, 0" FontSize="20" Foreground="White" FontWeight="Bold"/>
                 <TextBlock Text="UserName" Foreground="#CCCCCC"/>
-                <TextBox KeyDown="TextBoxKeyDown" Watermark="Cosmic_shalala etc." Text="{Binding UserName}"/>
+                <TextBox KeyDown="TextBoxKeyDown" Watermark="Cruid55mustard7oil, technoblade etc." Text="{Binding UserName}"/>
                 <TextBlock Text="Email address" Foreground="#CCCCCC"/>
                 <TextBox KeyDown="TextBoxKeyDown" Watermark="Your Email" Text="{Binding Email}"/>
                 <TextBlock Text="Passoword" Foreground="#CCCCCC"/>
@@ -222,7 +222,7 @@
                 <TextBlock Text="Confirm Passoword" Foreground="#CCCCCC"/>
                 <TextBox KeyDown="TextBoxKeyDown" Watermark="Confirm Password" PasswordChar="*" Text="{Binding ConfirmationPassword}"/>
                 <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding ColorsC}"/>
-                <Button IsDefault="True" HorizontalAlignment="Center"  Background="Orange" Content="Sign Up" Command="{Binding RegisterCommand}"/>
+                <Button HorizontalAlignment="Center"  Background="Orange" Content="Sign Up" Command="{Binding RegisterCommand}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="30">
                     <TextBlock Foreground="White" FontSize="20">Have an Account!!!</TextBlock>
                     <Button Background="Orange" Content="Got to Login page" Command="{Binding GotLoginCommand}"/>

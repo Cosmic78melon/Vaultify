@@ -30,6 +30,7 @@ namespace Password_Manager.ViewModels
 
     public partial class HomePageViewModel : PageViewModel
     {
+        public IPythonAPI _pythonAPI;
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
@@ -40,7 +41,7 @@ namespace Password_Manager.ViewModels
 
 
         [ObservableProperty] 
-        private string _passwordHaveToCheck = string.Empty;
+        private string _passwordHaveToCheck;
 
         [ObservableProperty] private string _password_result = "Password Status: Unknown";
         [ObservableProperty] private string _hasUpper = "Include Uppercase Letter";
@@ -54,19 +55,23 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _font3 = "White";
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
-        PythonAPI python_helper = new PythonAPI();
+        
+        public HomePageViewModel(IPythonAPI pythonAPI)
+        {
+            _pythonAPI = pythonAPI;
+        }
 
         [RelayCommand]
         public async Task GeneratePassword()
         {
-            object result = await Task.Run(() => python_helper.CustomeGen(has_Letter: HasLetterCase, hasNum: HasNumCase, hasPunc: HasPuncCase, Length: Lenght));
-            PasswordGenerator = result?.ToString() ?? string.Empty;
+            string result = await Task.Run(() => _pythonAPI.CustomeGen(has_Letter: HasLetterCase, hasNum: HasNumCase, hasPunc: HasPuncCase, length: Lenght));
+            PasswordGenerator = result;
         }
 
         [RelayCommand]
         public async Task PasswordChecker()
         {
-            var details = await Task.Run(() => python_helper.PassswordCheck(PasswordHaveToCheck));
+            var details = await Task.Run(() => _pythonAPI.PassswordCheck(PasswordHaveToCheck));
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 Password_result = "Password Status: " + details.Result;
@@ -83,7 +88,7 @@ namespace Password_Manager.ViewModels
             {
                 Password_result = "Password Status: " + details.Result;
                 CheckChar(details);
-                FontC = "White";
+                FontC = "yellow";
             }
             else
             {
@@ -171,7 +176,18 @@ namespace Password_Manager.ViewModels
         public void load_data_recent(string MasterPassword)
         {
             Items = new ObservableCollection<HomeCard>();
-            return;
+            dynamic data = _pythonAPI.show_all_data(MasterPassword);
+            // using (Py.GIL())
+            // {
+            //     foreach (dynamic item in data)
+            //     {
+            //         Items.Add(new HomeCard
+            //         {
+            //             title = item["Site Name"]
+            //             
+            //         });
+            //     }
+            // }
         }
     }
 }

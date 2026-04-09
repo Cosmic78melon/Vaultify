@@ -6,8 +6,9 @@ using System;
 using System.Xml.Serialization;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Password_Manager.Service;
 using Password_Manager.Models;
+using Password_Manager.Service;
+using ZstdSharp.Unsafe;
 
 namespace Password_Manager.ViewModels
 {
@@ -17,73 +18,23 @@ namespace Password_Manager.ViewModels
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private string? MasterPassword = string.Empty;
+        private string? _masterPassword = string.Empty;
         [ObservableProperty] private string _userName;
         [ObservableProperty] private string _email;
         [ObservableProperty] private string _password;
         [ObservableProperty] private string _confirmationPassword;
         [ObservableProperty] private string _statusMessage;
-        [ObservableProperty] private string _colorsC;
-        [ObservableProperty] private bool _bg_OP = true;
-        [ObservableProperty] private bool _bg_POP = true;
+        [ObservableProperty] private string _colorsC;            
+        [ObservableProperty] private bool _bgOp = true;
+        
+        [ObservableProperty] private bool _bgPop = true;
+        
+        [ObservableProperty] private bool _bgOpSignUp = false;
+        
+        [ObservableProperty] private bool _bgPopSignUp = false;
 
-        [ObservableProperty] private bool _bg_OPSignUp = false;
-        [ObservableProperty] private bool _bg_POPSignUp = false;
-
-
-        [RelayCommand]
-        public void GotRegister()
-        {
-            Bg_OP = Bg_POP = false;
-            Bg_POPSignUp = Bg_OPSignUp = true;
-        }
-        [RelayCommand]
-        public void GotLogin()
-        {
-            Bg_OP = Bg_POP = true;
-            Bg_POPSignUp = Bg_OPSignUp = false;
-        }
-
-        [RelayCommand]
-        public void Register()
-        {
-            StatusMessage = string.Empty;
-            
-            if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
-            {
-                StatusMessage = "Please Enter your Credentials";
-                ColorsC = "red";
-                return;
-            }
-        }
-
-        [RelayCommand]
-        public async void LoginCommand()
-        {
-            PythonAPI pythonhelper = new PythonAPI();
-            bool password_status = await Task.Run(() => pythonhelper.check_Password(Password));
-            Debug.WriteLine(password_status);
-            if (string.IsNullOrWhiteSpace(Password))
-            {
-                StatusMessage = "Please enter your password.";
-                ColorsC = "red";
-                return;
-            }
-
-            // Dummy login logic
-            if (password_status)
-            {
-                MasterPassword = Password;
-                Bg_OP = false;
-                Bg_POP = false;
-                Password = string.Empty;
-                // You can add navigation or other logic here upon successful login
-            }
-            StatusMessage = "Invalid Password.";
-            ColorsC = "red";
-        }
-
-        public PageFactory _pageFactory;
+        public required PageFactory _pageFactory;
+        public required IPythonAPI _pythonAPI;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
@@ -92,7 +43,7 @@ namespace Password_Manager.ViewModels
 
         public int IconSize => (IsExpanded) ? (int)IconSizeList.Large : (int)IconSizeList.Small;
 
-        public int SeacrhbarSize => (IsExpanded) ? 220 : 1;
+        public int SeacrhbarSize => (IsExpanded) ? 220 : 5;
 
         [ObservableProperty]
         public PageViewModel _currentPage;
@@ -102,32 +53,128 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public bool _securityNotesActive;
         [ObservableProperty] public bool _settingsPageActive;
         [ObservableProperty] public bool _accountPageActive;
+        
 
-
-        public MainWindowViewModel()
-        {
-            CurrentPage = new HomePageViewModel();
-        }
-        public MainWindowViewModel(PageFactory pageFactory)
+        public MainWindowViewModel(PageFactory pageFactory, IPythonAPI pythonAPI)
         {
             _pageFactory = pageFactory;
+            _pythonAPI = pythonAPI;
+            CheckUser();
             GoToHome();
         }
+        public MainWindowViewModel()
+        {
+            if (_pythonAPI != null) CurrentPage = new HomePageViewModel(_pythonAPI);
+        }
+
+        public void CheckUser()
+        {
+            bool isNewUser = _pythonAPI.isNewUser();
+            if (isNewUser)
+            {
+                // Show SIGNUP
+                BgOp = false;
+                BgPop = false;
+
+                BgOpSignUp = true;
+                BgPopSignUp = true;
+            }
+            else
+            {
+                // Show LOGIN
+                BgOp = true;
+                BgPop = true;
+
+                BgOpSignUp = false;
+                BgPopSignUp = false;
+            }
+        }
+        
+        [RelayCommand]
+        public void GotRegister()
+        {
+            BgOp = BgPop = false;
+            BgPopSignUp = BgOpSignUp = true;
+        }
+        [RelayCommand]
+        public void GotLogin()
+        {
+            BgOp = BgPop = true;
+            BgPopSignUp = BgOpSignUp = false;
+        }
+
+        [RelayCommand]
+        public void Register()
+        {
+            StatusMessage = string.Empty;
+            if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
+            {
+                StatusMessage = "Please Enter your Credentials";
+                ColorsC = "red";
+                return;
+            }
+
+            if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase))
+            {
+                bool isNewUser = _pythonAPI.isNewUser();
+                bool isAuthenticated = _pythonAPI.isAuthenticated(Password);
+                if (isNewUser != true && isAuthenticated)
+                {
+                    StatusMessage = "Welcome back! You are already registered with us.";
+                    ColorsC = "yellow";
+                    return;
+                }
+
+                StatusMessage = "Account created successfully! Welcome to our platform.";
+                ColorsC = "green";
+            }
+        }
+
+        [RelayCommand]
+        public async Task LoginCommand()
+        {
+            bool passwordStatus = await Task.Run(() => _pythonAPI.isAuthenticated(Password));
+            Debug.WriteLine(passwordStatus);
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                StatusMessage = "Please enter your password.";
+                ColorsC = "red";
+                return;
+            }
+
+            if (passwordStatus)
+            {
+                _masterPassword = Password;
+                BgOp = false;
+                BgPop = false;
+                Password = string.Empty;
+            }
+            StatusMessage = "Invalid Password.";
+            ColorsC = "red";
+        }
+
 
         [RelayCommand]
         public void GoToHome()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item => item.load_data_recent(MasterPassword));
+            CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item =>
+            {
+                if (_masterPassword != null) item.load_data_recent(_masterPassword);
+            });
             UpdateActiveState(PageViewData.Home);
         }  
 
         [RelayCommand]
-        public async void GoToAll_Entries()
+        public void GoToAll_Entries()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>(async item =>
+            CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>((item) =>
             {
-                item.HomepagePassword = MasterPassword;
-                await Task.Run(() => item.LoadData(MasterPassword));
+                if (_masterPassword != null)
+                {
+                    item.HomepagePassword = _masterPassword;
+                    Debug.Write(_masterPassword);
+                    item.LoadData(_masterPassword);
+                }
             });
             UpdateActiveState(PageViewData.All_Entries);
         } 

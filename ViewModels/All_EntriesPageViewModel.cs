@@ -5,10 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Service;
 using Python.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,8 +35,9 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public string _password;
         [ObservableProperty] private string _confirmationPassword;
         [ObservableProperty] public string _catagory;
-
         [ObservableProperty] private string _homepagePassword;
+
+        public readonly IPythonAPI _pythonAPI;
 
         [RelayCommand]
         public void AddnewPOPButton()
@@ -47,7 +45,7 @@ namespace Password_Manager.ViewModels
             AddnewPOP = AddnewOP = true;
         }
         [RelayCommand]
-        public void SharePOPButton()
+        public void SharePopButton()
         {
             ShareOP = SharePOP = true;
         }
@@ -63,23 +61,26 @@ namespace Password_Manager.ViewModels
         }
 
         private ObservableCollection<Entry> _items;
-
         public ObservableCollection<Entry> Items
         {
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
 
-        public async void LoadData(string password)
-        {   
+        public All_EntriesPageViewModel(IPythonAPI pythonAPI)
+        {
+            _pythonAPI = pythonAPI;
+        }
+
+        public async Task LoadData(string password)
+        {
+            await Task.Delay(100);
             try
             {
-                PythonAPI pythoneHelper = new PythonAPI();
                 Items = new ObservableCollection<Entry>();
-                dynamic data = await Task.Run(() => pythoneHelper.show_all_data(password));
+                dynamic data = await Task.Run(() => _pythonAPI.show_all_data(password));
                 using (Py.GIL())
                 {
-
                     foreach (dynamic item in data)
                     {
                         Items.Add(new Entry
@@ -92,12 +93,12 @@ namespace Password_Manager.ViewModels
                     }
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
                 Items.Add(new Entry
                 {
                     Title = "Nothing",
-                    Username = "Nothing",
+                    Username = ex.Message,
                     Password = "Nothing",
                     catagory = "Nothing"
                 });
@@ -106,16 +107,15 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public async void save()
+        public async Task save()
         {
             try
             {
-                PythonAPI python = new PythonAPI();
-                bool isAuthenticated = await Task.Run(() => python.check_Password(HomepagePassword));
+                bool isAuthenticated = await Task.Run(() => _pythonAPI.isAuthenticated(HomepagePassword));
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    dynamic data = await Task.Run(() => python.addCredentials(HomepagePassword, Webname, Password, catagory: Catagory, user_Name: Name));
-                    if (data == true)
+                    bool data = await Task.Run(() => _pythonAPI.addCredentials(HomepagePassword, Webname, Name, Password, Catagory)); 
+                    if (data != false)
                     {
                         StatusMessage = "Password Saved Successfully";
                         ColorC = "green";
@@ -135,10 +135,9 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public void GeneratePassword()
+        public async Task GeneratePassword()
         {
-            PythonAPI python = new PythonAPI();
-            string password = python.Generate_password().ToString();
+            string password = _pythonAPI.Generate_password();
             Password = ConfirmationPassword = password;
         }
     }

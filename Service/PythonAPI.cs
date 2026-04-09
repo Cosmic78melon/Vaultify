@@ -1,17 +1,18 @@
 ﻿using Python.Runtime;
 using System;
+using System.Collections;
 using System.IO;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tmds.DBus.Protocol;
 
 namespace Password_Manager.Service
 {
-    public class PythonAPI
+    public class PythonAPI: IPythonAPI
     {
-        public class PasswordCheckDetails
+        public class passwordCheckDetails
         {
             public string Result { get; set; } = "Unknown";
             public bool? HasUppercase { get; set; }
@@ -29,59 +30,50 @@ namespace Password_Manager.Service
                 string cwd = os.getcwd();
                 string parent = os.path.abspath(os.path.join(cwd, os.pardir, os.pardir, os.pardir));
                 sys.path.append(Path.Combine(parent, "Security"));
-                dynamic SecurityModule = Py.Import("Security");
-                return SecurityModule;
+                return Py.Import("Security");
             }
         }
-        public object Generate_password(string site_name = null, int Length = 12)
+        public string Generate_password(string? siteName = null, int length = 12)
         {
-            dynamic SecurityModule = SecurityMod();
+            dynamic securityModule = SecurityMod();
             using (Py.GIL())
             {
-                try
-                {
-                    dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
-                    dynamic result = PwManager.GeneratePass();
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-                return null;
+                dynamic pwManager = securityModule.PasswordManager(siteName, "Nothing", true, length);
+                dynamic result = pwManager.GeneratePass();
+                return result.ToString();
             }
         }
-        public object CustomeGen(string site_name = null, int Length = 12, bool has_Letter = true, bool hasNum = true, bool hasPunc = true)
+        public string CustomeGen(string? siteName = null, int length = 12, bool hasLetter = true, bool hasNum = true, bool hasPunc = true)
         {
             using (Py.GIL())
             {
-                dynamic SecurityModule = SecurityMod();
-                if ((has_Letter && hasNum && hasPunc) == true)
+                dynamic securityModule = SecurityMod();
+                if (hasLetter && hasNum && hasPunc)
                 {
-                    dynamic data = Generate_password(site_name, Length);
+                    dynamic data = Generate_password(siteName, length);
                     return data;
                 }
-                using dynamic PwManager = SecurityModule.PasswordManager(site_name, null, true, Length);
-                dynamic result = PwManager.Custom_GeneratePass(has_Letter, hasNum, hasPunc);
-                return result;
+                using dynamic pwManager = securityModule.PasswordManager(siteName, null, true, length);
+                dynamic result = pwManager.Custom_GeneratePass(hasLetter, hasNum, hasPunc);
+                return result.ToString();
             }
         }
-        public dynamic PassswordCheck(string Password = null)
+        public dynamic PassswordCheck(string? password = null)
         {
-            var details = new PasswordCheckDetails();
-            if (string.IsNullOrEmpty(Password))
+            var details = new passwordCheckDetails();
+            if (string.IsNullOrEmpty(password))
             {
-                details.Result = "No Password";
+                details.Result = "No password";
                 return details;
             }
             using (Py.GIL())
             {
-                dynamic SecurityModule = SecurityMod();
+                dynamic securityModule = SecurityMod();
                 try
                 {
-                    dynamic PwManger = SecurityModule.PasswordManager("Uknown", Password);
-                    details.Result = PwManger.Check_Password();
-                    PyObject testResultPy = PwManger.TestResult;
+                    dynamic pwManger = securityModule.PasswordManager("Unknown", password);
+                    details.Result = pwManger.Check_Password();
+                    PyObject testResultPy = pwManger.TestResult;
                     if (testResultPy != null && !testResultPy.IsNone())
                     {
                         var dict = testResultPy["Cause"];
@@ -105,12 +97,11 @@ namespace Password_Manager.Service
         }
         private static bool? GetBoolOrNull(PyObject dict)
         {
-            if (dict == null || dict.IsNone()) return null;
-            var value = dict;
-            if (value == null || value.IsNone()) return null;
+            // I have no fucking Idea how the code works, but it works as intended so don't touch anything
+            if (dict.IsNone()) return null;
             try
             {
-                if (value.IsTrue()) return false;
+                if (dict.IsTrue()) return false; // why?? it works
                 else return true;
             }
             catch
@@ -119,35 +110,68 @@ namespace Password_Manager.Service
             }
         }
 
-        public dynamic show_all_data(string Password)
+        public dynamic show_all_data(string password)
         {
-            dynamic SecurityModule = SecurityMod();
+            dynamic securityModule = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pw = SecurityModule.PasswordManager("Uknown", Password);
+                dynamic pw = securityModule.PasswordManager("Unknown", password);
                 dynamic data = pw.show_all_data();
                 return data;
             }
         }
 
-        public dynamic check_Password(string Password)
+        public bool isAuthenticated(string password)
         {
-            dynamic SecurityModule = SecurityMod();
+            dynamic securityModule = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pw = SecurityModule.PasswordManager("password", Password);
-                dynamic data = pw.check_password();
+                dynamic pw = securityModule.PasswordManager("password", password);
+                bool data = Convert.ToBoolean(pw.IsAuthenticated());
                 return data;
             }
         }
-
-        public dynamic addCredentials(string MasterPass,string site_name, string Password, string message = "unknown", string catagory = "unknown", string user_Name = "Nothing")
+        public bool isNewUser()
         {
             dynamic python = SecurityMod();
             using (Py.GIL())
             {
-                dynamic manager = python.PasswordManager(site_name, MasterPass);
-                dynamic data = manager.encryptAndStoredata(message, Password, catagory, user_Name);
+                dynamic manager = python.PasswordManager("Password Manager");
+                bool data = Convert.ToBoolean(manager.new_user());
+                return data; 
+            }
+        }
+
+        public bool addCredentials(string masterPass,string siteName = "password Manager", string user_Name = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false) 
+            // TODO: add a password strength checker
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = python.PasswordManager(siteName, masterPass);
+                dynamic data = Convert.ToBoolean(manager.encryptAndStoredata(user_Name, password, message, catagory, favourite));
+                return data;
+            }
+        }
+
+        public bool register(string userName, string password)
+        {
+            bool isNewUser = this.isNewUser();
+            bool isAuthenticated = this.isAuthenticated(password);
+            if (isAuthenticated && !isNewUser)
+            {
+                return false;
+            }
+            bool isRegistered = this.addCredentials(masterPass:password, user_Name:userName);
+            return true;
+        }
+        public dynamic card_Data(string masterpassword)
+        {
+            dynamic securityModule = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = securityModule.PasswordManager("Password Manager", masterpassword);
+                dynamic data = manager.vaultStatusCheck();
                 return data;
             }
         }

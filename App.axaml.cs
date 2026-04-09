@@ -7,6 +7,7 @@ using CSnakes.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Password_Manager.Factory;
 using Password_Manager.Models;
+using Password_Manager.Service;
 using Password_Manager.ViewModels;
 using Password_Manager.Views;
 using Python.Runtime;
@@ -16,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Password_Manager.Service;
 
 namespace Password_Manager
 {
@@ -29,7 +31,7 @@ namespace Password_Manager
         {
             var collections = new ServiceCollection();
             collections.AddSingleton<MainWindowViewModel>();
-            collections.AddTransient<HomePageViewModel>();
+            collections.AddSingleton<HomePageViewModel>();
             collections.AddTransient<All_EntriesPageViewModel>();
             collections.AddTransient<SecurityPageViewModel>();
             collections.AddTransient<SettingsPageViewModel>();
@@ -51,6 +53,9 @@ namespace Password_Manager
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
 
+            // Registering the PythonAPI
+            collections.AddSingleton<IPythonAPI, PythonAPI>();
+
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
             {
                 _ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
@@ -63,6 +68,7 @@ namespace Password_Manager
 
             collections.AddSingleton<PageFactory>();
             var service = collections.BuildServiceProvider();
+
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {

@@ -207,9 +207,5 @@
 		<Setter Property="LargeChange" Value="6"></Setter>
         <Setter Property="TickFrequency" Value="1"></Setter>
         <Setter Property="IsSnapToTickEnabled" Value="True"></Setter>
-        <Setter Property="Background" Value="white"></Setter>
-    </Style>  
-    <Style Selector="Slider:pointerover">
-        <Setter Property="Background" Value="white"></Setter>
     </Style>
 </Styles>

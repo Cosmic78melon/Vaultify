@@ -7,18 +7,20 @@ import base64
 import random 
 import string 
 import secrets
-import requests 
+import requests
+import datetime as dt
 from dotenv import load_dotenv
 import pwnedpasswords as pwend
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from sympy import true
 
 load_dotenv() 
 
 class PasswordManager:
     def __init__(self,
-                 site_name: str = "Unknown",
+                 site_name: str = "Password Manager",
                  password = None,
                  shouldGeneratePass: bool = False,
                  Password_Length: int = 12):
@@ -31,10 +33,10 @@ class PasswordManager:
                                                                                                   "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
 
         # This is are Constants that are not supposed to control by users
-        self.min = 0
-        self.max = 9999
+        self.minimum = 0
+        self.maximum = 9999
         self.iteration = 299990
-        self.Pure_Random_Ints = self._randomNumGen(10,self.min, self.max)
+        self.Pure_Random_Ints = self._randomNumGen(10,self.minimum, self.maximum)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.abspath(os.path.join(base_dir, os.pardir))
@@ -106,13 +108,15 @@ class PasswordManager:
     }
         return self.TestResult[0]
         
-    def GeneratePass(self) -> str | None: 
+    def GeneratePass(self) -> str | None:
+        minimum = self.minimum
+        maximum = self.maximum
         if self.Length < 12:
             return "Invalid Length. It must be greater than 12"
 
         if self.Pure_Random_Ints is None:
             rand = secrets.SystemRandom(10)
-            randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
+            randoms = [rand.randrange(minimum, maximum) for _ in range(10)]
         else:
             randoms = self.Pure_Random_Ints
 
@@ -128,16 +132,20 @@ class PasswordManager:
         return None
 
     def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str:
-        if self.Length < 12:
+        length = self.Length
+        randint = self.Pure_Random_Ints
+        minimum = self.minimum
+        maximum = self.maximum
+        if length < 12:
             return "Invalid Length. It must be greater than 12"
 
-        if self.Pure_Random_Ints is None:
+        if randint is None:
             rand = secrets.SystemRandom(10) 
-            randoms = [rand.randrange(self.min, self.max) for _ in range(10)]
+            randoms = [rand.randrange(minimum, maximum) for _ in range(144)]
         else:
             randoms = self.Pure_Random_Ints
             
-        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(self.Length, len(randoms))))
+        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(length, len(randoms))))
         if hasLetters and hasNumber and hasPunc:
             result = self.GeneratePass()
             return result
@@ -193,48 +201,57 @@ class PasswordManager:
                 data.append(rand.randrange(minimum, maximum +1))
             return data
 
-    def encryptAndStoredata(self, SecureNote = "Nothing", Password = "", Catagory = "Unknown", user_name = "Unknown"):
-        if self.password is None:
-            return self.TestResult[-1]
+    def encryptAndStoredata(self, user_name = "Unknown" ,Password = "",SecureNote = "Nothing",Catagory = "Unknown", favourite = False):
+        password = self.password
+        test_result = self.TestResult
+        path = self.path
+        iteration = self.iteration
 
-        if Password is None:
-            return self.TestResult[-1]
+        if self.IsAuthenticated() == False:
+            return False
 
-        if not os.path.exists(self.path) or os.path.getsize(self.path) == 0:
-            with open(self.path , "w") as file:
+        if password is None or Password is None:
+            return False
+
+        if not os.path.exists(path) or os.path.getsize(path) == 0:
+            with open(path , "w") as file:
                 json.dump({"Salt": None,"Credentials": []}, file,indent=10)
+
         
-        with open(self.path) as file:
+        with open(path) as file:
             file_data = json.load(file)
             
             if file_data["Salt"] is None:
                 file_data["Salt"] = base64.urlsafe_b64encode(os.urandom(16)).decode()
 
             salt = base64.urlsafe_b64decode(file_data["Salt"])
-            kdf_derived_key, kdf = self._derived_key(salt, iteration = self.iteration)
+            kdf_derived_key, kdf = self._derived_key(salt, iteration = iteration)
             key = Fernet(kdf_derived_key)
-            
-            Id = str(uuid.uuid4())
-            credentials = self._EncJson(key, self.site_name,SecureNote, Password, Catagory, user_name)
-            
+
+
+            credentials = self._EncJson(key, self.site_name, user_name, Password, SecureNote, Catagory, favourite=favourite)
+
             temp_kdf_type = str(type(kdf))
             kdf_type = re.findall( r'\w+|[^\s\w]+', temp_kdf_type)[-2]
+
+            Id = str(uuid.uuid4())
             New_entry = {
                 "Id": Id,   
                 "KDF": str(kdf_type),
-                "iteration": self.iteration,
+                "iteration": iteration,
                 "Vault": base64.urlsafe_b64encode(credentials).decode()
             }
                             
             file_data["Credentials"].append(New_entry)
             file.seek(0)
-        with open(self.path, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(file_data, f, indent=10)
             
         return True
 
 
-    def _EncJson(self, fernet, site_name, message, Password = None, Catagory = "Unknown", user_name = "Unknown"):
+    def _EncJson(self, fernet, site_name, user_name = "Unknown", Password = None, message = None, Catagory = "Unknown",
+                 favourite = False):
         """
         Encrypt a JSON payload using a provided Fernet instance.
         """
@@ -251,19 +268,25 @@ class PasswordManager:
             raise ValueError("Invalid Fernet instance")
 
         vault_data = {
-            "Site Name": site_name,
-            "User Name": user_name,
-            "Password": Password,
-            "Secure Note": str(message),
-            "Catagory": Catagory
+            "title": site_name,
+            "username": user_name,
+            "password": Password,
+            "notes": str(message),
+            "category": Catagory,
+            "Strength":self.Check_Password(Password),
+            "favorite": favourite,
+            "created_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
+
         temp_json = json.dumps(vault_data).encode()
         encrypted_json = fernet.encrypt(temp_json)
 
         return encrypted_json
 
     def _derived_key(self, salt, iteration):
-        if self.password is None:
+        password = self.password
+        if password is None:
             return "Invalid Password", None
 
         if salt is None:
@@ -275,22 +298,24 @@ class PasswordManager:
             salt = salt,
             iterations=iteration
         )
-        return base64.urlsafe_b64encode(kdf.derive(self.password.encode())), kdf
-        
-    
+        return base64.urlsafe_b64encode(kdf.derive(password.encode())), kdf
+
+
     def decryptAndStoredata(self, id = None):
-        if self.password is None:
+        path = self.path
+        password = self.password
+        if password is None:
             return self.TestResult[-1], None
-        
-        if not os.path.exists(self.path) or os.path.getsize(self.path) < 50:
+
+        if not os.path.exists(path) or os.path.getsize(path) < 50:
             return "Invalid Path", None
 
         if id is None:
             return "Please enter a Id", None
 
-        with open(self.path) as file:
+        with open(path) as file:
             file_data = json.load(file)
-            
+
             salt = base64.urlsafe_b64decode(file_data["Salt"])
             for detail in file_data["Credentials"]:
                 if id == detail["Id"]:
@@ -308,7 +333,8 @@ class PasswordManager:
 
     def show_all_data(self):
         decrypted_data = []
-        with open(self.path) as file:
+        path = self.path
+        with open(path) as file:
             json_data = json.load(file)
             salt = base64.urlsafe_b64decode(json_data["Salt"])
             for detail in json_data["Credentials"]:
@@ -322,13 +348,16 @@ class PasswordManager:
                     decrypted_data.append(data)
                 except Exception:
                     return [{"success": False, "error": "Decryption failed"}]
-        return decrypted_data
+        return decrypted_data[1:]
 
-    def check_password(self):
-        if self.password is None:
+    def IsAuthenticated(self):
+        Password = self.password
+        path = self.path
+
+        if Password is None:
             return False
 
-        with open(self.path) as file:
+        with open(path) as file:
             json_data = json.load(file)
             salt = base64.urlsafe_b64decode(json_data["Salt"])
             for detail in json_data["Credentials"]:
@@ -342,15 +371,23 @@ class PasswordManager:
                     return False
         return True
 
+    def new_user(self):
+        path = self.path
+        with open(path) as file:
+            json_data = json.load(file)
+            if len(json_data["Credentials"]) == 0:
+                return True
+            return False
 
     def change_password(self, id = None, new_Password = ""):
-        if not os.path.exists(self.path) or os.path.getsize(self.path) < 50:
+        path = self.path
+        if not os.path.exists(path) or os.path.getsize(path) < 50:
             return "Invalid Path"
 
         if id is None:
             return "Please enter a Id"
 
-        with open(self.path) as file:
+        with open(path) as file:
             file_data = json.load(file)
             salt = base64.urlsafe_b64decode(file_data["Salt"])
             for detail in file_data["Credentials"]:
@@ -366,24 +403,105 @@ class PasswordManager:
                         decrypt_data = f.decrypt(vault).decode()
                         data = json.loads(decrypt_data)
                         data["Password"] = new_Password
+                        data["updated_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         # use the Fernet instance 'f' to encrypt the updated data
                         enc_data = self._EncJson(f, data['Site Name'], data['Secure Note'], data['Password'])
                         detail["Vault"] = base64.urlsafe_b64encode(enc_data).decode()
                         # write the full file_data back to disk to avoid corruption
-                        with open(self.path, "w", encoding="utf-8") as fl:
+                        with open(path, "w", encoding="utf-8") as fl:
                             json.dump(file_data, fl, indent=10)
                         return f"Password Changed Successfully"
                     except Exception as e:
                         return e
             return "Invalid Id"
 
+    def card_data(self):
+        """ This is how the data looks like
+         vault_data = {
+             "title": site_name,
+             "username": user_name,
+             "password": Password,
+             "notes": str(message),
+             "category": Catagory,
+             "Strength":self.Check_Password(Password),
+             "favorite": False,
+             "created_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+             "updated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+         } """
+
+        result_data = {}
+        raw_data = self.show_all_data()
+        for dict_x in raw_data:
+            if dict_x["title"] != "Password Manager" and dict_x["title"] != "Unknown" and dict_x["title"] != "":
+                result_data[dict_x["title"]] = result_data.get(dict_x["title"], 0) + 1
+        return result_data
+
+    def fovourite_card_data(self):
+        """ This is how the data looks like
+         vault_data = {
+             "title": site_name,
+             "username": user_name,
+             "password": Password,
+             "notes": str(message),
+             "category": Catagory,
+             "Strength":self.Check_Password(Password),
+             "favorite": False,
+             "created_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+             "updated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+         } """
+
+        result_data = {}
+        raw_data = self.show_all_data()
+        for dict_x in raw_data:
+            if dict_x["title"] != "Password Manager" and dict_x["title"] != "Unknown" and dict_x["title"] != "" and dict_x["favorite"] is True:
+                result_data[dict_x["title"]] = result_data.get(dict_x["title"], 0) + 1
+        return result_data
+
+    def vaultStatusCheck(self):
+        isAuth = self.IsAuthenticated()
+        if isAuth:
+            data = self.show_all_data()
+        # vault_data = {
+        #     "title": site_name,
+        #     "username": user_name,
+        #     "password": Password,
+        #     "notes": str(message),
+        #     "category": Catagory,
+        #     "Strength":self.Check_Password(Password),
+        #     "favorite": False,
+        #     "created_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        #     "updated_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        #}
+            weak = 0
+            strong = 0
+            breached = 0
+            total = 0
+            for i in data:
+                if i["Strength"] == self.TestResult[1]:
+                    weak += 1
+                    total += 1
+                elif i["Strength"] == self.TestResult[0]:
+                    strong += 1
+                    total += 1
+                elif i["Strength"] == self.TestResult[80]:
+                    total += 1
+                    breached += 1
+
+            return {"Total": total,"Strong:": strong, "Weak": weak, "Breached":breached}
+        return None
+
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netflix", "adol", False, 32)
-    # Status = pw_1.encryptAndStoredata("Important security 😤 Message", "adol33v454")
+    pw_1 = PasswordManager("Steam", "adol", False, 32)
+    # print(pw_1.vaultStatusCheck())
+    # print(pw_1.IsAuthenticated())
+    # Status = pw_1.encryptAndStoredata("Cosmic78melon", pw_1.GeneratePass(), "Important Message", "edu")
     # print(Status)
+    print(pw_1.vaultStatusCheck())
+    print(pw_1.card_data())
+    print(pw_1.fovourite_card_data())
     # print(pw_1.change_password("d737a2d9-9478-4cbc-800b-aa8a43fae07b", "%^ado54"))
-    details, vault = pw_1.decryptAndStoredata("719d7351-59bc-4262-b7d4-76cf2932c353")
-    print(vault)
+    # details, vault = pw_1.decryptAndStoredata()
+    # print(vault)
     print(pw_1.show_all_data())
     # print("This is the updated vault "+vault)
 

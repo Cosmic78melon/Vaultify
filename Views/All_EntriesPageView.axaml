@@ -36,7 +36,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Classes="Vault" Command="{Binding SharePOPButtonCommand}">
+                    <Button Classes="Vault" Command="{Binding SharePopButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Share" FontSize="20" />
                             <TextBlock Text="Share" />

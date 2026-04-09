@@ -20,11 +20,10 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="Controls/CheckBox.axaml"></MergeResourceInclude>
+				<MergeResourceInclude Source="Controls/Sliders.axaml"></MergeResourceInclude>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Application.Resources>
 
-  <Application.Resources>
 	  <SolidColorBrush x:Key="Primary_Background_Color">#0f0c09</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_SideMenu_Color">#2b231d</SolidColorBrush>
 	  <SolidColorBrush x:Key="Primary_Seperator_Color">Wheat</SolidColorBrush>

@@ -15,9 +15,9 @@ namespace Password_Manager.ViewModels
 {
     public class Entry
     {
-        public string Title { get; set; }
-        public string Password { get; set; }
-        public string Username { get; set; }
+        public required string Title { get; set; }
+        public required string Password { get; set; }
+        public required string Username { get; set; }
         public string catagory { get; set; }
     }
     public partial class All_EntriesPageViewModel : PageViewModel
@@ -107,15 +107,15 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public async Task save()
+        public void save()
         {
             try
             {
-                bool isAuthenticated = await Task.Run(() => _pythonAPI.isAuthenticated(HomepagePassword));
+                bool isAuthenticated = _pythonAPI.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    bool data = await Task.Run(() => _pythonAPI.addCredentials(HomepagePassword, Webname, Name, Password, Catagory)); 
-                    if (data != false)
+                    bool data = Convert.ToBoolean(_pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false)); 
+                    if (data)
                     {
                         StatusMessage = "Password Saved Successfully";
                         ColorC = "green";
@@ -135,7 +135,7 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public async Task GeneratePassword()
+        public void GeneratePassword()
         {
             string password = _pythonAPI.Generate_password();
             Password = ConfirmationPassword = password;

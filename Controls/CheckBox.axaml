@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    x:ClassModifier="internal">
+                    xmlns:sys="using:System">
   <Design.PreviewWith>
     <Border Padding="20" Background="{DynamicResource Primary_SideMenu_Color}">
       <StackPanel Spacing="20">

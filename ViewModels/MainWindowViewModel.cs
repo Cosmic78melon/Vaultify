@@ -125,16 +125,22 @@ namespace Password_Manager.ViewModels
                     return;
                 }
 
+                bool register = _pythonAPI.register(UserName, Password);
+                if (register == false)
+                {
+                    StatusMessage = "Your Password is Weak. please enter strong password";
+                    ColorsC = "red";
+                    return;
+                }
                 StatusMessage = "Account created successfully! Welcome to our platform.";
                 ColorsC = "green";
             }
         }
 
         [RelayCommand]
-        public async Task LoginCommand()
+        public void LoginCommand()
         {
-            bool passwordStatus = await Task.Run(() => _pythonAPI.isAuthenticated(Password));
-            Debug.WriteLine(passwordStatus);
+            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
             if (string.IsNullOrWhiteSpace(Password))
             {
                 StatusMessage = "Please enter your password.";
@@ -173,7 +179,7 @@ namespace Password_Manager.ViewModels
                 {
                     item.HomepagePassword = _masterPassword;
                     Debug.Write(_masterPassword);
-                    item.LoadData(_masterPassword);
+                    _ = item.LoadData(_masterPassword);
                 }
             });
             UpdateActiveState(PageViewData.All_Entries);

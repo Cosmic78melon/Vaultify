@@ -38,7 +38,7 @@ namespace Password_Manager.Service
             dynamic securityModule = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pwManager = securityModule.PasswordManager(siteName, "Nothing", true, length);
+                dynamic pwManager = securityModule.PasswordManager(siteName, "Nothing", length);
                 dynamic result = pwManager.GeneratePass();
                 return result.ToString();
             }
@@ -53,7 +53,7 @@ namespace Password_Manager.Service
                     dynamic data = Generate_password(siteName, length);
                     return data;
                 }
-                using dynamic pwManager = securityModule.PasswordManager(siteName, null, true, length);
+                using dynamic pwManager = securityModule.PasswordManager(siteName, null, length);
                 dynamic result = pwManager.Custom_GeneratePass(hasLetter, hasNum, hasPunc);
                 return result.ToString();
             }
@@ -112,68 +112,90 @@ namespace Password_Manager.Service
 
         public dynamic show_all_data(string password)
         {
-            dynamic securityModule = SecurityMod();
+            dynamic python = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pw = securityModule.PasswordManager("Unknown", password);
-                dynamic data = pw.show_all_data();
+                dynamic manager = python.PasswordManager(null, password);
+                dynamic data = manager.show_all_data();
                 return data;
             }
         }
 
         public bool isAuthenticated(string password)
         {
-            dynamic securityModule = SecurityMod();
+            dynamic python = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pw = securityModule.PasswordManager("password", password);
-                bool data = Convert.ToBoolean(pw.IsAuthenticated());
-                return data;
-            }
+                dynamic manager = python.PasswordManager(null, password);
+                dynamic data = manager.IsAuthenticated();
+                return data; 
+            } 
         }
         public bool isNewUser()
         {
             dynamic python = SecurityMod();
             using (Py.GIL())
             {
-                dynamic manager = python.PasswordManager("Password Manager");
-                bool data = Convert.ToBoolean(manager.new_user());
-                return data; 
+                dynamic manager = python.PasswordManager();
+                bool data = manager.isNewUser();
+                return data;
             }
         }
 
-        public bool addCredentials(string masterPass,string siteName = "password Manager", string user_Name = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false) 
-            // TODO: add a password strength checker
+
+        public bool addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
             dynamic python = SecurityMod();
             using (Py.GIL())
             {
-                dynamic manager = python.PasswordManager(siteName, masterPass);
-                dynamic data = Convert.ToBoolean(manager.encryptAndStoredata(user_Name, password, message, catagory, favourite));
+                if (this.isAuthenticated(masterPass) != true)
+                {
+                    return false;
+                }
+                dynamic manager = python.PasswordManager(siteName,  masterPass);
+                bool data = manager.encryptAndStoredata(userName, password, message, category, favourite);
+                return data;
+            }
+        }
+        public bool register(string userName, string password)
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic details = this.PassswordCheck(password);
+                if (!string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+                dynamic manager = python.PasswordManager("Password Manager", password);
+                bool data = manager.encryptAndStoredata(userName, password);
+                return data;
+            }
+        }
+        public dynamic statusdata(string masterpassword)
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = python.PasswordManager(null, masterpassword);
+                dynamic data = manager.status();
+                return data;
+            }
+        }
+        public dynamic favData(string masterpassword)
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = python.PasswordManager(null, masterpassword);
+                dynamic data = manager.favourite_card_data();
                 return data;
             }
         }
 
-        public bool register(string userName, string password)
-        {
-            bool isNewUser = this.isNewUser();
-            bool isAuthenticated = this.isAuthenticated(password);
-            if (isAuthenticated && !isNewUser)
-            {
-                return false;
-            }
-            bool isRegistered = this.addCredentials(masterPass:password, user_Name:userName);
-            return true;
-        }
         public dynamic card_Data(string masterpassword)
         {
-            dynamic securityModule = SecurityMod();
-            using (Py.GIL())
-            {
-                dynamic manager = securityModule.PasswordManager("Password Manager", masterpassword);
-                dynamic data = manager.vaultStatusCheck();
-                return data;
-            }
+            throw new NotImplementedException();
         }
     }
 }

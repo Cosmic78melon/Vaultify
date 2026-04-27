@@ -423,7 +423,7 @@ if __name__ == "__main__":
     # print(Status)
     # print(pw_1.status())
     # print(pw_1.favourite_card_data())
-    ic(pw_1.show_all_data())
+    # ic(pw_1.show_all_data())
 
 
 

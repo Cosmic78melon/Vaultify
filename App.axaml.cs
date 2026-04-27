@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using Avalonia.Controls;
 using Password_Manager.Service;
 
 namespace Password_Manager
@@ -39,16 +40,12 @@ namespace Password_Manager
 
 
             // Initialize Python
-            string baseDir = AppContext.BaseDirectory;
+            string baseDir =  Directory.GetCurrentDirectory();
             string pythonHome = Path.Combine(baseDir, "python-3.13.12-embed-amd64");
             string pythonDll = Path.Combine(pythonHome, "python313.dll");
 
             Runtime.PythonDLL = pythonDll;
             PythonEngine.PythonHome = pythonHome;
-
-            // Append directory, not DLL
-            string currentPath = Environment.GetEnvironmentVariable("PATH");
-            Environment.SetEnvironmentVariable("PATH", currentPath + ";" + pythonHome);
 
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();

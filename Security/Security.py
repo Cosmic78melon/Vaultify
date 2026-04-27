@@ -9,8 +9,6 @@ import string
 import secrets
 import binascii
 import datetime as dt
-import wave
-
 from icecream import ic
 import pwnedpasswords as pwend
 from cryptography.fernet import Fernet
@@ -418,14 +416,14 @@ class PasswordManager:
         
 
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netflix", "#$Adol22((00",  32)
+    pw_1 = PasswordManager("Netflix", "@@Adol2280@@",  32)
     # ic(pw_1.IsAuthenticated())
     # Status = pw_1.encryptAndStoredata("Cosmic78melon", pw_1.GeneratePass(),
     #                                   "Important Message", "edu", True)
     # print(Status)
     # print(pw_1.status())
     # print(pw_1.favourite_card_data())
-    # ic(pw_1.show_all_data())
+    ic(pw_1.show_all_data())
 
 
 

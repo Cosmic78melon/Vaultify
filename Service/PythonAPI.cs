@@ -28,8 +28,7 @@ namespace Password_Manager.Service
                 dynamic sys = Py.Import("sys");
                 dynamic os = Py.Import("os");
                 string cwd = os.getcwd();
-                string parent = os.path.abspath(os.path.join(cwd, os.pardir, os.pardir, os.pardir));
-                sys.path.append(Path.Combine(parent, "Security"));
+                sys.path.append(Path.Combine(cwd, "Security"));
                 return Py.Import("Security");
             }
         }

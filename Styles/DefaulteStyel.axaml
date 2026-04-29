@@ -36,6 +36,14 @@
     </Border>
   </Design.PreviewWith>
 
+	
+	<!-- Headers Styles for Font -->
+	<Style Selector="TextBlock.Headers">
+		<Setter Property="FontSize" Value="18"></Setter>
+		<Setter Property="FontWeight" Value="SemiBold"></Setter>
+		<Setter Property="Foreground" Value="#AAAAAA"></Setter>
+		<Setter Property="VerticalAlignment" Value="Center"></Setter>
+	</Style>
     
     <!--Label Fonts Set-->
   <Style Selector="Label">

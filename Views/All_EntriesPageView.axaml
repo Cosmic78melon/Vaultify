@@ -38,15 +38,15 @@
 
                     <Button Classes="Vault" Command="{Binding SharePopButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <icons:SymbolIcon Symbol="Share" FontSize="20" />
-                            <TextBlock Text="Share" />
+                            <icons:SymbolIcon Symbol="ArrowExportUp" FontSize="20" />
+                            <TextBlock Text="Export Vault" />
                         </StackPanel>
                     </Button>
 
                     <Button Classes="Vault" Command="{Binding ChangePasswordPOPButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="ArrowSync" FontSize="20" />
-                            <TextBlock Text="Change passwords" />
+                            <TextBlock Text="Import Vault" />
                             <Border Background="#FF8C00"
                                     CornerRadius="6"
                                     Padding="8,2"
@@ -73,43 +73,36 @@
                     <!-- Header – always stays at top -->
                     <Grid x:Name="HeaderGrid"
                           DockPanel.Dock="Top"
-                          ColumnDefinitions="3*, 2.4*, 1.8*, 1.4*, 80"
+                          ColumnDefinitions="2.2*, 2*, 1.5*, 1.3*, 1.5*, 50"
                           Height="56"
                           Background="#222222">
 
                         <TextBlock Grid.Column="0"
-                                   Text="Site / App"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#AAAAAA"
-                                   VerticalAlignment="Center"
+                                   Text="Site / App"    
+                                   Classes="Headers"
                                    Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="1"
-                                   Text="Username"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#AAAAAA"
-                                   VerticalAlignment="Center"
+                                   Text="Username" 
+                                   Classes="Headers"
                                    Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="2"
                                    Text="Password"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#AAAAAA"
-                                   VerticalAlignment="Center"
+                                   Classes="Headers"
                                    Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="3"
-                                   Text="Category"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="#AAAAAA"
-                                   VerticalAlignment="Center"
+                                   Text="Strenght"
+                                   Classes="Headers"
                                    Margin="16,0,8,0" />
 
-                        <TextBlock Grid.Column="4" Text="" />
+                        <TextBlock Grid.Column="4"
+                                   Text="Category"
+                                   Classes="Headers"
+                                   Margin="16,0,8,0" />
+
+                        <TextBlock Grid.Column="5" Text="" />
                     </Grid>
 
                     <!-- Scrollable list -->
@@ -120,7 +113,7 @@
 
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid ColumnDefinitions="3*, 2.4*, 1.8*, 1.4*, 80"
+                                <Grid ColumnDefinitions="2.1*, 2*, 1.5*, 1.3*, 1.5*, 50"
                                       Background="Transparent"
                                       Margin="0,0,0,1">
 
@@ -164,7 +157,15 @@
                                                TextWrapping="NoWrap" />
 
                                     <TextBlock Grid.Column="3"
-                                               Text="{Binding catagory}"
+                                               Text="{Binding strength}"
+                                               Margin="16,12,8,12"
+                                               VerticalAlignment="Center"
+                                               Foreground="{Binding Color_S}"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap" />
+
+                                    <TextBlock Grid.Column="4"
+                                               Text="{Binding category}"
                                                Margin="16,12,8,12"
                                                VerticalAlignment="Center"
                                                Foreground="#BBBBBB"
@@ -172,7 +173,7 @@
                                                TextWrapping="NoWrap" />
 
                                     <!-- Actions column (empty for now) -->
-                                    <StackPanel Grid.Column="4"
+                                    <StackPanel Grid.Column="5"
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
@@ -249,7 +250,7 @@
         </Border>
 
         <!-- Share Popup -->
-        <Border Grid.RowSpan="2"
+        <Border Grid.RowSpan="2" 
                 Background="#80000000"
                 ZIndex="1000"
                 IsVisible="{Binding ShareOP}" />
@@ -265,22 +266,34 @@
                 Width="440"
                 Height="320">
             <StackPanel Spacing="16">
-                <TextBlock Text="Share Entry"
+                <TextBlock Text="Export Entries"
                            FontSize="22"
                            Foreground="White"
                            FontWeight="Bold" />
-                <TextBlock Text="Select sharing options"
-                           Foreground="#BBBBBB" />
-                <TextBox Watermark="Recipient Email or Username" />
-                <CheckBox Content="Share Password (full access)"
-                          Classes="CheckBoxP" />
-                <CheckBox Content="Read-Only access"
+                <ComboBox PlaceholderText="Select File Type"
+                ItemsSource="{Binding Categories}"
+                IsEditable="False"
+                SelectedItem="{Binding SelectedItem}">
+                    <ComboBox.DataTemplates>
+                        <DataTemplate DataType="viewmodels:FileType">
+                            <StackPanel Orientation="Horizontal">
+                                <icons:SymbolIcon Symbol="{Binding Icons}"></icons:SymbolIcon>
+                                <TextBlock Text="{Binding Name}"></TextBlock>
+                                <TextBlock Text="("></TextBlock>
+                                <TextBlock Text="{Binding Extension}"></TextBlock>
+                                <TextBlock Text=")"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.DataTemplates>
+                </ComboBox>
+                <CheckBox Content="Decrypted Credentials (full access)"
+                          IsChecked="{Binding IsDecrypted}"
                           Classes="CheckBoxP" />
                 <StackPanel Orientation="Horizontal"
                             Spacing="12"
                             HorizontalAlignment="Right"
-                            Margin="0,16,0,0">
-                    <Button Classes="Vault" Content="Share" />
+                            Margin="0,10,05,08">
+                    <Button Classes="Vault" Content="Save as" Command="{Binding SaveFileCommand}"/>
                     <Button Classes="Vault"
                             Content="Cancel"
                             Command="{Binding CancelButtonCommand}" />

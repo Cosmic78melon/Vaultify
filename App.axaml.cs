@@ -19,7 +19,6 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Avalonia.Controls;
 using Password_Manager.Service;
-
 namespace Password_Manager
 {
     public partial class App : Application
@@ -30,6 +29,8 @@ namespace Password_Manager
         }
         public override void OnFrameworkInitializationCompleted()
         {
+            if (Design.IsDesignMode) return;
+            
             var collections = new ServiceCollection();
             collections.AddSingleton<MainWindowViewModel>();
             collections.AddSingleton<HomePageViewModel>();
@@ -52,7 +53,8 @@ namespace Password_Manager
 
             // Registering the PythonAPI
             collections.AddSingleton<IPythonAPI, PythonAPI>();
-
+            
+            // Page View Models and Page View
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
             {
                 _ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
@@ -64,9 +66,20 @@ namespace Password_Manager
             });
 
             collections.AddSingleton<PageFactory>();
+            //File Picker Service
+            collections.AddSingleton<FilePickerService>();
+            collections.AddSingleton<Func<TopLevel?>>(x => () =>
+            {
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime window)
+                {
+                    return TopLevel.GetTopLevel(window.MainWindow);
+                }
+
+                return null;
+            });
             var service = collections.BuildServiceProvider();
 
-
+            
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 

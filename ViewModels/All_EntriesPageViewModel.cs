@@ -1,15 +1,19 @@
 ﻿using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Service;
 using Python.Runtime;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls.Chrome;
 
 namespace Password_Manager.ViewModels
 {
@@ -18,10 +22,21 @@ namespace Password_Manager.ViewModels
         public required string Title { get; set; }
         public required string Password { get; set; }
         public required string Username { get; set; }
-        public string catagory { get; set; }
+        public required string strength { get; set; }
+        public required string Color_S { get; set; }
+        public string category { get; set; }
     }
-    public partial class All_EntriesPageViewModel : PageViewModel
+    
+    public class FileType
     {
+        public string Name { get; set; }
+        public string Extension { get; set; }
+        public string Icons { get; set; }
+        
+    }
+    
+    public partial class All_EntriesPageViewModel : PageViewModel
+    {  
         [ObservableProperty] private bool _addnewOP = false;
         [ObservableProperty] private bool _addnewPOP = false;
         [ObservableProperty] private bool _shareOP = false;
@@ -36,8 +51,12 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _confirmationPassword;
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
+        [ObservableProperty] private FileType _selectedItem;
+        [ObservableProperty] private bool _isDecrypted = false;
+        
 
         public readonly IPythonAPI _pythonAPI;
+        public readonly FilePickerService _filePickerService;
 
         [RelayCommand]
         public void AddnewPOPButton()
@@ -67,9 +86,10 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public All_EntriesPageViewModel(IPythonAPI pythonAPI)
+        public All_EntriesPageViewModel(IPythonAPI pythonAPI, FilePickerService filePickerService)
         {
             _pythonAPI = pythonAPI;
+            _filePickerService = filePickerService;
         }
 
         public async Task LoadData(string password)
@@ -85,10 +105,12 @@ namespace Password_Manager.ViewModels
                     {
                         Items.Add(new Entry
                         {
-                            Title = item["Site Name"],
-                            Username = item["User Name"],
+                            Title = item["Site"],
+                            Username = item["Username"],
                             Password = item["Password"],
-                            catagory = item["Catagory"]
+                            strength = item["Strength"],
+                            Color_S = ((string.Compare(Convert.ToString(item["Strength"]), "Strong") == 0) ? "ForestGreen":"red"),
+                            category = item["Category"]
                         });
                     }
                 }
@@ -100,11 +122,70 @@ namespace Password_Manager.ViewModels
                     Title = "Nothing",
                     Username = ex.Message,
                     Password = "Nothing",
-                    catagory = "Nothing"
+                    strength = "Nothing",
+                    Color_S = "white",
+                    category = "Nothing"
                 });
             }
             
         }
+        
+        public ObservableCollection<FileType> Categories { get; } = new()
+        {
+            new FileType
+            {
+                Name = "CSV Document",
+                Extension = ".csv",
+                Icons = "DocumentCsv"
+            },
+            new FileType
+            {
+                Name = "Excel Document",
+                Extension = ".xlsx",
+                Icons = "Document"
+            },
+            new FileType
+            {
+                Name = "XML Document",
+                Extension = ".xml",
+                Icons = "DocumentData"
+            },
+            new FileType
+            {
+                Name = "Html Document",
+                Extension = ".html",
+                Icons = "DocumentCss"
+            },
+            new FileType
+            {
+                Name = "Json Document",
+                Extension = ".json",
+                Icons = "JavaScript"
+            },
+            new FileType
+            {
+                Name = "Text Document",
+                Extension = ".txt",
+                Icons = "DocumentText"
+            }
+        };
+        
+        [RelayCommand]
+        public async Task SaveFile()
+        {
+            if (string.IsNullOrEmpty(SelectedItem.Extension))
+            {
+                SelectedItem.Extension = ".csv";
+            }
+            var path = await _filePickerService.SaveFile(HomepagePassword);
+            bool result = _pythonAPI.ExportVault(HomepagePassword, SelectedItem.Extension, path, IsDecrypted);
+            if (result == true)
+            {
+                SharePOP = false;
+                ShareOP = false;
+            }
+        }
+
 
         [RelayCommand]
         public void save()
@@ -140,5 +221,6 @@ namespace Password_Manager.ViewModels
             string password = _pythonAPI.Generate_password();
             Password = ConfirmationPassword = password;
         }
+        
     }
 }

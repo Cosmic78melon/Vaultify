@@ -8,6 +8,7 @@ import random
 import string
 import secrets
 import binascii
+import pandas as pd
 import datetime as dt
 from icecream import ic
 import pwnedpasswords as pwend
@@ -107,7 +108,7 @@ class PasswordManager:
     def GeneratePass(self) -> str | None:
         minimum = self.minimum
         maximum = self.maximum
-        if self.Length < 12:
+        if self.Length <= 11:
             return "Invalid Length. It must be greater than 12"
 
         if self.Pure_Random_Ints is None:
@@ -131,7 +132,7 @@ class PasswordManager:
         randint = self.Pure_Random_Ints
         minimum = self.minimum
         maximum = self.maximum
-        if length < 12:
+        if length <= 11:
             return "Invalid Length. It must be greater than 12"
 
         if randint is None:
@@ -229,7 +230,100 @@ class PasswordManager:
             connection.commit()
             connection.close()
             return isAuth
+        
+    def changePass(self, Id, new_data):
+        path = self.path
+        #                            Id text,
+        #                     Salt text,
+        #                     Iteration int,
+        #                     Site_name text,
+        #                     User_name text,
+        #                     Password,
+        #                     Notes text,
+        #                     Category text,
+        #                     Strength text,
+        #                     Favourite Boolean,
+        #                     Created_at text,
+        #                     Updated_at text
+        
+        if not os.path.exists(path):
+            return False
 
+        if self.IsAuthenticated() != True:
+            return False
+
+        connection = sqlite3.connect(path)
+        cursor = connection.cursor()
+        cursor.execute("UPDATE Credential_Data SET Site_name = ?, User_name = ?, Password = ?, Notes = ?, Category = ?, Strength = ?, Favourite = ?, Updated_at = ? where Id = ?", new_data)
+        connection.commit()
+        connection.close()
+        return True
+    
+    def share_data(self, Command,location = "C:/Users/Digital Computer/Downloads", isDecrypted = False):
+        if self.IsAuthenticated() != True:
+            return False
+        connection = sqlite3.connect(self.path)
+        df = pd.read_sql_query("SELECT * FROM Credential_Data", connection)
+
+        if os.path.exists(location) != True:
+            os.mkdir(location)
+            
+        if isDecrypted != True:
+            match Command:
+                case ".csv":
+                    df.to_csv(os.path.join(location, "Credential_Data.csv"), index = False)
+                case ".xlsx":
+                    df.to_excel(os.path.join(location, "Credential_Data.xlsx"), index = False)
+                case ".json":
+                    df.to_json(os.path.join(location, "Credential_Data.json"), orient = "records")
+                case ".xml":
+                    df.to_xml(os.path.join(location, "Credential_Data.xml"))
+                case ".html":
+                    df.to_html(os.path.join(location, "Credential_Data.html"))
+                case ".txt":
+                    df.to_csv(os.path.join(location, "Credential_Data.txt"), index = False)
+                case _:
+                    return False
+            return True
+        elif isDecrypted == True:
+            data = {"Id": [], "Salt": [],"Iteration": [],"Site": [],"Username": [], "Password": [], "Notes": [],"Strength": [], "Category": [], "Favourite": [],"Created_at": [], "Updated_at": []}
+            for item in self.show_all_data():
+                data["Id"].append(item["Id"])
+                data["Site"].append(item["Site"])
+                data["Salt"].append(item["Salt"])
+                data["Iteration"].append(item["Iteration"])
+                data["Username"].append(item["Username"])
+                data["Password"].append(item["Password"])
+                data["Notes"].append(item["Notes"])
+                data["Strength"].append(item["Strength"])
+                data["Category"].append(item["Category"])
+                data["Favourite"].append(item["Favourite"])
+                data["Created_at"].append(item["Created_at"])
+                data["Updated_at"].append(item['Updated_at'])
+            
+            df = pd.DataFrame(data)
+            match Command:
+                case ".csv":
+                    df.to_csv(os.path.join(location, "Credential_Data.csv"), index=False)
+                case ".xlsx":
+                    df.to_excel(os.path.join(location, "Credential_Data.xlsx"), index=False)
+                case ".json":
+                    df.to_json(os.path.join(location, "Credential_Data.json"), orient="records")
+                case ".xml":
+                    df.to_xml(os.path.join(location, "Credential_Data.xml"))
+                case ".html":
+                    df.to_html(os.path.join(location, "Credential_Data.html"))
+                case ".txt":
+                    df.to_csv(os.path.join(location, "Credential_Data.txt"), index=False)
+                case _:
+                    return False
+            return True
+        else:
+            return False
+
+
+            
+        
 
     def _EncJson(self, fernet, plainText):
         """
@@ -282,14 +376,17 @@ class PasswordManager:
         raw_data = cursor.fetchall()
         
         for item in raw_data:
-            temp = {"Site": None, "Username": None, "Password": None, "Notes": None,"Strength": None, "Category": None, "Favourite": None,"Created_at": None, "Updated_at": None}
+            temp = {"Id": None,"Site": None, "Salt": None,"Iteration": None,"Username": None, "Password": None, "Notes": None,"Strength": None, "Category": None, "Favourite": None,"Created_at": None, "Updated_at": None}
+            temp["Id"] = item[0]
+            temp["Salt"] = item[1]
+            temp["Iteration"] = item[2]
             temp["Site"] = self.decryptdata(item[1], item[2], item[3])
             temp["Username"] = self.decryptdata(item[1], item[2], item[4])
             temp["Password"] = self.decryptdata(item[1], item[2], item[5])
             temp["Notes"] = self.decryptdata(item[1], item[2], item[6])
+            temp["Category"] = item[7]
             temp["Strength"] = item[8]
             temp["Favourite"] = True if item[9] == 1 else False
-            temp["Category"] = item[7]
             temp["Created_at"] = item[10]
             temp["Updated_at"] = item[11]
             

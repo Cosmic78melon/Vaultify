@@ -178,7 +178,6 @@ namespace Password_Manager.ViewModels
                 if (_masterPassword != null)
                 {
                     item.HomepagePassword = _masterPassword;
-                    Debug.Write(_masterPassword);
                     _ = item.LoadData(_masterPassword);
                 }
             });

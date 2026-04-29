@@ -194,7 +194,19 @@ namespace Password_Manager.Service
 
         public dynamic card_Data(string masterpassword)
         {
+            // TODO: Card Data Not Implemented
             throw new NotImplementedException();
+        }
+
+        public bool ExportVault(string masterPass, string Command, dynamic file_path, bool isDec)
+        {
+            dynamic python = SecurityMod();
+            using (Py.GIL())
+            {
+                dynamic manager = python.PasswordManager(null, masterPass);
+                bool data = manager.share_data(Command, file_path, isDec);
+                return data;
+            }
         }
     }
 }

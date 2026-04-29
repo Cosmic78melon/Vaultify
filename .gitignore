@@ -3,16 +3,11 @@ bin/
 Security/.venv/
 Security/.idea/
 Security/.qodo/
-Security/test.db/
 Security/.vs/
 Security/.env
 Security/test.py
 obj/
 Assets/
 Security/__pycache__/
-DataBase/encrypted-data.db/
-DataBase/*.json/
-*.json
-python-3.12.0-embed-amd64/
 *.idea
 .vscode

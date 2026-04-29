@@ -24,7 +24,7 @@ class PasswordManager:
                  Password_Length: int = 12):
 
         self.password = password
-        self.site_name = site_name
+        self.site_name = site_name.lower()
         self.Length = Password_Length
         self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None,
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
@@ -168,6 +168,7 @@ class PasswordManager:
 
     def encryptAndStoredata(self, user_name = "Unknown", Password = "", SecureNote = "Nothing", Category ="Unknown", favourite = False):
         site_name = self.site_name
+        user_name = user_name.lower()
         salt = os.urandom(16)
         iteration = self.iteration
         if not os.path.exists(self.path):
@@ -230,34 +231,6 @@ class PasswordManager:
             connection.commit()
             connection.close()
             return isAuth
-        
-    def changePass(self, Id, new_data):
-        path = self.path
-        #                            Id text,
-        #                     Salt text,
-        #                     Iteration int,
-        #                     Site_name text,
-        #                     User_name text,
-        #                     Password,
-        #                     Notes text,
-        #                     Category text,
-        #                     Strength text,
-        #                     Favourite Boolean,
-        #                     Created_at text,
-        #                     Updated_at text
-        
-        if not os.path.exists(path):
-            return False
-
-        if self.IsAuthenticated() != True:
-            return False
-
-        connection = sqlite3.connect(path)
-        cursor = connection.cursor()
-        cursor.execute("UPDATE Credential_Data SET Site_name = ?, User_name = ?, Password = ?, Notes = ?, Category = ?, Strength = ?, Favourite = ?, Updated_at = ? where Id = ?", new_data)
-        connection.commit()
-        connection.close()
-        return True
     
     def share_data(self, Command,location = "C:/Users/Digital Computer/Downloads", isDecrypted = False):
         if self.IsAuthenticated() != True:
@@ -359,6 +332,21 @@ class PasswordManager:
             iterations=iteration
         )
         return base64.urlsafe_b64encode(kdf.derive(password.encode()))
+    
+    def card_data(self):
+        data = self.show_all_data()
+        # temp = {"Id": None, "Site": None, "Salt": None, "Iteration": None, "Username": None, "Password": None,
+        #         "Notes": None, "Strength": None, "Category": None, "Favourite": None, "Created_at": None,
+        #         "Updated_at": None}
+        card_data = {}
+        for item in data:
+            temp = item["Site"]
+            if item["Site"] == temp:
+                if item["Site"] in card_data:
+                    card_data[item["Site"]] += 1
+                else:
+                    card_data[item["Site"]] = 1
+        return card_data
 
     def show_all_data(self):
         decrypted_list = []
@@ -376,7 +364,9 @@ class PasswordManager:
         raw_data = cursor.fetchall()
         
         for item in raw_data:
-            temp = {"Id": None,"Site": None, "Salt": None,"Iteration": None,"Username": None, "Password": None, "Notes": None,"Strength": None, "Category": None, "Favourite": None,"Created_at": None, "Updated_at": None}
+            temp = {"Id": None,"Site": None, "Salt": None,"Iteration": None,"Username": None, "Password": None,
+                    "Notes": None,"Strength": None, "Category": None, "Favourite": None,"Created_at": None,
+                    "Updated_at": None}
             temp["Id"] = item[0]
             temp["Salt"] = item[1]
             temp["Iteration"] = item[2]
@@ -440,41 +430,36 @@ class PasswordManager:
             print("Authentication Error:", e)
             return False
 
-    def change_password(self, id = None, new_Password = ""):
+    def change_password(self, id, new_data):
         path = self.path
-        if not os.path.exists(path) or os.path.getsize(path) < 50:
-            return "Invalid Path"
+        connection = sqlite3.connect(path)
+        cursor = connection.cursor()
+        fields = []
+        values = []
+        cursor.execute(
+            "SELECT Salt, Iteration FROM Credential_Data WHERE Id = ?",
+            (id,)
+        )
+        item = cursor.fetchone()
 
-        if id is None:
-            return "Please enter a Id"
+        if not item:
+            connection.close()
+            return False
 
-        with open(path) as file:
-            file_data = json.load(file)
-            salt = base64.urlsafe_b64decode(file_data["Salt"])
-            for detail in file_data["Credentials"]:
-                if id == detail["Id"]:
-                    vault = base64.urlsafe_b64decode(detail["Vault"])
-                    iteration = detail["iteration"]
-                    key, _ = self._derived_key(salt=salt, iteration = iteration)
-                    if key is None:
-                        return "Invalid Password"
-                    f = Fernet(key=key)
+        salt = binascii.unhexlify(item[0])
+        iteration = item[1]
+        dkeys = self._derived_key(salt, iteration)
+        keys = Fernet(dkeys)
 
-                    try:
-                        decrypt_data = f.decrypt(vault).decode()
-                        data = json.loads(decrypt_data)
-                        data["Password"] = new_Password
-                        data["updated_at"] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        # use the Fernet instance 'f' to encrypt the updated data
-                        enc_data = self._EncJson(f, data['Site Name'], data['Secure Note'], data['Password'])
-                        detail["Vault"] = base64.urlsafe_b64encode(enc_data).decode()
-                        # write the full file_data back to disk to avoid corruption
-                        with open(path, "w", encoding="utf-8") as fl:
-                            json.dump(file_data, fl, indent=10)
-                        return f"Password Changed Successfully"
-                    except Exception as e:
-                        return e
-            return "Invalid Id"
+        for key, val in new_data.items():
+            fields.append(f"{key} = ?")
+            values.append(self._EncJson(keys, val))
+
+        values.append(id)
+        cursor.execute(f"""UPDATE Credential_Data SET {", ".join(fields)} WHERE Id = ?""", values)
+        connection.commit()
+        connection.close()
+        return True
         
     def isNewUser(self):
         path = self.path
@@ -510,17 +495,28 @@ class PasswordManager:
             data.append(fav)
         connection.close()
         return data
-        
+    
+    def remove_data(self, id):
+        path = self.path
+        connection = sqlite3.connect(path)
+        cursor = connection.cursor()
+
+        cursor.execute(f"DELETE FROM Credential_Data WHERE Id = ?", (id,))
+        connection.commit()
+        connection.close()
+        return True
 
 if __name__ == "__main__":
-    pw_1 = PasswordManager("Netflix", "@@Adol2280@@",  32)
+    pw_1 = PasswordManager("shikho", "@@Adol2280@@")
     # ic(pw_1.IsAuthenticated())
     # Status = pw_1.encryptAndStoredata("Cosmic78melon", pw_1.GeneratePass(),
-    #                                   "Important Message", "edu", True)
+    #                                   "This account has jumanji movie", "edu", True)
     # print(Status)
     # print(pw_1.status())
     # print(pw_1.favourite_card_data())
     # ic(pw_1.show_all_data())
+    # print(pw_1.change_password("088427c0-17c4-4ff0-9562-b4708d48468c", {"Site_name": "Steam"}))
+    # print(pw_1.card_data())
 
 
 

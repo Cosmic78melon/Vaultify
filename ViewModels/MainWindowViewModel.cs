@@ -1,14 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Factory;
-using System.Diagnostics;
 using System;
-using System.Xml.Serialization;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Password_Manager.Models;
 using Password_Manager.Service;
-using ZstdSharp.Unsafe;
 
 namespace Password_Manager.ViewModels
 {
@@ -165,7 +160,13 @@ namespace Password_Manager.ViewModels
         {
             CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item =>
             {
-                if (_masterPassword != null) item.load_data_recent(_masterPassword);
+                if (_masterPassword != null)
+                {
+                    if (string.IsNullOrEmpty(_masterPassword)) return;
+                    item.load_data_recent(_masterPassword);
+                    item.favouriteData(_masterPassword);
+                    item.statusDataLoad(_masterPassword);
+                }
             });
             UpdateActiveState(PageViewData.Home);
         }  

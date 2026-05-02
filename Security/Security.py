@@ -360,7 +360,7 @@ class PasswordManager:
 
         connection = sqlite3.connect(path)
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Credential_Data where Id != 0")
+        cursor.execute("SELECT * FROM Credential_Data where Id != 0 ORDER BY Updated_at DESC;")
         raw_data = cursor.fetchall()
         
         for item in raw_data:
@@ -370,10 +370,11 @@ class PasswordManager:
             temp["Id"] = item[0]
             temp["Salt"] = item[1]
             temp["Iteration"] = item[2]
-            temp["Site"] = self.decryptdata(item[1], item[2], item[3])
-            temp["Username"] = self.decryptdata(item[1], item[2], item[4])
-            temp["Password"] = self.decryptdata(item[1], item[2], item[5])
-            temp["Notes"] = self.decryptdata(item[1], item[2], item[6])
+            salt = binascii.unhexlify(item[1])
+            temp["Site"] = self.decryptdata(salt, item[2], item[3])
+            temp["Username"] = self.decryptdata(salt, item[2], item[4])
+            temp["Password"] = self.decryptdata(salt, item[2], item[5])
+            temp["Notes"] = self.decryptdata(salt, item[2], item[6])
             temp["Category"] = item[7]
             temp["Strength"] = item[8]
             temp["Favourite"] = True if item[9] == 1 else False
@@ -381,6 +382,7 @@ class PasswordManager:
             temp["Updated_at"] = item[11]
             
             decrypted_list.append(temp)
+        connection.commit()
         connection.close()
         return decrypted_list
 
@@ -430,7 +432,8 @@ class PasswordManager:
             print("Authentication Error:", e)
             return False
 
-    def change_password(self, id, new_data):
+    def change_password(self, id: str, json_obj: str):
+        new_data = json.loads(json_obj)
         path = self.path
         connection = sqlite3.connect(path)
         cursor = connection.cursor()
@@ -457,6 +460,8 @@ class PasswordManager:
 
         values.append(id)
         cursor.execute(f"""UPDATE Credential_Data SET {", ".join(fields)} WHERE Id = ?""", values)
+        time_temp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.execute(f"UPDATE Credential_Data SET Updated_at = ?", (time_temp,))
         connection.commit()
         connection.close()
         return True
@@ -514,9 +519,11 @@ if __name__ == "__main__":
     # print(Status)
     # print(pw_1.status())
     # print(pw_1.favourite_card_data())
-    # ic(pw_1.show_all_data())
-    # print(pw_1.change_password("088427c0-17c4-4ff0-9562-b4708d48468c", {"Site_name": "Steam"}))
-    # print(pw_1.card_data())
+    print(pw_1.show_all_data())
+    # json_obj = json.dumps({"Site_name": "Ubisoft"})
+    # print(pw_1.change_password("088427c0-17c4-4ff0-9562-b4708d48468c", json_obj))
+    print(pw_1.card_data())
+
 
 
 

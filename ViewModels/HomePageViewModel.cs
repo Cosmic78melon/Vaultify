@@ -17,7 +17,9 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Security.Policy;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using CommunityToolkit.HighPerformance.Enumerables;
 using Python.Runtime;
+using PyObject = Python.Runtime.PyObject;
 
 
 namespace Password_Manager.ViewModels
@@ -25,9 +27,19 @@ namespace Password_Manager.ViewModels
     public class HomeCard()
     {
         public string title { get; set; }
-        public int number { get; set; } = 0;
+        public int number { get; set; } 
     }
-
+    public class FavDataTitle()
+    {
+        public string title { get; set; }
+    }
+    public class StatusData()
+    {
+        public int total {get; set;}
+        public int strongCount { get; set; }
+        public int weakCount { get; set; }
+        public  int breachCount {get; set; }
+    }
     public partial class HomePageViewModel : PageViewModel
     {
         public IPythonAPI _pythonAPI;
@@ -38,6 +50,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _hasNumCase = true;
         [ObservableProperty] private bool _hasPuncCase = true;
         [ObservableProperty] private int _lenght;
+        [ObservableProperty] private string _master_pass;
 
 
         [ObservableProperty] 
@@ -165,7 +178,30 @@ namespace Password_Manager.ViewModels
             details.HasDigits = null;
             details.IsLongEnough = null;
         }
+        private ObservableCollection<FavDataTitle> _favData;
+        public ObservableCollection<FavDataTitle> FavData
+        {
+            get { return _favData; }
+            set { SetProperty(ref _favData, value); } 
+        }
 
+        public void favouriteData(string MasterPassword)
+        {
+            FavData = new ObservableCollection<FavDataTitle>();
+            using (Py.GIL())
+            {
+                dynamic raw_data = _pythonAPI.favData(MasterPassword);
+                FavData.Clear();
+                foreach(var name in raw_data)
+                {
+                    FavData.Add( new FavDataTitle
+                    {
+                        title = Convert.ToString(name)
+                    });
+                }
+            }
+        }
+        
         private ObservableCollection<HomeCard> _items;
         public ObservableCollection<HomeCard> Items
         {
@@ -176,18 +212,47 @@ namespace Password_Manager.ViewModels
         public void load_data_recent(string MasterPassword)
         {
             Items = new ObservableCollection<HomeCard>();
-            dynamic data = _pythonAPI.show_all_data(MasterPassword);
-            // using (Py.GIL())
-            // {
-            //     foreach (dynamic item in data)
-            //     {
-            //         Items.Add(new HomeCard
-            //         {
-            //             title = item["Site Name"]
-            //             
-            //         });
-            //     }
-            // }
+            using (Py.GIL())
+            {
+                PyDict pyDict = _pythonAPI.card_Data(MasterPassword);
+                Items.Clear();
+                foreach(var key in pyDict)
+                {
+                    var value = pyDict[key];
+                    string key_str = key.ToString();
+                    int value_int = Convert.ToInt32(value);
+                    Items.Add( new HomeCard
+                        {
+                            title = key_str,
+                            number = value_int
+                        });
+                }
+            }
+        }
+        
+        private ObservableCollection<StatusData> _statusData;
+
+        public ObservableCollection<StatusData> StatusData
+        {
+            get { return _statusData; }
+            set { SetProperty(ref _statusData, value); }
+        }
+
+        public void statusDataLoad(string MasterPassword)
+        {
+            StatusData = new ObservableCollection<StatusData>();
+            StatusData.Clear();
+            using (Py.GIL())
+            {
+                dynamic pyStatusdata = _pythonAPI.statusdata(MasterPassword);
+                StatusData.Add(new StatusData
+                {
+                    total = pyStatusdata[0],
+                    strongCount = pyStatusdata[1],
+                    weakCount = pyStatusdata[2],
+                    breachCount = pyStatusdata[3]
+                });
+            }
         }
     }
 }

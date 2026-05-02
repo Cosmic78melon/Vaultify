@@ -3,7 +3,7 @@
     public interface IPythonAPI
     {
         public string Generate_password(string siteName = null!, int length = 12);
-        public string CustomeGen(string siteName = null!, int length = 12, bool has_Letter = true, bool hasNum = true, bool hasPunc = true);
+        public string CustomeGen(int length = 12, bool has_Letter = true, bool hasNum = true, bool hasPunc = true);
         public dynamic PassswordCheck(string password = null!);
         public dynamic show_all_data(string password);
         public bool isAuthenticated(string password);
@@ -14,5 +14,6 @@
         public dynamic favData(string masterpassword);
         public dynamic statusdata(string masterpassword);
         public bool ExportVault(string masterPass, string Command, dynamic file_path, bool isDec);
+        public bool change_Data(string masterpassword, string id, string json_obj);
     }
 }

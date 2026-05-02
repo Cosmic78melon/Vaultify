@@ -24,13 +24,13 @@
             <Label FontSize="30"
                    Margin="10, 0, -110, 0"
                    VerticalAlignment="Center"
-                   Content="Main"/>
+                   Content="DashBoard"/>
 
-            <TextBox Grid.Column="1"
-                     Width="600"
-                     HorizontalAlignment="Center"
-                     Watermark="Search"
-                     CornerRadius="7"/>
+            <TextBlock Grid.Column="1" 
+                       FontSize="40"
+                       FontWeight="Bold"
+                       Text="Welcome To Vaultify The Best Password Manager Made BY Adol"
+                       HorizontalAlignment="Center"/>
         </Grid>
 
         <!-- Top Separator -->
@@ -48,75 +48,34 @@
                     Height="350"
                     Margin="10, 27, 0, 0"
                     HorizontalAlignment="Left">
-
                 <Grid RowDefinitions="Auto,*"
                       Margin="20">
-
                     <Label FontSize="20"
                            Foreground="Orange"
                            Content="Recent"/>
-
                     <ScrollViewer Grid.Row="1"
                                   VerticalScrollBarVisibility="Auto">
-
-                        <StackPanel>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Google" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="2"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Facebook" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Youtube" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Instagram" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="5"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                        </StackPanel>
-
+                        <ItemsControl ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                       <Grid ColumnDefinitions="*,Auto">
+                                           <TextBlock Text="{Binding title}" Foreground="#d4d4d4" Margin="0,7"/>
+                                           <Border Grid.Column="1"
+                                                   CornerRadius="10"
+                                                   Padding="8,2">
+                                               <TextBlock Text="{Binding number}"
+                                                          FontSize="30"
+                                                          Foreground="#666666"
+                                                          FontWeight="Bold"/>
+                                           </Border>
+                                       </Grid>
+                                        <Separator Classes="CardSep"/>               
+                                    </StackPanel>
+                                </DataTemplate>    
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </ScrollViewer>
-
                 </Grid>
             </Border>
 
@@ -138,81 +97,19 @@
                            Content="Favourite"/>
 
                     <ScrollViewer Grid.Row="1"
-                                  Margin="10 0 10 -10"
-                                  VerticalScrollBarVisibility="Auto">
-
-                        <StackPanel>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Bank LTD." Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="10"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                            <Separator Classes="CardSep"/>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Minecraft" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                            <Separator Classes="CardSep"/>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Ubisoft" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Steam" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="1"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                            <Separator Classes="CardSep"/>
-
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="Epic Games" Foreground="#d4d4d4" Margin="0,7"/>
-                                <Border Grid.Column="1"
-                                        CornerRadius="10"
-                                        Padding="8,2">
-                                    <TextBlock Text="3"
-                                               FontSize="30"
-                                               Foreground="#666666"
-                                               FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-
-                        </StackPanel>
-
+                          Margin="10 0 10 -10"
+                          VerticalScrollBarVisibility="Auto">
+                          <ItemsControl ItemsSource="{Binding FavData}">
+                              <ItemsControl.ItemTemplate>
+                                  <DataTemplate>
+                                      <StackPanel>
+                                          <TextBlock Text="{Binding title}" Foreground="#d4d4d4" Margin="0,7"/>
+                                          <Separator Classes="CardSep"/>
+                                      </StackPanel>
+                                  </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                          </ItemsControl>
                     </ScrollViewer>
-
                 </Grid>
             </Border>
             
@@ -289,35 +186,92 @@
             <!-- ===================== -->
             <!-- Status Card -->
             <!-- ===================== -->
-            <Border Classes="Card" HorizontalAlignment="Left"
-                    Width="1000"
-                                  VerticalAlignment="Top">
+            <Border Classes="Card"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Width="1000">
 
-                <Grid Grid.ColumnSpan="1" Grid.ColumnDefinitions="Auto, auto, auto" RowDefinitions="Auto,auto,*"
-                      Margin="10">
+                <Grid Margin="10"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      RowDefinitions="Auto,Auto,*"
+                      ColumnDefinitions="Auto,Auto,Auto">
 
-                    <Label FontSize="20"
+                    <!-- Title -->
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           FontSize="20"
                            Foreground="Orange"
-                           Content="Status"/>
-                    <Separator Grid.Row="1" Margin="0 0 -95 0"></Separator>
-                    <StackPanel Grid.Column="0" Grid.Row="2" Orientation="Horizontal">
-                        <StackPanel>
-						        <TextBlock Classes="status_Text"><LineBreak/><Span Foreground="CornflowerBlue" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Saved Passwords</TextBlock>
-                        </StackPanel>
-                    <Separator Classes="Vertical_Seperator"></Separator>
-                    <StackPanel>
-					    <TextBlock Classes="status_Text"><LineBreak/> <Span Foreground="ForestGreen" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Strong Passwords</TextBlock>
-                    </StackPanel>
-                    <Separator Classes="Vertical_Seperator"></Separator>
+                           Content="Status"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"/>
 
-                    <StackPanel>
-						   <TextBlock Classes="status_Text"><LineBreak/><Span Foreground="Red" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Weak Passwords</TextBlock>
-                    </StackPanel>
-                    <Separator Classes="Vertical_Seperator"></Separator>
-                    <StackPanel>
-						   <TextBlock Classes="status_Text"><LineBreak/><Span Foreground="Yellow" FontSize="60" FontFamily="Arial Bold">0</Span>  <LineBreak/>Duplicate</TextBlock>
-                    </StackPanel>
-                    </StackPanel>
+                    <!-- Separator -->
+                    <Separator Grid.Row="1"
+                               Grid.ColumnSpan="3"
+                               Margin="0 0 -18 0"
+                               HorizontalAlignment="Stretch"/>
+
+                    <!-- Content -->
+                    <ItemsControl Grid.Row="2"
+                                  Grid.ColumnSpan="3"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Top"
+                                  ItemsSource="{Binding StatusData}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+
+                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
+                                        <TextBlock Margin="6, 0, 0, 0"
+                                                   Foreground="CornflowerBlue"
+                                                   FontSize="60"
+                                                   FontFamily="Arial Bold"
+                                                   Text="{Binding total}"/>
+                                        <TextBlock Classes="status_Text"
+                                                   Text="Saved Password"/>
+                                    </StackPanel>
+
+                                    <Separator Classes="Vertical_Seperator"/>
+
+                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
+                                        <TextBlock Text="{Binding strongCount}"
+                                                   Foreground="LimeGreen"
+                                                   FontFamily="Arial Bold"
+                                                   FontSize="60"
+                                                   Margin="6, 0, 0, 0"/>
+                                        <TextBlock Classes="status_Text"
+                                                   Text="Strong Password"/>
+                                    </StackPanel>
+
+                                    <Separator Classes="Vertical_Seperator"/>
+
+                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
+                                        <TextBlock Text="{Binding weakCount}"
+                                                   Foreground="red"
+                                                   FontFamily="Arial Bold"
+                                                   FontSize="60"
+                                                   Margin="6, 0, 0, 0"/>
+                                        <TextBlock Classes="status_Text"
+                                                   Text="Weak Password"/>
+                                    </StackPanel>
+
+                                    <Separator Classes="Vertical_Seperator"/>
+
+                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
+                                        <TextBlock Text="{Binding breachCount}"
+                                                   Foreground="Yellow"
+                                                   FontFamily="Arial Bold"
+                                                   FontSize="60"
+                                                   Margin="6, 0, 0, 0"/>
+                                        <TextBlock Classes="status_Text"
+                                                   Text="Breached Password"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                 </Grid>
             </Border>

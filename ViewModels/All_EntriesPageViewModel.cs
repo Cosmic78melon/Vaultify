@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Controls.Chrome;
+using System.Text.Json;
 
 namespace Password_Manager.ViewModels
 {
@@ -33,6 +33,15 @@ namespace Password_Manager.ViewModels
         public string Extension { get; set; }
         public string Icons { get; set; }
         
+    }
+
+    public class changebleObj
+    {
+        public string user_name { get; set; }
+        public string password { get; set; }
+        public string site_name { get; set; }
+        public string category { get; set; }
+        public string favourite { get; set; }
     }
     
     public partial class All_EntriesPageViewModel : PageViewModel
@@ -220,7 +229,6 @@ namespace Password_Manager.ViewModels
         {
             string password = _pythonAPI.Generate_password();
             Password = ConfirmationPassword = password;
-        }
-        
+        }        
     }
 }

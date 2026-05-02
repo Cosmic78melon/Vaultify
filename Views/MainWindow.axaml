@@ -25,8 +25,8 @@
               
                 <!-- Top: App Branding -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,16" Spacing="8" PointerPressed="DoubleClicked">
-                    <TextBlock Text="PASSWORD" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff"/>
-                    <TextBlock Text="MANAGER" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff" Margin="0,-8,0,0"/>
+                    <TextBlock Text="Vaultify" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff"/>
+                    <TextBlock Text="Made by Adol" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff" Margin="0,-8,0,0"/>
                 </StackPanel>
               
                 <!-- Search Bar -->

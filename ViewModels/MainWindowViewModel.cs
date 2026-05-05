@@ -9,7 +9,7 @@ namespace Password_Manager.ViewModels
 {
     enum IconSizeList
     {
-        Small = 10, Large = 22
+        Small = 40, Large = 100 
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
@@ -33,12 +33,12 @@ namespace Password_Manager.ViewModels
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
-        [NotifyPropertyChangedFor(nameof(SeacrhbarSize))]
+        [NotifyPropertyChangedFor(nameof(SeacrhbarVisibility))]
         public bool _isExpanded = true;
 
         public int IconSize => (IsExpanded) ? (int)IconSizeList.Large : (int)IconSizeList.Small;
 
-        public int SeacrhbarSize => (IsExpanded) ? 220 : 5;
+        public bool SeacrhbarVisibility => (IsExpanded) ? true : false;
 
         [ObservableProperty]
         public PageViewModel _currentPage;
@@ -133,29 +133,6 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public void LoginCommand()
-        {
-            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
-            if (string.IsNullOrWhiteSpace(Password))
-            {
-                StatusMessage = "Please enter your password.";
-                ColorsC = "red";
-                return;
-            }
-
-            if (passwordStatus)
-            {
-                _masterPassword = Password;
-                BgOp = false;
-                BgPop = false;
-                Password = string.Empty;
-            }
-            StatusMessage = "Invalid Password.";
-            ColorsC = "red";
-        }
-
-
-        [RelayCommand]
         public void GoToHome()
         {
             CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item =>
@@ -216,5 +193,29 @@ namespace Password_Manager.ViewModels
         {
             IsExpanded = !IsExpanded;
         }
+
+        [RelayCommand]
+        public void LoginCommand()
+        {
+            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                StatusMessage = "Please enter your password.";
+                ColorsC = "red";
+                return;
+            }
+
+            if (passwordStatus)
+            {
+                _masterPassword = Password;
+                BgOp = false;
+                BgPop = false;
+                Password = string.Empty;
+                GoToHome();
+            }
+            StatusMessage = "Invalid Password.";
+            ColorsC = "red";
+        }
+
     }
 }

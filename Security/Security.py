@@ -21,11 +21,11 @@ class PasswordManager:
     def __init__(self,
                  site_name: str = "Password Manager",
                  password = None,
-                 Password_Length: int = 12):
+                 password_length: int = 12):
 
         self.password = password
         self.site_name = site_name.lower()
-        self.Length = Password_Length
+        self.Length = password_length
         self.TestResult = {0:"Strong", 1:"Weak" , 2: "Error", -1: "No Password", 80:"Breached", "Cause": {"Breached": None, "hasUppercase": None, "hasLowercase": None,
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
 
@@ -33,23 +33,23 @@ class PasswordManager:
         self.minimum = 0
         self.maximum = 9999
         self.iteration = 299990
-        self.Pure_Random_Ints = self._randomNumGen(100000,self.minimum, self.maximum)
+        self.Pure_Random_Ints = self._randomnumgen(100000,self.minimum, self.maximum)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.abspath(os.path.join(base_dir, os.pardir))
         self.path = os.path.join(project_root, "DataBase", "encrypted-data.db")
 
-    def Check_Password(self, Password = None) -> str | dict[str, None]:
+    def Check_Password(self, password = None) -> str | dict[str, None]:
         """
         This function Checks is the password is strong or not by looking at how many characters does this have enough letters or char ect.
         and also this function checks is the password branched or not so we can ensure full safety of the password
 
         Status: ✔Complete
         """
-        if Password is None:
-            Password = self.password
+        if password is None:
+            password = self.password
 
-        if not Password:
+        if not password :
             return self.TestResult[-1]
 
         self.TestResult["Cause"] = {
@@ -63,13 +63,13 @@ class PasswordManager:
 
 
         weak = False
-        has_lowercase_letters = any(i in string.ascii_lowercase for i in Password)
-        has_uppercase_letters = any(i in string.ascii_uppercase for i in Password)
-        has_digits = any(i in string.digits for i in Password)
-        has_special_Character = any(i in string.punctuation for i in Password)
+        has_lowercase_letters = any(i in string.ascii_lowercase for i in password)
+        has_uppercase_letters = any(i in string.ascii_uppercase for i in password)
+        has_digits = any(i in string.digits for i in password)
+        has_special_Character = any(i in string.punctuation for i in password)
 
         try:
-            if pwend.check(Password, timeout=22):
+            if pwend.check(password, timeout=22):
                 self.TestResult["Cause"]["Breached"] = True #type: ignore
                 return self.TestResult[80]
         except Exception as e:
@@ -87,7 +87,7 @@ class PasswordManager:
         if not has_special_Character:
             self.TestResult["Cause"]["hasPunc"] = False#type: ignore
             weak = True
-        if len(Password) < 12:
+        if len(password) < 12:
             self.TestResult["Cause"]["isLong"] = False#type: ignore
             weak = True
 
@@ -125,7 +125,7 @@ class PasswordManager:
             result = self.Check_Password(password)
             if result == self.TestResult[0]:
                 return password
-        return None
+        return "Invalid Password!" 
 
     def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str:
         length = self.Length
@@ -141,7 +141,8 @@ class PasswordManager:
         else:
             randoms = self.Pure_Random_Ints
 
-        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(length, len(randoms))))
+        length_of_random_num = len(randoms)
+        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(length, length_of_random_num)))
         if hasLetters and hasNumber and hasPunc:
             result = self.GeneratePass()
             return result
@@ -159,7 +160,7 @@ class PasswordManager:
         return password
 
     @staticmethod
-    def _randomNumGen(num: int, minimum: int, maximum: int) -> list[int] | None:
+    def _randomnumgen(num: int, minimum: int, maximum: int) -> list[int] | None:
         rand = secrets.SystemRandom()
         data = []
         for _ in range(num):
@@ -468,7 +469,7 @@ class PasswordManager:
         
     def isNewUser(self):
         path = self.path
-        if os.path.exists(path) == False:
+        if not os.path.exists(path):
             return True
         return False
 
@@ -501,12 +502,12 @@ class PasswordManager:
         connection.close()
         return data
     
-    def remove_data(self, id):
+    def remove_data(self, Id):
         path = self.path
         connection = sqlite3.connect(path)
         cursor = connection.cursor()
 
-        cursor.execute(f"DELETE FROM Credential_Data WHERE Id = ?", (id,))
+        cursor.execute(f"DELETE FROM Credential_Data WHERE Id = ?", (Id,))
         connection.commit()
         connection.close()
         return True

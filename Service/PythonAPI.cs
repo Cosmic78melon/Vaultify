@@ -32,12 +32,12 @@ namespace Password_Manager.Service
                 return Py.Import("Security");
             }
         }
-        public string Generate_password(string? siteName = "null", int length = 12)
+        public string Generate_password(int length = 12)
         {
             dynamic securityModule = SecurityMod();
             using (Py.GIL())
             {
-                dynamic pwManager = securityModule.PasswordManager(siteName, null, length);
+                dynamic pwManager = securityModule.PasswordManager("null", "null", length);
                 dynamic result = pwManager.GeneratePass();
                 return result.ToString();
             }
@@ -49,7 +49,7 @@ namespace Password_Manager.Service
                 dynamic securityModule = SecurityMod();
                 if (hasLetter && hasNum && hasPunc)
                 {
-                    dynamic data = Generate_password("null", length);
+                    dynamic data = Generate_password(length);
                     return data;
                 }
                 using dynamic pwManager = securityModule.PasswordManager("null", length);

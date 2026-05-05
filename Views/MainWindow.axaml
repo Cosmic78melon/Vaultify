@@ -25,15 +25,15 @@
               
                 <!-- Top: App Branding -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,16" Spacing="8" PointerPressed="DoubleClicked">
-                    <TextBlock Text="Vaultify" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff"/>
-                    <TextBlock Text="Made by Adol" FontSize="{Binding IconSize}" FontWeight="ExtraBold" Foreground="#ffffff" Margin="0,-8,0,0"/>
+                    <Image Source="/Assets/avalonia-logo.ico" Height="{Binding IconSize}"  Margin="0,-8,0,0"/>
                 </StackPanel>
               
                 <!-- Search Bar -->
                 <TextBox Grid.Row="1"
                          Margin="24,0,24,16"
                          Watermark="Search passwords..."
-                         Width="{Binding SeacrhbarSize}"
+                         Width="220"
+                         IsVisible="{Binding SeacrhbarVisibility}"
                          Background="#1E1E1E"
                          BorderBrush="#2A2A2A"
                          Foreground="#808080"
@@ -44,11 +44,11 @@
                 <!-- Navigation Menu -->
                 <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
                     <StackPanel Spacing="4" Margin="12,0">
-                      
+
                         <!-- Home -->
                         <Button Command="{Binding GoToHomeCommand}"
                                 Classes.active="{Binding HomePageActive}">
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="10,14">
                                 <icons:SymbolIcon Symbol="Board" FontSize="20"/>
                                 <Label FontSize="16" IsVisible="{Binding IsExpanded}" VerticalAlignment="Center">Home</Label>
                             </StackPanel>
@@ -58,7 +58,7 @@
                         <!-- Vault -->
                         <Button Command="{Binding GoToAll_EntriesCommand}"
                                 Classes.active="{Binding All_EntriesActive}">
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="10,14">
                                 <icons:SymbolIcon Symbol="Key" FontSize="20"/>
                                 <Label FontSize="16" IsVisible="{Binding IsExpanded}" FontWeight="SemiBold" VerticalAlignment="Center">Passwords</Label>
                             </StackPanel>
@@ -67,7 +67,7 @@
                         <!-- Secure Notes -->
                         <Button Command="{Binding GoToSecurityCommand}"
                                 Classes.active="{Binding SecurityNotesActive}">
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="10,14">
                                 <icons:SymbolIcon Symbol="Note" FontSize="20"/>
                                 <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Secure Notes</Label>
                             </StackPanel>
@@ -78,12 +78,12 @@
                                    Foreground="#555555"
                                    FontSize="13"
                                    FontWeight="SemiBold"
-                                   Margin="24,32,24,8"/>
+                                   Margin="10,32,10,8"/>
                                               
                         <!-- Personal Info -->
                         <Button Command="{Binding GoToAccountsCommand}" 
                                 Classes.active="{Binding AccountPageActive}">
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="10,14">
                                 <icons:SymbolIcon Symbol="Person" FontSize="20"/>
                                 <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Personal Info</Label>
                             </StackPanel>
@@ -91,7 +91,7 @@
                       
                         <!-- Settings Center -->
                         <Button Command="{Binding GoToSettingsCommand}" Classes.active="{Binding SettingsPageActive}">
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="20,14">
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="10,14">
                                 <icons:SymbolIcon Symbol="Settings" FontSize="20"/>
                                 <Label IsVisible="{Binding IsExpanded}" FontSize="16" VerticalAlignment="Center">Settings</Label>
                             </StackPanel>

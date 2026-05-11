@@ -5,8 +5,12 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tmds.DBus.Protocol;
+using System.Security.Cryptography;
+using CSnakes.Runtime.Python;
+using PyObject = Python.Runtime.PyObject;
 
 namespace Password_Manager.Service
 {
@@ -32,30 +36,47 @@ namespace Password_Manager.Service
                 return Py.Import("Security");
             }
         }
-        public string Generate_password(int length = 12)
+        public string CustomeGen(bool hasUpperLetters, bool hasLowerLetters, bool hasNum, bool hasPunc, int length = 12)
         {
-            dynamic securityModule = SecurityMod();
-            using (Py.GIL())
+            bool[] lenResult = { hasLowerLetters, hasUpperLetters, hasNum, hasPunc};
+            int boolCount = lenResult.Count(x => x);
+            if (boolCount < 2) return "Not Possible";
+            if (length < 12) return "Not Possible";
+
+            int alphaC = 26;
+            char[] ascii_lowerLetters = new char[alphaC];
+            char[] ascii_upperLetters = new char[alphaC];
+            for (int i = 0; i < (alphaC); i++)
             {
-                dynamic pwManager = securityModule.PasswordManager("null", "null", length);
-                dynamic result = pwManager.GeneratePass();
-                return result.ToString();
+                ascii_lowerLetters[i] = (char)('a' + i);
             }
-        }
-        public string CustomeGen(int length = 12, bool hasLetter = true, bool hasNum = true, bool hasPunc = true)
-        {
-            using (Py.GIL())
+            for (int i = 0; i < (alphaC); i++)
             {
-                dynamic securityModule = SecurityMod();
-                if (hasLetter && hasNum && hasPunc)
+                ascii_upperLetters[i] = (char)('A' + i);
+            }
+
+            char[] ascii_numbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            char[] ascii_puncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
+ 
+            var raw_data = new StringBuilder();
+            if (hasNum) raw_data.Append(ascii_numbers);
+            if (hasLowerLetters) raw_data.Append(ascii_lowerLetters);
+            if (hasUpperLetters) raw_data.Append(ascii_upperLetters);
+            if (hasPunc) raw_data.Append(ascii_puncs);
+
+            string password = new string(RandomNumberGenerator.GetItems<char>(raw_data.ToString().AsSpan(), length));
+            if (hasLowerLetters && hasNum && hasPunc && hasUpperLetters)
+            {
+                while (true)
                 {
-                    dynamic data = Generate_password(length);
-                    return data;
+                    var result = this.PassswordCheck(password);
+                    if (string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return password;
+                    }
                 }
-                using dynamic pwManager = securityModule.PasswordManager("null", length);
-                dynamic result = pwManager.Custom_GeneratePass(hasLetter, hasNum, hasPunc);
-                return result.ToString();
             }
+            return password;
         }
         public dynamic PassswordCheck(string? password = null)
         {

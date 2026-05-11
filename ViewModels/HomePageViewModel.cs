@@ -46,7 +46,8 @@ namespace Password_Manager.ViewModels
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
-        [ObservableProperty] private bool _hasLetterCase = true;
+        [ObservableProperty] private bool _hasUpperLetter = true;
+        [ObservableProperty] private bool _hasLowerLetter = true;
         [ObservableProperty] private bool _hasNumCase = true;
         [ObservableProperty] private bool _hasPuncCase = true;
         [ObservableProperty] private int _lenght;
@@ -77,7 +78,7 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public async Task GeneratePassword()
         {
-            string result = await Task.Run(() => _pythonAPI.CustomeGen(has_Letter: HasLetterCase, hasNum: HasNumCase, hasPunc: HasPuncCase, length: Lenght));
+            string result = await Task.Run(() => _pythonAPI.CustomeGen(length: Lenght, hasUpperLetters: HasUpperLetter, hasLowerLetters: HasLowerLetter, hasNum: HasNumCase, hasPunc: HasPuncCase));
             PasswordGenerator = result;
         }
 

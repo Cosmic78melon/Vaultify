@@ -227,7 +227,7 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public void GeneratePassword()
         {
-            string password = _pythonAPI.Generate_password();
+            string password = _pythonAPI.CustomeGen(true, true, true, true);
             Password = ConfirmationPassword = password;
         }        
     }

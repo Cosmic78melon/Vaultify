@@ -14,5 +14,6 @@
         public dynamic statusdata(string masterpassword);
         public bool ExportVault(string masterPass, string Command, dynamic file_path, bool isDec);
         public bool change_Data(string masterpassword, string id, string json_obj);
+
     }
 }

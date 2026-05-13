@@ -1,4 +1,5 @@
-﻿using Python.Runtime;
+﻿using System.Net.Http;
+using Python.Runtime;
 using System;
 using System.Collections;
 using System.IO;
@@ -16,14 +17,20 @@ namespace Password_Manager.Service
 {
     public class PythonAPI: IPythonAPI
     {
+        public static char[] ascii_puncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
+        public static char[] ascii_numbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        public static int alphaC = 26;
+        char[] ascii_lowerLetters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+        char[] ascii_upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
         public class passwordCheckDetails
         {
-            public string Result { get; set; } = "Unknown";
-            public bool? HasUppercase { get; set; }
-            public bool? HasLowercase { get; set; }
-            public bool? HasDigits { get; set; }
-            public bool? HasPunctuation { get; set; }
-            public bool? IsLongEnough { get; set; }
+            public string Result { get; set; } = "Weak";
+            public bool? HasUppercase { get; set; } = false;
+            public bool? HasLowercase { get; set; } = false;
+            public bool? HasDigits { get; set; } = false;
+            public bool? HasPunctuation { get; set; } = false;
+            public bool? IsLongEnough { get; set; } = false;
         }
         private static dynamic SecurityMod()
         {
@@ -42,22 +49,7 @@ namespace Password_Manager.Service
             int boolCount = lenResult.Count(x => x);
             if (boolCount < 2) return "Not Possible";
             if (length < 12) return "Not Possible";
-
-            int alphaC = 26;
-            char[] ascii_lowerLetters = new char[alphaC];
-            char[] ascii_upperLetters = new char[alphaC];
-            for (int i = 0; i < (alphaC); i++)
-            {
-                ascii_lowerLetters[i] = (char)('a' + i);
-            }
-            for (int i = 0; i < (alphaC); i++)
-            {
-                ascii_upperLetters[i] = (char)('A' + i);
-            }
-
-            char[] ascii_numbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-            char[] ascii_puncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
- 
+            
             var raw_data = new StringBuilder();
             if (hasNum) raw_data.Append(ascii_numbers);
             if (hasLowerLetters) raw_data.Append(ascii_lowerLetters);
@@ -78,6 +70,44 @@ namespace Password_Manager.Service
             }
             return password;
         }
+
+        private async Task<int> IsPasswordBreached(string password)
+        {
+            try
+            {
+                var sha1 = SHA1.Create();
+                byte[] inputBytes = Encoding.ASCII.GetBytes(password);
+                byte[] hashBytes = sha1.ComputeHash(inputBytes);
+                string hash = BitConverter.ToString(hashBytes).Replace("-", "");
+
+                string prefix = hash.Substring(0, 5);
+                string suffix = hash.Substring(5);
+
+                using (var client = new HttpClient())
+                {
+                    using var isActive = await client.GetAsync("https://www.google.com");
+                    if (isActive.IsSuccessStatusCode != true) return 101;
+                    string response = await client.GetStringAsync($"https://api.pwnedpasswords.com/range/{prefix}");
+                    if (response.Contains(suffix))
+                    {
+                        return 200;
+                    }
+                    else
+                    {
+                        return 500;
+                    }
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return 101;
+            }
+            catch (TimeoutException)
+            {
+                return 101;
+            }
+
+        }
         public dynamic PassswordCheck(string? password = null)
         {
             var details = new passwordCheckDetails();
@@ -86,48 +116,42 @@ namespace Password_Manager.Service
                 details.Result = "No password";
                 return details;
             }
-            using (Py.GIL())
+            
+            int isBreached = this.IsPasswordBreached(password).GetAwaiter().GetResult();
+            if (isBreached == 200)
             {
-                dynamic securityModule = SecurityMod();
-                try
-                {
-                    dynamic pwManger = securityModule.PasswordManager("null", password);
-                    details.Result = pwManger.Check_Password();
-                    PyObject testResultPy = pwManger.TestResult;
-                    if (testResultPy != null && !testResultPy.IsNone())
-                    {
-                        var dict = testResultPy["Cause"];
-                        if (dict != null && !dict.IsNone())
-                        {
-                            details.HasUppercase = GetBoolOrNull(dict["hasUppercase"]);
-                            details.HasLowercase = GetBoolOrNull(dict["hasLowercase"]);
-                            details.HasDigits = GetBoolOrNull(dict["hasDigits"]);
-                            details.HasPunctuation = GetBoolOrNull(dict["hasPunc"]);
-                            details.IsLongEnough = GetBoolOrNull(dict["isLong"]);
-                        }
-                    }
-                    return details;
-                }
-                catch (Exception ex)
-                {
-                    details.Result = ex.Message;
-                }
+                details.Result = "Breached";
                 return details;
             }
-        }
-        private static bool? GetBoolOrNull(PyObject dict)
-        {
-            // I have no fucking Idea how the code works, but it works as intended so don't touch anything
-            if (dict.IsNone()) return null;
-            try
+            if (isBreached == 101)
             {
-                if (dict.IsTrue()) return false; // why?? it works
-                else return true;
+                details.Result = "No Internet";
+                return details;
             }
-            catch
+            if (isBreached == 500)
             {
-                return null;
+                int hasL = 0;
+                int hasU = 0;
+                int hasP = 0;
+                int hasN = 0;
+                for (int i = 0; i < password.Length; i++)
+                {
+                    if (char.IsPunctuation(password[i])) hasP++;
+                    if (char.IsAsciiDigit(password[i])) hasN++;
+                    if (char.IsAsciiLetterLower(password[i])) hasL++;
+                    if (char.IsAsciiLetterUpper(password[i])) hasU++;
+                }
+
+                if (hasL > 0) details.HasLowercase = true;
+                if (hasU > 0) details.HasUppercase = true;
+                if (hasP > 0) details.HasPunctuation = true;
+                if (hasN > 0) details.HasDigits = true;
+                if (password.Length >= 12) details.IsLongEnough = true;
+
+                if ((hasL + hasU + hasP + hasN) >= 4 && password.Length >= 12) details.Result = "Strong";
             }
+
+            return details;
         }
 
         public dynamic show_all_data(string password)

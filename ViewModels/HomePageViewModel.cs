@@ -113,7 +113,7 @@ namespace Password_Manager.ViewModels
         }
         private void CheckChar(dynamic details)
         {
-            if (details.HasUppercase != true)
+            if (details.HasUppercase)
             {
                 HasUpper = "✔ Has Uppercase Letter";
                 Font1 = "green";
@@ -124,7 +124,7 @@ namespace Password_Manager.ViewModels
                 Font1 = "red";
             }
 
-            if (details.HasLowercase != true)
+            if (details.HasLowercase)
             {
                 Font2 = "green";
                 HasLower = "✔ Has Lowercase Letter";
@@ -135,7 +135,7 @@ namespace Password_Manager.ViewModels
                 Font2 = "red";
             }
 
-            if (details.HasDigits != true)
+            if (details.HasDigits)
             {
                 Font3 = "green";
                 HasNum = "✔ Has Numbers";
@@ -146,7 +146,7 @@ namespace Password_Manager.ViewModels
                 Font3 = "red";
             }
 
-            if (details.HasPunctuation != true)
+            if (details.HasPunctuation)
             {
                 HasPunc = "✔ Has Special Characters Letter";
                 Font4 = "green";
@@ -158,7 +158,7 @@ namespace Password_Manager.ViewModels
 
             }
 
-            if (details.IsLongEnough != true)
+            if (details.IsLongEnough)
             {
                 Islong = "✔ Password meets length requirements";
                 Font5 = "green";
@@ -173,11 +173,11 @@ namespace Password_Manager.ViewModels
                 HasUpper = HasLower = HasNum = HasPunc = Islong = null;
                 FontC = "White";
             }
-            details.HasUppercase = null;
-            details.HasLowercase = null;
-            details.HasPunctuation = null;
-            details.HasDigits = null;
-            details.IsLongEnough = null;
+            details.HasUppercase = false;
+            details.HasLowercase = false;
+            details.HasPunctuation = false;
+            details.HasDigits = false;
+            details.IsLongEnough = false;
         }
         private ObservableCollection<FavDataTitle> _favData;
         public ObservableCollection<FavDataTitle> FavData

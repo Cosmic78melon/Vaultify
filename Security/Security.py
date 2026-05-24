@@ -1,12 +1,8 @@
-# Importing Important Libraries
 import os
-import json
 import uuid
 import sqlite3
 import base64
-import random
 import string
-import secrets
 import binascii
 import pandas as pd
 import datetime as dt
@@ -30,22 +26,13 @@ class PasswordManager:
                                                                                                           "hasDigits": None, "hasPunc": None, "isLong": None, "Errors": None}}
 
         # This is are Constants that are not supposed to control by users
-        self.minimum = 0
-        self.maximum = 9999
         self.iteration = 299990
-        self.Pure_Random_Ints = self._randomnumgen(100000,self.minimum, self.maximum)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
         project_root = os.path.abspath(os.path.join(base_dir, os.pardir))
         self.path = os.path.join(project_root, "DataBase", "encrypted-data.db")
 
     def Check_Password(self, password = None) -> str | dict[str, None]:
-        """
-        This function Checks is the password is strong or not by looking at how many characters does this have enough letters or char ect.
-        and also this function checks is the password branched or not so we can ensure full safety of the password
-
-        Status: ✔Complete
-        """
         if password is None:
             password = self.password
 
@@ -105,67 +92,6 @@ class PasswordManager:
         }
         return self.TestResult[0]
 
-    def GeneratePass(self) -> str | None:
-        minimum = self.minimum
-        maximum = self.maximum
-        if self.Length <= 11:
-            return "Invalid Length. It must be greater than 12"
-
-        if self.Pure_Random_Ints is None:
-            rand = secrets.SystemRandom(10)
-            randoms = [rand.randrange(minimum, maximum) for _ in range(10)]
-        else:
-            randoms = self.Pure_Random_Ints
-
-        random_num = str(secrets.choice(randoms))
-        alpha_char = string.ascii_letters + random_num + string.punctuation
-        run = True
-        while run:
-            password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
-            result = self.Check_Password(password)
-            if result == self.TestResult[0]:
-                return password
-        return "Invalid Password!" 
-
-    def Custom_GeneratePass(self, hasLetters, hasNumber, hasPunc) -> str:
-        length = self.Length
-        randint = self.Pure_Random_Ints
-        minimum = self.minimum
-        maximum = self.maximum
-        if length <= 11:
-            return "Invalid Length. It must be greater than 12"
-
-        if randint is None:
-            rand = secrets.SystemRandom(10)
-            randoms = [rand.randrange(minimum, maximum) for _ in range(144)]
-        else:
-            randoms = self.Pure_Random_Ints
-
-        length_of_random_num = len(randoms)
-        random_num = ''.join(str(x) for x in random.sample(randoms, k=min(length, length_of_random_num)))
-        if hasLetters and hasNumber and hasPunc:
-            result = self.GeneratePass()
-            return result
-
-        if hasLetters != True and hasNumber and hasPunc:
-            alpha_char = random_num + string.punctuation
-        elif hasLetters and hasNumber != True and hasPunc:
-            alpha_char = string.ascii_letters + string.punctuation
-        elif hasLetters and hasNumber and hasPunc != True:
-            alpha_char = string.ascii_letters + random_num
-        else:
-            return "Invalid request!"
-
-        password = "".join(secrets.choice(alpha_char) for _ in range(self.Length))
-        return password
-
-    @staticmethod
-    def _randomnumgen(num: int, minimum: int, maximum: int) -> list[int] | None:
-        rand = secrets.SystemRandom()
-        data = []
-        for _ in range(num):
-            data.append(rand.randrange(minimum, maximum +1))
-        return data
 
     def encryptAndStoredata(self, user_name = "Unknown", Password = "", SecureNote = "Nothing", Category ="Unknown", favourite = False):
         site_name = self.site_name
@@ -210,10 +136,6 @@ class PasswordManager:
             cursor.close()
             return True
         else:
-            isAuth = self.IsAuthenticated()
-            ic(isAuth)
-            if isAuth == False:
-                return isAuth
             connection = sqlite3.connect(self.path)
             cursor = connection.cursor()
 
@@ -231,7 +153,7 @@ class PasswordManager:
             cursor.execute("""INSERT INTO Credential_Data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", data)
             connection.commit()
             connection.close()
-            return isAuth
+            return True
     
     def share_data(self, Command,location = "C:/Users/Digital Computer/Downloads", isDecrypted = False):
         if self.IsAuthenticated() != True:
@@ -333,21 +255,6 @@ class PasswordManager:
             iterations=iteration
         )
         return base64.urlsafe_b64encode(kdf.derive(password.encode()))
-    
-    def card_data(self):
-        data = self.show_all_data()
-        # temp = {"Id": None, "Site": None, "Salt": None, "Iteration": None, "Username": None, "Password": None,
-        #         "Notes": None, "Strength": None, "Category": None, "Favourite": None, "Created_at": None,
-        #         "Updated_at": None}
-        card_data = {}
-        for item in data:
-            temp = item["Site"]
-            if item["Site"] == temp:
-                if item["Site"] in card_data:
-                    card_data[item["Site"]] += 1
-                else:
-                    card_data[item["Site"]] = 1
-        return card_data
 
     def show_all_data(self):
         decrypted_list = []
@@ -396,133 +303,11 @@ class PasswordManager:
         decoded_text = key.decrypt(plaintext).decode()
         return decoded_text
 
-    def IsAuthenticated(self):
-        Password = self.password
-        path = self.path
 
-        if Password is None or not os.path.exists(path):
-            return False
-
-        connection = sqlite3.connect(path)
-        cursor = connection.cursor()
-
-        row = cursor.execute("""
-            SELECT Password, Salt, Iteration
-            FROM Credential_Data
-            WHERE Id = 0
-        """).fetchone()
-
-        connection.close()
-
-        if not row:
-            return False
-
-        enc_pass = row[0]  # KEEP AS BYTES
-        salt = binascii.unhexlify(row[1])
-        iteration = int(row[2])
-
-        try:
-            decoded_pass = self.decryptdata(
-                salt,
-                iteration,
-                enc_pass
-            )
-            return Password == decoded_pass
-
-        except Exception as e:
-            print("Authentication Error:", e)
-            return False
-
-    def change_password(self, id: str, json_obj: str):
-        new_data = json.loads(json_obj)
-        path = self.path
-        connection = sqlite3.connect(path)
-        cursor = connection.cursor()
-        fields = []
-        values = []
-        cursor.execute(
-            "SELECT Salt, Iteration FROM Credential_Data WHERE Id = ?",
-            (id,)
-        )
-        item = cursor.fetchone()
-
-        if not item:
-            connection.close()
-            return False
-
-        salt = binascii.unhexlify(item[0])
-        iteration = item[1]
-        dkeys = self._derived_key(salt, iteration)
-        keys = Fernet(dkeys)
-
-        for key, val in new_data.items():
-            fields.append(f"{key} = ?")
-            values.append(self._EncJson(keys, val))
-
-        values.append(id)
-        cursor.execute(f"""UPDATE Credential_Data SET {", ".join(fields)} WHERE Id = ?""", values)
-        time_temp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor.execute(f"UPDATE Credential_Data SET Updated_at = ?", (time_temp,))
-        connection.commit()
-        connection.close()
-        return True
-        
-    def isNewUser(self):
-        path = self.path
-        if not os.path.exists(path):
-            return True
-        return False
-
-    def status(self):
-        data = self.show_all_data()
-        count = 0
-        strong = 0
-        weak = 0
-        breached = 0
-        for i in data:
-            count += 1
-            if i["Strength"] == self.TestResult[0]:
-                strong += 1
-            elif i["Strength"] == self.TestResult[1]:
-                weak += 1
-            elif i["Strength"] == self.TestResult[80]:
-                breached += 1
-        
-        return (count, strong, weak, breached)
-
-    def favourite_card_data(self):
-        connection = sqlite3.connect(self.path)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM Credential_Data where Id != 0 AND Favourite == 1")
-        raw_data = cursor.fetchall()
-        data = []
-        for item in raw_data:
-            fav = self.decryptdata(item[1], item[2], item[3])
-            data.append(fav)
-        connection.close()
-        return data
-    
-    def remove_data(self, Id):
-        path = self.path
-        connection = sqlite3.connect(path)
-        cursor = connection.cursor()
-
-        cursor.execute(f"DELETE FROM Credential_Data WHERE Id = ?", (Id,))
-        connection.commit()
-        connection.close()
-        return True
 
 if __name__ == "__main__":
     pw_1 = PasswordManager("shikho", "@@Adol2280@@")
-    # ic(pw_1.IsAuthenticated())
-    # Status = pw_1.encryptAndStoredata("Cosmic78melon", pw_1.GeneratePass(),
-    #                                   "This account has jumanji movie", "edu", True)
-    # print(Status)
-    # print(pw_1.status())
-    # print(pw_1.favourite_card_data())
     print(pw_1.show_all_data())
-    # json_obj = json.dumps({"Site_name": "Ubisoft"})
-    # print(pw_1.change_password("088427c0-17c4-4ff0-9562-b4708d48468c", json_obj))
     print(pw_1.card_data())
 
 

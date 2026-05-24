@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Service;
 using Python.Runtime;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -103,26 +104,22 @@ namespace Password_Manager.ViewModels
 
         public async Task LoadData(string password)
         {
-            await Task.Delay(100);
             try
             {
                 Items = new ObservableCollection<Entry>();
-                dynamic data = await Task.Run(() => _pythonAPI.show_all_data(password));
-                using (Py.GIL())
-                {
-                    foreach (dynamic item in data)
+                var data = await Task.Run(() => _pythonAPI.show_all_data(password));
+                foreach (var item in data)
                     {
                         Items.Add(new Entry
                         {
-                            Title = item["Site"],
-                            Username = item["Username"],
-                            Password = item["Password"],
-                            strength = item["Strength"],
-                            Color_S = ((string.Compare(Convert.ToString(item["Strength"]), "Strong") == 0) ? "ForestGreen":"red"),
-                            category = item["Category"]
+                            Title = item.siteName,
+                            Username = item.userName,
+                            Password = item.password,
+                            strength = item.strength,
+                            Color_S = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
+                            category = item.cateGory
                         });
                     }
-                }
             }
             catch(Exception ex)
             {
@@ -204,7 +201,7 @@ namespace Password_Manager.ViewModels
                 bool isAuthenticated = _pythonAPI.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    bool data = Convert.ToBoolean(_pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false)); 
+                    bool data = _pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
                     if (data)
                     {
                         StatusMessage = "Password Saved Successfully";
@@ -217,17 +214,17 @@ namespace Password_Manager.ViewModels
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 StatusMessage = "Something Went Wrong";
-                ColorC = "red";
+                ColorC = "yellow";
             }
         }
 
         [RelayCommand]
-        public void GeneratePassword()
+        public async Task GeneratePassword()
         {
-            string password = _pythonAPI.CustomeGen(true, true, true, true);
+            string password = await _pythonAPI.CustomeGen(true, true, true, true);
             Password = ConfirmationPassword = password;
         }        
     }

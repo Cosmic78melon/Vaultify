@@ -120,7 +120,7 @@ namespace Password_Manager.ViewModels
                     return;
                 }
 
-                bool register = _pythonAPI.register(UserName, Password);
+                bool register = _pythonAPI.register(UserName, Password).GetAwaiter().GetResult();
                 if (register == false)
                 {
                     StatusMessage = "Your Password is Weak. please enter strong password";
@@ -197,24 +197,26 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public void LoginCommand()
         {
-            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
             if (string.IsNullOrWhiteSpace(Password))
             {
                 StatusMessage = "Please enter your password.";
                 ColorsC = "red";
                 return;
             }
+            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
 
-            if (passwordStatus)
+            if (passwordStatus != true)
             {
-                _masterPassword = Password;
-                BgOp = false;
-                BgPop = false;
-                Password = string.Empty;
-                GoToHome();
+                StatusMessage = "Invalid Password.";
+                ColorsC = "red";
+                return;
             }
-            StatusMessage = "Invalid Password.";
-            ColorsC = "red";
+            
+            _masterPassword = Password;
+            BgOp = false;
+            BgPop = false;
+            Password = string.Empty;
+            GoToHome();
         }
 
     }

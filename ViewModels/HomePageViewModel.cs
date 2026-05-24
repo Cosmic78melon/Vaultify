@@ -85,7 +85,7 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public async Task PasswordChecker()
         {
-            var details = await Task.Run(() => _pythonAPI.PassswordCheck(PasswordHaveToCheck));
+            var details = await _pythonAPI.PassswordCheck(PasswordHaveToCheck);
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 Password_result = "Password Status: " + details.Result;
@@ -191,13 +191,13 @@ namespace Password_Manager.ViewModels
             FavData = new ObservableCollection<FavDataTitle>();
             using (Py.GIL())
             {
-                dynamic raw_data = _pythonAPI.favData(MasterPassword);
+                List<string> raw_data = _pythonAPI.favData(MasterPassword);
                 FavData.Clear();
-                foreach(var name in raw_data)
+                foreach(string name in raw_data)
                 {
                     FavData.Add( new FavDataTitle
                     {
-                        title = Convert.ToString(name)
+                        title = name
                     });
                 }
             }
@@ -215,17 +215,14 @@ namespace Password_Manager.ViewModels
             Items = new ObservableCollection<HomeCard>();
             using (Py.GIL())
             {
-                PyDict pyDict = _pythonAPI.card_Data(MasterPassword);
+                Dictionary<string, int> card_Data = _pythonAPI.card_Data(MasterPassword);
                 Items.Clear();
-                foreach(var key in pyDict)
+                foreach(var pair in card_Data)
                 {
-                    var value = pyDict[key];
-                    string key_str = key.ToString();
-                    int value_int = Convert.ToInt32(value);
                     Items.Add( new HomeCard
                         {
-                            title = key_str,
-                            number = value_int
+                            title = pair.Key,
+                            number = pair.Value
                         });
                 }
             }
@@ -245,13 +242,13 @@ namespace Password_Manager.ViewModels
             StatusData.Clear();
             using (Py.GIL())
             {
-                dynamic pyStatusdata = _pythonAPI.statusdata(MasterPassword);
+                List<int> Statusdata = _pythonAPI.statusdata(MasterPassword);
                 StatusData.Add(new StatusData
                 {
-                    total = pyStatusdata[0],
-                    strongCount = pyStatusdata[1],
-                    weakCount = pyStatusdata[2],
-                    breachCount = pyStatusdata[3]
+                    total = Statusdata[0],
+                    strongCount = Statusdata[1],
+                    weakCount = Statusdata[2],
+                    breachCount = Statusdata[3]
                 });
             }
         }

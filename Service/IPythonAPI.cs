@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
 
 namespace Password_Manager.Service
 {
@@ -12,12 +11,12 @@ namespace Password_Manager.Service
         public bool isAuthenticated(string password);
         public bool isNewUser();
         public Task<bool> register(string userName, string password);
-        public bool addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
+        public Task<bool> addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
         public Dictionary<string, int> card_Data(string masterpassword);
         public List<string> favData(string masterpassword);
         public List<int> statusdata(string masterpassword);
         public bool ExportVault(string masterPass, string Command, dynamic file_path, bool isDec);
-        public bool change_Data(string masterpassword, string id, string json_obj);
+        public bool loginAuth(string password);
 
     }
 }

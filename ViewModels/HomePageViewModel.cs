@@ -1,25 +1,10 @@
 ﻿using System;
-using System.IO;
-using Meilisearch;
-using System.Threading;
-using System.Reflection;
-using System.Diagnostics;
-using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Reflection;
 using Password_Manager.Service;
-using CSnakes.Runtime;
-using CSnakes.Runtime.Python;
-using Microsoft.Extensions.DependencyInjection;
-using System.Security.Policy;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
-using CommunityToolkit.HighPerformance.Enumerables;
-using Python.Runtime;
-using PyObject = Python.Runtime.PyObject;
 
 
 namespace Password_Manager.ViewModels
@@ -189,17 +174,14 @@ namespace Password_Manager.ViewModels
         public void favouriteData(string MasterPassword)
         {
             FavData = new ObservableCollection<FavDataTitle>();
-            using (Py.GIL())
+            List<string> raw_data = _pythonAPI.favData(MasterPassword);
+            FavData.Clear();
+            foreach(string name in raw_data)
             {
-                List<string> raw_data = _pythonAPI.favData(MasterPassword);
-                FavData.Clear();
-                foreach(string name in raw_data)
+                FavData.Add( new FavDataTitle
                 {
-                    FavData.Add( new FavDataTitle
-                    {
-                        title = name
-                    });
-                }
+                    title = name
+                });
             }
         }
         
@@ -213,18 +195,15 @@ namespace Password_Manager.ViewModels
         public void load_data_recent(string MasterPassword)
         {
             Items = new ObservableCollection<HomeCard>();
-            using (Py.GIL())
+            Dictionary<string, int> card_Data = _pythonAPI.card_Data(MasterPassword);
+            Items.Clear();
+            foreach(var pair in card_Data)
             {
-                Dictionary<string, int> card_Data = _pythonAPI.card_Data(MasterPassword);
-                Items.Clear();
-                foreach(var pair in card_Data)
-                {
-                    Items.Add( new HomeCard
-                        {
-                            title = pair.Key,
-                            number = pair.Value
-                        });
-                }
+                Items.Add( new HomeCard
+                    {
+                        title = pair.Key,
+                        number = pair.Value
+                    });
             }
         }
         
@@ -240,17 +219,15 @@ namespace Password_Manager.ViewModels
         {
             StatusData = new ObservableCollection<StatusData>();
             StatusData.Clear();
-            using (Py.GIL())
+            
+            List<int> Statusdata = _pythonAPI.statusdata(MasterPassword);
+            StatusData.Add(new StatusData
             {
-                List<int> Statusdata = _pythonAPI.statusdata(MasterPassword);
-                StatusData.Add(new StatusData
-                {
-                    total = Statusdata[0],
-                    strongCount = Statusdata[1],
-                    weakCount = Statusdata[2],
-                    breachCount = Statusdata[3]
-                });
-            }
+                total = Statusdata[0],
+                strongCount = Statusdata[1],
+                weakCount = Statusdata[2],
+                breachCount = Statusdata[3]
+            });
         }
     }
 }

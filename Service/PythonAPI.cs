@@ -1,15 +1,12 @@
 ﻿using System.Net.Http;
 using System.Collections.Generic;
-using Python.Runtime;
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
 using System.Security.Cryptography;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Data.Sqlite;
 
 namespace Password_Manager.Service
@@ -51,17 +48,6 @@ namespace Password_Manager.Service
             public bool? HasDigits { get; set; } = false;
             public bool? HasPunctuation { get; set; } = false;
             public bool? IsLongEnough { get; set; } = false;
-        }
-        private static dynamic SecurityMod()
-        {
-            using (Py.GIL())
-            {
-                dynamic sys = Py.Import("sys");
-                dynamic os = Py.Import("os");
-                string cwd = os.getcwd();
-                sys.path.append(Path.Combine(cwd, "Security"));
-                return Py.Import("Security");
-            }
         }
         public async Task<string> CustomeGen(bool hasUpperLetters, bool hasLowerLetters, bool hasNum, bool hasPunc, int length = 12)
         {
@@ -192,11 +178,11 @@ namespace Password_Manager.Service
                 if (global_Data.Count == dbCount) return global_Data;
                     
                 global_Data.Clear();
-                var sql = "SELECT * FROM Credential_Data where Id != 0 ORDER BY Updated_at DESC;";
+                var sql = "SELECT * FROM Credential_Data where Id != @id ORDER BY Updated_at DESC;";
                 int id = 0;
 
                 using var command = new SqliteCommand(sql, connection);
-                
+                command.Parameters.AddWithValue("@id", "0");
 
                 using SqliteDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
@@ -227,10 +213,11 @@ namespace Password_Manager.Service
             if (string.IsNullOrEmpty(password) || Path.Exists(DPath) == false) return false;
             using var connection = new SqliteConnection($"Data Source={DPath}");
             connection.Open();
-            const string sql = "SELECT * FROM Credential_Data WHERE Id = 0";
 
+            const string sql = "SELECT * FROM Credential_Data WHERE Id = @id";
             using var command = new SqliteCommand(sql, connection);
-
+            command.Parameters.AddWithValue("@id", "0");
+            
             using SqliteDataReader reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -255,8 +242,17 @@ namespace Password_Manager.Service
                 }
             }
             isAuth = true;
-            show_all_data(password);
             return isAuth;
+        }
+        public bool loginAuth(string password)
+        {
+            if (isAuthenticated(password))
+            {
+                show_all_data(password);
+                return true;
+            }
+
+            return false;
         }
         public bool isNewUser()
         {
@@ -266,26 +262,61 @@ namespace Password_Manager.Service
         }
 
 
-        public bool addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
+        public async Task<bool> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
-            dynamic python = SecurityMod();
-            using (Py.GIL())
+            int iteration = 299990;
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            var result = await PassswordCheck(password);
+            if (isAuthenticated(masterPass) == false && isNewUser() == true)
+                return false;
+            
+            try
             {
-                if (isAuth != true)
+                using var connection = new SqliteConnection($"Data Source={DPath}");
+                connection.Open();
+                
+                string fernetKey = DeriveKey(salt, iteration, masterPass);
+                Guid myguid = Guid.NewGuid();
+                string id = myguid.ToString();
+                string encSitename = Fernet.Encrypt(fernetKey, siteName);
+                string encUsername = Fernet.Encrypt(fernetKey, userName);
+                string encPass = Fernet.Encrypt(fernetKey, password);
+                string encMsg = Fernet.Encrypt(fernetKey, message);
+                string localNow = DateTime.UtcNow.ToString("O");
+
+                using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
                 {
-                    return false;
-                }
-                dynamic manager = python.PasswordManager(siteName,  masterPass);
-                bool data = manager.encryptAndStoredata(userName, password, message, category, favourite);
-                return Convert.ToBoolean(data);
+                    Parameters = 
+                    {
+                        new SqliteParameter("@id", id),
+                        new SqliteParameter("@salt", Convert.ToHexString(salt)), 
+                        new SqliteParameter("@iteration", iteration), 
+                        new SqliteParameter("@site", encSitename), 
+                        new SqliteParameter("@user", encUsername), 
+                        new SqliteParameter("@pass", encPass), 
+                        new SqliteParameter("@notes", encMsg), 
+                        new SqliteParameter("@category", category),
+                        new SqliteParameter("@strength", result.Result),
+                        new SqliteParameter("@fav", favourite), 
+                        new SqliteParameter("@created", localNow),
+                        new SqliteParameter("@updated", localNow)
+                    }
+                };
+                await commandLate.ExecuteNonQueryAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
+        
         public async Task<bool> register(string userName, string password)
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
-            string result = await PassswordCheck(password).Result;
-            if (string.Equals(result, "Strong", StringComparison.OrdinalIgnoreCase) != true || isNewUser() == false || isAuthenticated(password)) return false;
+            var result = await PassswordCheck(password).Result;
+            if (string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) != true || isNewUser() == false || isAuthenticated(password)) return false;
             try
             {
                 using var connection = new SqliteConnection($"Data Source={DPath}");
@@ -298,7 +329,7 @@ namespace Password_Manager.Service
                 string fernetKey = DeriveKey(salt, iteration, password);
                 string encUsername = Fernet.Encrypt(fernetKey, userName);
                 string encPass = Fernet.Encrypt(fernetKey, password);
-                string localNow = Convert.ToString(DateTime.Now);
+                string localNow = DateTime.UtcNow.ToString("O");
 
                 using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
                 {
@@ -386,14 +417,8 @@ namespace Password_Manager.Service
 
         public bool ExportVault(string masterPass, string command, dynamic filePath, bool isDec)
         {
-            if (isAuth != true) return false;
-            dynamic python = SecurityMod();
-            using (Py.GIL())
-            {
-                dynamic manager = python.PasswordManager("null", masterPass);
-                bool data = manager.share_data(command, filePath, isDec);
-                return data;
-            }
+            //TODO: rewrite in C#
+            return false;
         }
 
         public bool change_Data(string masterpassword, string id, string jsonObj)

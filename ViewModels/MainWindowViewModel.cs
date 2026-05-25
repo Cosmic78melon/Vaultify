@@ -203,7 +203,7 @@ namespace Password_Manager.ViewModels
                 ColorsC = "red";
                 return;
             }
-            bool passwordStatus = _pythonAPI.isAuthenticated(Password);
+            bool passwordStatus = _pythonAPI.loginAuth(Password);
 
             if (passwordStatus != true)
             {

@@ -1,24 +1,15 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using CSnakes.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Password_Manager.Factory;
-using Password_Manager.Models;
 using Password_Manager.Service;
 using Password_Manager.ViewModels;
 using Password_Manager.Views;
-using Python.Runtime;
 using System;
-using System.CodeDom;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Avalonia.Controls;
-using Password_Manager.Service;
 namespace Password_Manager
 {
     public partial class App : Application
@@ -39,19 +30,7 @@ namespace Password_Manager
             collections.AddTransient<SettingsPageViewModel>();
             collections.AddTransient<AccountPageViewModel>();
 
-
-            // Initialize Python
-            string baseDir =  Directory.GetCurrentDirectory();
-            string pythonHome = Path.Combine(baseDir, "python-3.13.12-embed-amd64");
-            string pythonDll = Path.Combine(pythonHome, "python313.dll");
-
-            Runtime.PythonDLL = pythonDll;
-            PythonEngine.PythonHome = pythonHome;
-
-            PythonEngine.Initialize();
-            PythonEngine.BeginAllowThreads();
-
-            // Registering the PythonAPI
+            // service initialization
             collections.AddSingleton<IPythonAPI, PythonAPI>();
             
             // Page View Models and Page View

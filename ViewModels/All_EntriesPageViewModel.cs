@@ -1,20 +1,9 @@
-﻿using Avalonia.Automation.Peers;
-using Avalonia.Controls;
-using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Service;
-using Python.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Avalonia;
-using System.Text.Json;
 
 namespace Password_Manager.ViewModels
 {
@@ -194,14 +183,14 @@ namespace Password_Manager.ViewModels
 
 
         [RelayCommand]
-        public void save()
+        public async Task save()
         {
             try
             {
                 bool isAuthenticated = _pythonAPI.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    bool data = _pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
+                    bool data = await _pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
                     if (data)
                     {
                         StatusMessage = "Password Saved Successfully";

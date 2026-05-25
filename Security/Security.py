@@ -94,48 +94,6 @@ class PasswordManager:
 
 
     def encryptAndStoredata(self, user_name = "Unknown", Password = "", SecureNote = "Nothing", Category ="Unknown", favourite = False):
-        site_name = self.site_name
-        user_name = user_name.lower()
-        salt = os.urandom(16)
-        iteration = self.iteration
-        if not os.path.exists(self.path):
-            Password = self.password
-            strength_check = self.Check_Password(Password)
-            if strength_check == self.TestResult[1] or strength_check == self.TestResult[2] or strength_check == self.TestResult[80]:
-                return False 
-
-            connection = sqlite3.connect(self.path)
-            cursor = connection.cursor()
-            cursor.execute("""
-                            CREATE TABLE Credential_Data(
-                            Id text,
-                            Salt text,
-                            Iteration int,
-                            Site_name text,
-                            User_name text,
-                            Password,
-                            Notes text,
-                            Category text,
-                            Strength text,
-                            Favourite Boolean,
-                            Created_at text,
-                            Updated_at text
-            )
-            """)
-
-            derived_key = self._derived_key(salt, iteration)
-            key = Fernet(derived_key)
-            enc_pass = self._EncJson(key, self.password)
-            enc_user_name = self._EncJson(key, user_name)
-            Created_at = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            data = ["0", salt.hex(), iteration, "Password Manager", enc_user_name, enc_pass, SecureNote, Category,
-                    strength_check, int(favourite),Created_at, Created_at]
-            cursor.execute("""INSERT INTO Credential_Data VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", data)
-            result = cursor.execute("SELECT Salt FROM Credential_Data WHERE Id= 0").fetchall()
-            connection.commit()
-            cursor.close()
-            return True
-        else:
             connection = sqlite3.connect(self.path)
             cursor = connection.cursor()
 

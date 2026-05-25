@@ -4,6 +4,7 @@ using Python.Runtime;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
@@ -226,11 +227,9 @@ namespace Password_Manager.Service
             if (string.IsNullOrEmpty(password) || Path.Exists(DPath) == false) return false;
             using var connection = new SqliteConnection($"Data Source={DPath}");
             connection.Open();
-            const string sql = "SELECT * FROM Credential_Data WHERE Id = @id";
-            int id = 0;
+            const string sql = "SELECT * FROM Credential_Data WHERE Id = 0";
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", id);
 
             using SqliteDataReader reader = command.ExecuteReader();
             if (reader.HasRows)
@@ -283,22 +282,53 @@ namespace Password_Manager.Service
         }
         public async Task<bool> register(string userName, string password)
         {
-            dynamic python = SecurityMod();
-            using (Py.GIL())
+            int iteration = 299990;
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            string result = await PassswordCheck(password).Result;
+            if (string.Equals(result, "Strong", StringComparison.OrdinalIgnoreCase) != true || isNewUser() == false || isAuthenticated(password)) return false;
+            try
             {
-                dynamic details = await this.PassswordCheck(password);
-                if (!string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
+                using var connection = new SqliteConnection($"Data Source={DPath}");
+                connection.Open();
+                const string sql = @"CREATE TABLE IF NOT EXISTS Credential_Data(Id text, Salt text, Iteration int, Site_name text, User_name text, Password, Notes text, Category text, Strength text, Favourite Boolean, Created_at text, Updated_at text)";
+                
+                using var command = new SqliteCommand(sql, connection);
+                await command.ExecuteNonQueryAsync();
+                
+                string fernetKey = DeriveKey(salt, iteration, password);
+                string encUsername = Fernet.Encrypt(fernetKey, userName);
+                string encPass = Fernet.Encrypt(fernetKey, password);
+                string localNow = Convert.ToString(DateTime.Now);
+
+                using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
                 {
-                    return false;
-                }
-                dynamic manager = python.PasswordManager("Password Manager", password);
-                bool data = manager.encryptAndStoredata(userName, password);
-                return data;
+                    Parameters = 
+                    {
+                        new SqliteParameter("@id", "0"),
+                        new SqliteParameter("@salt", Convert.ToHexString(salt)), 
+                        new SqliteParameter("@iteration", iteration), 
+                        new SqliteParameter("@site", "Password Manager"), 
+                        new SqliteParameter("@user", encUsername), 
+                        new SqliteParameter("@pass", encPass), 
+                        new SqliteParameter("@notes", "Null"), 
+                        new SqliteParameter("@category", "Security"),
+                        new SqliteParameter("@strength", result),
+                        new SqliteParameter("@fav", false), 
+                        new SqliteParameter("@created", localNow),
+                        new SqliteParameter("@updated", localNow)
+                    }
+                };
+                await commandLate.ExecuteNonQueryAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
         public List<int> statusdata(string masterpassword)
         {
-            if (isAuth != true) return null;
+            if (isAuth != true) return new List<int>{0,0,0,0};
             
             int total = 0;
             int weak = 0;

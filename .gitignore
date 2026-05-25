@@ -1,13 +1,6 @@
 bin/
 .vs/
-Security/.venv/
-Security/.idea/
-Security/.qodo/
-Security/.vs/
-Security/.env
-Security/test.py
 obj/
 Assets/
-Security/__pycache__/
 *.idea
 .vscode

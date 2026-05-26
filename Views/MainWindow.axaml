@@ -158,15 +158,25 @@
             <TextBlock Text="Password"
                        FontSize="14"
                        Foreground="#dddddd"/>
-
-            <!-- Input -->
-            <TextBox Watermark="Enter your password"
-                     PasswordChar="*"
-                     Height="40"
-                     Padding="10"
-                     BorderBrush="#444"
-                     CornerRadius="8"
-                     Text="{Binding Password}"/>
+            
+            <StackPanel Orientation="Horizontal">
+                <!-- Input -->
+                <TextBox Watermark="Enter your password"
+                         PasswordChar="*"
+                         RevealPassword="{Binding RevealPass}"
+                         Height="40"
+                         Width="330"
+                         Padding="10"
+                         BorderBrush="#444"
+                         CornerRadius="8"
+                         Text="{Binding Password}"/>
+                <Button Background="Transparent"
+                        Command="{Binding RevealPasswordCommand}"
+                        Height="40"
+                        Width="50">
+                    <icons:SymbolIcon Symbol="{Binding EyeIcon}"></icons:SymbolIcon>
+                </Button>
+            </StackPanel>
 
             <!-- Status -->
             <TextBlock Text="{Binding StatusMessage}"

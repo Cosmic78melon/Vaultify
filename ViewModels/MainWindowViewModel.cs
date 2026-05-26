@@ -27,7 +27,8 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _bgOpSignUp = false;
         
         [ObservableProperty] private bool _bgPopSignUp = false;
-
+        [ObservableProperty] private bool _revealPass = false;
+        [ObservableProperty] private string _eyeIcon = "EyeOff";
         public required PageFactory _pageFactory;
         public required IPythonAPI _pythonAPI;
 
@@ -189,9 +190,13 @@ namespace Password_Manager.ViewModels
             SettingsPageActive = activepage == PageViewData.Settings;
         }
         [RelayCommand]
-        public void SideMenuResize()
+        public void SideMenuResize() => IsExpanded = !IsExpanded;
+
+        [RelayCommand]
+        public void RevealPassword()
         {
-            IsExpanded = !IsExpanded;
+            RevealPass = !RevealPass;
+            EyeIcon = RevealPass ? "Eye" : "EyeOff";
         }
 
         [RelayCommand]

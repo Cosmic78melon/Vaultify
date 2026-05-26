@@ -54,7 +54,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _isDecrypted = false;
         
 
-        public readonly IPythonAPI _pythonAPI;
+        public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
 
         [RelayCommand]
@@ -85,9 +85,9 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public All_EntriesPageViewModel(IPythonAPI pythonAPI, FilePickerService filePickerService)
+        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService)
         {
-            _pythonAPI = pythonAPI;
+            _appServices = appServices;
             _filePickerService = filePickerService;
         }
 
@@ -96,7 +96,7 @@ namespace Password_Manager.ViewModels
             try
             {
                 Items = new ObservableCollection<Entry>();
-                var data = await Task.Run(() => _pythonAPI.show_all_data(password));
+                var data = await Task.Run(() => _appServices.show_all_data(password));
                 foreach (var item in data)
                     {
                         Items.Add(new Entry
@@ -173,7 +173,7 @@ namespace Password_Manager.ViewModels
                 SelectedItem.Extension = ".csv";
             }
             var path = await _filePickerService.SaveFile(HomepagePassword);
-            bool result = _pythonAPI.ExportVault(HomepagePassword, SelectedItem.Extension, path, IsDecrypted);
+            bool result = _appServices.ExportVault(HomepagePassword, SelectedItem.Extension, path, IsDecrypted);
             if (result == true)
             {
                 SharePOP = false;
@@ -187,10 +187,10 @@ namespace Password_Manager.ViewModels
         {
             try
             {
-                bool isAuthenticated = _pythonAPI.isAuthenticated(HomepagePassword);
+                bool isAuthenticated = _appServices.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    bool data = await _pythonAPI.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
+                    bool data = await _appServices.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
                     if (data)
                     {
                         StatusMessage = "Password Saved Successfully";
@@ -213,7 +213,7 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public async Task GeneratePassword()
         {
-            string password = await _pythonAPI.CustomeGen(true, true, true, true);
+            string password = await _appServices.CustomeGen(true, true, true, true);
             Password = ConfirmationPassword = password;
         }        
     }

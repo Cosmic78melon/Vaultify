@@ -11,7 +11,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Password_Manager.Service
 {
-    public class PythonAPI: IPythonAPI
+    public class AppServices: IAppServices
     {
         public static char[] AsciiPuncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
         public static char[] AsciiNumbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};

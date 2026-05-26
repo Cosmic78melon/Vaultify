@@ -31,7 +31,7 @@ namespace Password_Manager
             collections.AddTransient<AccountPageViewModel>();
 
             // service initialization
-            collections.AddSingleton<IPythonAPI, PythonAPI>();
+            collections.AddSingleton<IAppServices, AppServices>();
             
             // Page View Models and Page View
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch

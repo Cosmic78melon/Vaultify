@@ -27,7 +27,7 @@ namespace Password_Manager.ViewModels
     }
     public partial class HomePageViewModel : PageViewModel
     {
-        public IPythonAPI _pythonAPI;
+        public IAppServices _appServices;
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
@@ -55,22 +55,22 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
         
-        public HomePageViewModel(IPythonAPI pythonAPI)
+        public HomePageViewModel(IAppServices appServices)
         {
-            _pythonAPI = pythonAPI;
+            _appServices = appServices;
         }
 
         [RelayCommand]
         public async Task GeneratePassword()
         {
-            string result = await Task.Run(() => _pythonAPI.CustomeGen(length: Lenght, hasUpperLetters: HasUpperLetter, hasLowerLetters: HasLowerLetter, hasNum: HasNumCase, hasPunc: HasPuncCase));
+            string result = await Task.Run(() => _appServices.CustomeGen(length: Lenght, hasUpperLetters: HasUpperLetter, hasLowerLetters: HasLowerLetter, hasNum: HasNumCase, hasPunc: HasPuncCase));
             PasswordGenerator = result;
         }
 
         [RelayCommand]
         public async Task PasswordChecker()
         {
-            var details = await _pythonAPI.PassswordCheck(PasswordHaveToCheck);
+            var details = await _appServices.PassswordCheck(PasswordHaveToCheck);
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 Password_result = "Password Status: " + details.Result;
@@ -174,7 +174,7 @@ namespace Password_Manager.ViewModels
         public void favouriteData(string MasterPassword)
         {
             FavData = new ObservableCollection<FavDataTitle>();
-            List<string> raw_data = _pythonAPI.favData(MasterPassword);
+            List<string> raw_data = _appServices.favData(MasterPassword);
             FavData.Clear();
             foreach(string name in raw_data)
             {
@@ -195,7 +195,7 @@ namespace Password_Manager.ViewModels
         public void load_data_recent(string MasterPassword)
         {
             Items = new ObservableCollection<HomeCard>();
-            Dictionary<string, int> card_Data = _pythonAPI.card_Data(MasterPassword);
+            Dictionary<string, int> card_Data = _appServices.card_Data(MasterPassword);
             Items.Clear();
             foreach(var pair in card_Data)
             {
@@ -220,7 +220,7 @@ namespace Password_Manager.ViewModels
             StatusData = new ObservableCollection<StatusData>();
             StatusData.Clear();
             
-            List<int> Statusdata = _pythonAPI.statusdata(MasterPassword);
+            List<int> Statusdata = _appServices.statusdata(MasterPassword);
             StatusData.Add(new StatusData
             {
                 total = Statusdata[0],

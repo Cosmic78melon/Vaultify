@@ -30,7 +30,7 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _revealPass = false;
         [ObservableProperty] private string _eyeIcon = "EyeOff";
         public required PageFactory _pageFactory;
-        public required IPythonAPI _pythonAPI;
+        public required IAppServices _appServices;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
@@ -51,21 +51,21 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public bool _accountPageActive;
         
 
-        public MainWindowViewModel(PageFactory pageFactory, IPythonAPI pythonAPI)
+        public MainWindowViewModel(PageFactory pageFactory, IAppServices appServices)
         {
             _pageFactory = pageFactory;
-            _pythonAPI = pythonAPI;
+            _appServices = appServices;
             CheckUser();
             GoToHome();
         }
         public MainWindowViewModel()
         {
-            if (_pythonAPI != null) CurrentPage = new HomePageViewModel(_pythonAPI);
+            if (_appServices != null) CurrentPage = new HomePageViewModel(_appServices);
         }
 
         public void CheckUser()
         {
-            bool isNewUser = _pythonAPI.isNewUser();
+            bool isNewUser = _appServices.isNewUser();
             if (isNewUser)
             {
                 // Show SIGNUP
@@ -112,8 +112,8 @@ namespace Password_Manager.ViewModels
 
             if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase))
             {
-                bool isNewUser = _pythonAPI.isNewUser();
-                bool isAuthenticated = _pythonAPI.isAuthenticated(Password);
+                bool isNewUser = _appServices.isNewUser();
+                bool isAuthenticated = _appServices.isAuthenticated(Password);
                 if (isNewUser != true && isAuthenticated)
                 {
                     StatusMessage = "Welcome back! You are already registered with us.";
@@ -121,7 +121,7 @@ namespace Password_Manager.ViewModels
                     return;
                 }
 
-                bool register = _pythonAPI.register(UserName, Password).GetAwaiter().GetResult();
+                bool register = _appServices.register(UserName, Password).GetAwaiter().GetResult();
                 if (register == false)
                 {
                     StatusMessage = "Your Password is Weak. please enter strong password";
@@ -208,7 +208,7 @@ namespace Password_Manager.ViewModels
                 ColorsC = "red";
                 return;
             }
-            bool passwordStatus = _pythonAPI.loginAuth(Password);
+            bool passwordStatus = _appServices.loginAuth(Password);
 
             if (passwordStatus != true)
             {

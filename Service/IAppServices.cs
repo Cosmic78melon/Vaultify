@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace Password_Manager.Service
 {
-    public interface IPythonAPI
+    public interface IAppServices
     {
         public Task<string> CustomeGen(bool hasUpperLetters, bool hasLowerLetters, bool hasNum, bool hasPunc, int length = 12);
         public Task<dynamic> PassswordCheck(string password = null!);
-        public List<PythonAPI.vaultData> show_all_data(string password);
+        public List<AppServices.vaultData> show_all_data(string password);
         public bool isAuthenticated(string password);
         public bool isNewUser();
         public Task<bool> register(string userName, string password);

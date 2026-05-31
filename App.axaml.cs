@@ -10,6 +10,8 @@ using Password_Manager.Views;
 using System;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Dialogs;
+
 namespace Password_Manager
 {
     public partial class App : Application
@@ -56,9 +58,20 @@ namespace Password_Manager
 
                 return null;
             });
-            var service = collections.BuildServiceProvider();
 
+            collections.AddSingleton<CopyTextsServices>();
+            collections.AddSingleton<Func<TopLevel?>>(x => () =>
+            {
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime clipboards)
+                {
+                    return TopLevel.GetTopLevel(clipboards.MainWindow);
+                }
+
+                return null;
+            });
             
+            var service = collections.BuildServiceProvider();
+           
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 DisableAvaloniaDataAnnotationValidation();

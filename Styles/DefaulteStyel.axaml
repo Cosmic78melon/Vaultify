@@ -35,7 +35,30 @@
     </StackPanel>
     </Border>
   </Design.PreviewWith>
+	
+	
+	<!-- Context Menu Styles -->
+	<Style Selector="ContextMenu">
+		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"></Setter>
+		<Setter Property="Padding" Value="4"></Setter>
+		<Setter Property="Opacity" Value=".78"></Setter>
+	</Style>
+	
+	<Style Selector="ContextMenu > Border">
+		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"/>
+	</Style>	
+	<Style Selector="ContextMenu > TextBox">
+		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"/>
+	</Style>
 
+	<Style Selector="MenuItem">
+		<Setter Property="Foreground" Value="Azure"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+	</Style>
+
+	<Style Selector="MenuItem:pointerover > Border">
+		<Setter Property="Background" Value="#2a2a2a"/>
+	</Style>
 	
 	<!-- Headers Styles for Font -->
 	<Style Selector="TextBlock.Headers">

@@ -1,11 +1,15 @@
-﻿using System.Net.Http;
+﻿using ClosedXML.Excel;
+using System.Net.Http;
 using System.Collections.Generic;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
+using CsvHelper;
+using CsvHelper.Excel.EPPlus;
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 
@@ -15,10 +19,10 @@ namespace Password_Manager.Service
     {
         public static char[] AsciiPuncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
         public static char[] AsciiNumbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        public static int AlphaC = 26;
         char[] _asciiLowerLetters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
         char[] _asciiUpperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-        private readonly string DPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "DataBase"), "encrypted-data.db");
+        private const string Filename = "encrypted-data";
+        private readonly string DPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "DataBase"), $"{Filename}.db");
         private const int KeySize = 32;
         public static bool isAuth = false;
         
@@ -178,11 +182,9 @@ namespace Password_Manager.Service
                 if (global_Data.Count == dbCount) return global_Data;
                     
                 global_Data.Clear();
-                var sql = "SELECT * FROM Credential_Data where Id != @id ORDER BY Updated_at DESC;";
-                int id = 0;
+                var sql = "SELECT * FROM Credential_Data where Id != 0 ORDER BY Updated_at DESC;";
 
                 using var command = new SqliteCommand(sql, connection);
-                command.Parameters.AddWithValue("@id", "0");
 
                 using SqliteDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
@@ -235,7 +237,7 @@ namespace Password_Manager.Service
                             return false;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         return false;
                     }
@@ -262,13 +264,13 @@ namespace Password_Manager.Service
         }
 
 
-        public async Task<bool> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
+        public async Task<(bool isAdded, string? Id, string? strength)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
             if (isAuthenticated(masterPass) == false && isNewUser() == true)
-                return false;
+                return (false, null, null);
             
             try
             {
@@ -303,11 +305,12 @@ namespace Password_Manager.Service
                     }
                 };
                 await commandLate.ExecuteNonQueryAsync();
-                return true;
+                show_all_data(masterPass);
+                return (true, id, result.Result);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return false;
+                return (false, null, null);
             }
         }
         
@@ -316,7 +319,7 @@ namespace Password_Manager.Service
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password).Result;
-            if (string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) != true || isNewUser() == false || isAuthenticated(password)) return false;
+            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || !isNewUser() || isAuthenticated(password)) return false;
             try
             {
                 using var connection = new SqliteConnection($"Data Source={DPath}");
@@ -352,12 +355,38 @@ namespace Password_Manager.Service
                 await commandLate.ExecuteNonQueryAsync();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
         }
-        public List<int> statusdata(string masterpassword)
+        public async Task<bool> remove_data(string Id, string password)
+        {
+            if (string.IsNullOrEmpty(Id)) return false;
+            if (string.IsNullOrEmpty(password)) return false;
+            
+            if (isAuth)
+            {
+                using var connection = new SqliteConnection($"Data Source={DPath}");
+                connection.Open(); 
+                const string sql = "DELETE FROM Credential_Data WHERE id = @id";
+                using var command = new SqliteCommand(sql, connection);
+                command.Parameters.AddWithValue("@id", Id);
+
+                int rowAffected = command.ExecuteNonQuery();
+                if (rowAffected > 0)
+                {
+                    show_all_data(password);
+                    await command.ExecuteNonQueryAsync();
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+        
+        public List<int> statusdata()
         {
             if (isAuth != true) return new List<int>{0,0,0,0};
             
@@ -384,7 +413,7 @@ namespace Password_Manager.Service
 
             return new List<int> { total, strong, weak, breached };
         }
-        public List<string> favData(string masterpassword)
+        public List<string> favData()
         {
             if (isAuth != true) return null;
             
@@ -397,7 +426,7 @@ namespace Password_Manager.Service
             return card_data;
         }
 
-        public Dictionary<string, int> card_Data(string masterpassword)
+        public Dictionary<string, int> card_Data()
         {
             if (isAuth != true) return null;
             Dictionary<string, int> card_data = new();
@@ -415,9 +444,41 @@ namespace Password_Manager.Service
             return card_data;
         }
 
-        public bool ExportVault(string masterPass, string command, dynamic filePath, bool isDec)
+
+        public bool ExportVault(string command, dynamic filePath)
         {
-            //TODO: rewrite in C#
+            if (!isAuth)
+            {
+                return false;
+            }
+
+
+            string fileFormat = Filename + command;
+            string path = Path.Combine(filePath, fileFormat);
+            if (string.Equals(command, ".csv", StringComparison.InvariantCultureIgnoreCase))
+            {
+                using (var writer = new StreamWriter(path))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.WriteRecords(global_Data);
+                }
+
+                return true;
+            }
+            else if (string.Equals(command, ".xlsx", StringComparison.InvariantCultureIgnoreCase))
+            {
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Vault");
+
+                    worksheet.Cell(1, 1).InsertTable(global_Data);
+
+                    workbook.SaveAs(path);
+                }
+
+                return true;
+            }
+
             return false;
         }
 

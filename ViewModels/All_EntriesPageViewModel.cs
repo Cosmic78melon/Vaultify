@@ -4,34 +4,28 @@ using Password_Manager.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace Password_Manager.ViewModels
 {
     public class Entry
     {
+        public required string Id { get; set; }
         public required string Title { get; set; }
         public required string Password { get; set; }
         public required string Username { get; set; }
-        public required string strength { get; set; }
-        public required string Color_S { get; set; }
-        public string category { get; set; }
+        public required string Strength { get; set; }
+        public required string ColorS { get; set; }
+        public required string Category { get; set; }
     }
     
     public class FileType
     {
-        public string Name { get; set; }
-        public string Extension { get; set; }
-        public string Icons { get; set; }
+        public required string Name { get; set; }
+        public required string Extension { get; set; }
+        public required string Icons { get; set; }
         
-    }
-
-    public class changebleObj
-    {
-        public string user_name { get; set; }
-        public string password { get; set; }
-        public string site_name { get; set; }
-        public string category { get; set; }
-        public string favourite { get; set; }
     }
     
     public partial class All_EntriesPageViewModel : PageViewModel
@@ -51,14 +45,13 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
         [ObservableProperty] private FileType _selectedItem;
-        [ObservableProperty] private bool _isDecrypted = false;
-        
 
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
+        public readonly CopyTextsServices _copyTexts;
 
         [RelayCommand]
-        public void AddnewPOPButton()
+        public void AddnewPopButton()
         {
             AddnewPOP = AddnewOP = true;
         }
@@ -101,12 +94,13 @@ namespace Password_Manager.ViewModels
                     {
                         Items.Add(new Entry
                         {
+                            Id =  item.Id,
                             Title = item.siteName,
                             Username = item.userName,
                             Password = item.password,
-                            strength = item.strength,
-                            Color_S = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            category = item.cateGory
+                            Strength = item.strength,
+                            ColorS = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
+                            Category = item.cateGory
                         });
                     }
             }
@@ -114,67 +108,45 @@ namespace Password_Manager.ViewModels
             {
                 Items.Add(new Entry
                 {
+                    Id =  null,
                     Title = "Nothing",
                     Username = ex.Message,
                     Password = "Nothing",
-                    strength = "Nothing",
-                    Color_S = "white",
-                    category = "Nothing"
+                    Strength = "Nothing",
+                    ColorS = "white",
+                    Category = "Nothing"
                 });
             }
             
         }
         
-        public ObservableCollection<FileType> Categories { get; } = new()
-        {
+        public ObservableCollection<FileType> Categories { get; } =
+        [
             new FileType
             {
                 Name = "CSV Document",
                 Extension = ".csv",
                 Icons = "DocumentCsv"
             },
+
             new FileType
             {
                 Name = "Excel Document",
                 Extension = ".xlsx",
                 Icons = "Document"
-            },
-            new FileType
-            {
-                Name = "XML Document",
-                Extension = ".xml",
-                Icons = "DocumentData"
-            },
-            new FileType
-            {
-                Name = "Html Document",
-                Extension = ".html",
-                Icons = "DocumentCss"
-            },
-            new FileType
-            {
-                Name = "Json Document",
-                Extension = ".json",
-                Icons = "JavaScript"
-            },
-            new FileType
-            {
-                Name = "Text Document",
-                Extension = ".txt",
-                Icons = "DocumentText"
             }
-        };
+        ];
         
         [RelayCommand]
-        public async Task SaveFile()
+        private async Task SaveFile()
         {
             if (string.IsNullOrEmpty(SelectedItem.Extension))
             {
                 SelectedItem.Extension = ".csv";
             }
             var path = await _filePickerService.SaveFile(HomepagePassword);
-            bool result = _appServices.ExportVault(HomepagePassword, SelectedItem.Extension, path, IsDecrypted);
-            if (result == true)
+            bool result = _appServices.ExportVault(SelectedItem.Extension, path);
+            if (result)
             {
                 SharePOP = false;
                 ShareOP = false;
@@ -183,18 +155,28 @@ namespace Password_Manager.ViewModels
 
 
         [RelayCommand]
-        public async Task save()
+        private async Task save()
         {
             try
             {
                 bool isAuthenticated = _appServices.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    bool data = await _appServices.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
+                    var (data, Id, strength) = await _appServices.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
                     if (data)
                     {
                         StatusMessage = "Password Saved Successfully";
                         ColorC = "green";
+                        Items.Add(new Entry
+                        {
+                            Id = Id,
+                            Title = Webname,
+                            Username =  Name,
+                            Category = Catagory,
+                            ColorS = ((string.Compare(strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
+                            Password = Password,
+                            Strength = strength
+                        });
                     }
                     else
                     {
@@ -203,15 +185,41 @@ namespace Password_Manager.ViewModels
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 StatusMessage = "Something Went Wrong";
                 ColorC = "yellow";
             }
         }
-
+        
         [RelayCommand]
-        public async Task GeneratePassword()
+        private async Task CopyUsername(Entry items)
+        {
+            if (items == null) return;
+            var clipboard = CopyTextsServices.Get();
+            await clipboard.SetTextAsync(items.Username);
+
+        }        
+        [RelayCommand]
+        private async Task CopyPassword(Entry items)
+        {
+            if (items == null) return;
+            var clipboard = CopyTextsServices.Get();
+            await clipboard.SetTextAsync(items.Password);
+        }        
+        [RelayCommand]
+        private async Task DeleteItem(Entry items)
+        {
+            if (items == null) return;
+            bool isDeleted = await _appServices.remove_data(items.Id, HomepagePassword);
+
+            if (isDeleted)
+            {
+                Items.Remove(items);
+            }
+        }
+        [RelayCommand]
+        private async Task GeneratePassword()
         {
             string password = await _appServices.CustomeGen(true, true, true, true);
             Password = ConfirmationPassword = password;

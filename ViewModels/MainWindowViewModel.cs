@@ -14,12 +14,12 @@ namespace Password_Manager.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private string? _masterPassword = string.Empty;
-        [ObservableProperty] private string _userName;
-        [ObservableProperty] private string _email;
-        [ObservableProperty] private string _password;
-        [ObservableProperty] private string _confirmationPassword;
-        [ObservableProperty] private string _statusMessage;
-        [ObservableProperty] private string _colorsC;            
+        [ObservableProperty] private string _userName = null!;
+        [ObservableProperty] private string _email = null!;
+        [ObservableProperty] private string _password = null!;
+        [ObservableProperty] private string _confirmationPassword = null!;
+        [ObservableProperty] private string _statusMessage = null!;
+        [ObservableProperty] private string _colorsC = null!;            
         [ObservableProperty] private bool _bgOp = true;
         
         [ObservableProperty] private bool _bgPop = true;
@@ -42,7 +42,7 @@ namespace Password_Manager.ViewModels
         public bool SeacrhbarVisibility => (IsExpanded) ? true : false;
 
         [ObservableProperty]
-        public PageViewModel _currentPage;
+        public required PageViewModel _currentPage;
 
         [ObservableProperty] public bool _homePageActive;
         [ObservableProperty] public bool _all_EntriesActive;
@@ -141,9 +141,9 @@ namespace Password_Manager.ViewModels
                 if (_masterPassword != null)
                 {
                     if (string.IsNullOrEmpty(_masterPassword)) return;
-                    item.load_data_recent(_masterPassword);
-                    item.favouriteData(_masterPassword);
-                    item.statusDataLoad(_masterPassword);
+                    item.load_data_recent();
+                    item.favouriteData();
+                    item.statusDataLoad();
                 }
             });
             UpdateActiveState(PageViewData.Home);

@@ -11,11 +11,12 @@ namespace Password_Manager.Service
         public bool isAuthenticated(string password);
         public bool isNewUser();
         public Task<bool> register(string userName, string password);
-        public Task<bool> addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
-        public Dictionary<string, int> card_Data(string masterpassword);
-        public List<string> favData(string masterpassword);
-        public List<int> statusdata(string masterpassword);
-        public bool ExportVault(string masterPass, string Command, dynamic file_path, bool isDec);
+        public Task<(bool isAdded, string Id, string strength)> addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
+        public Dictionary<string, int> card_Data();
+        public List<string> favData();
+        public List<int> statusdata();
+        public bool ExportVault(string Command, dynamic file_path);
+        public Task<bool> remove_data(string Id, string password);
         public bool loginAuth(string password);
 
     }

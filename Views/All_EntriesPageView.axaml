@@ -29,7 +29,7 @@
                             Orientation="Horizontal"
                             Spacing="12"
                             VerticalAlignment="Center">
-                    <Button Classes="Vault" Command="{Binding AddnewPOPButtonCommand}">
+                    <Button Classes="Vault" Command="{Binding AddnewPopButtonCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <icons:SymbolIcon Symbol="Add" FontSize="20" />
                             <TextBlock Text="Add new" />
@@ -93,7 +93,7 @@
                                    Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="3"
-                                   Text="Strenght"
+                                   Text="Strength"
                                    Classes="Headers"
                                    Margin="16,0,8,0" />
 
@@ -105,10 +105,11 @@
                         <TextBlock Grid.Column="5" Text="" />
                     </Grid>
 
+
                     <!-- Scrollable list -->
                     <ListBox Background="Transparent"
+                             x:Name="ListBoxData"
                              ItemsSource="{Binding Items}"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                         <ListBox.ItemTemplate>
@@ -157,15 +158,15 @@
                                                TextWrapping="NoWrap" />
 
                                     <TextBlock Grid.Column="3"
-                                               Text="{Binding strength}"
+                                               Text="{Binding Strength}"
                                                Margin="16,12,8,12"
                                                VerticalAlignment="Center"
-                                               Foreground="{Binding Color_S}"
+                                               Foreground="{Binding ColorS}"
                                                TextTrimming="CharacterEllipsis"
                                                TextWrapping="NoWrap" />
 
                                     <TextBlock Grid.Column="4"
-                                               Text="{Binding category}"
+                                               Text="{Binding Category}"
                                                Margin="16,12,8,12"
                                                VerticalAlignment="Center"
                                                Foreground="#BBBBBB"
@@ -191,12 +192,18 @@
                                 <Setter Property="Background" Value="#252535" />
                             </Style>
                         </ListBox.Styles>
+                        
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Delete" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding $parent[ListBox].SelectedItem}"></MenuItem>
+                                <MenuItem Header="Copy Username" Command="{Binding CopyUsernameCommand}" CommandParameter="{Binding $parent[ListBox].SelectedItem}"></MenuItem>
+                                <MenuItem Header="Copy Password" Command="{Binding CopyPasswordCommand}" CommandParameter="{Binding $parent[ListBox].SelectedItem}"></MenuItem>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
                     </ListBox>
                 </DockPanel>
             </Border>
         </Grid>
-
-        <!-- Popups / Overlays -->
 
         <Border Grid.RowSpan="2"
                 IsVisible="{Binding AddnewOP}"
@@ -286,9 +293,6 @@
                         </DataTemplate>
                     </ComboBox.DataTemplates>
                 </ComboBox>
-                <CheckBox Content="Decrypted Credentials (full access)"
-                          IsChecked="{Binding IsDecrypted}"
-                          Classes="CheckBoxP" />
                 <StackPanel Orientation="Horizontal"
                             Spacing="12"
                             HorizontalAlignment="Right"

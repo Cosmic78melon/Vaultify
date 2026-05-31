@@ -4,7 +4,7 @@
              xmlns:converters="using:Avalonia.Markup.Xaml.Converters"
              x:Class="Password_Manager.App"
              xmlns:local="using:Password_Manager"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
@@ -21,18 +21,20 @@
 			<ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="Controls/CheckBox.axaml"></MergeResourceInclude>
 				<MergeResourceInclude Source="Controls/Sliders.axaml"></MergeResourceInclude>
+				<MergeResourceInclude Source="Controls/MenuItem.axaml"></MergeResourceInclude>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
-	  <SolidColorBrush x:Key="Primary_Background_Color">#0f0c09</SolidColorBrush>
-	  <SolidColorBrush x:Key="Primary_SideMenu_Color">#2b231d</SolidColorBrush>
-	  <SolidColorBrush x:Key="Primary_Seperator_Color">Wheat</SolidColorBrush>
-	  <SolidColorBrush x:Key="Primary_Button_Background">Transparent</SolidColorBrush>
-      <SolidColorBrush x:Key="ButtonInactive">#b3b3b3</SolidColorBrush>
-	  <SolidColorBrush x:Key="Primary_Button_Foreground">White</SolidColorBrush>
-	  <SolidColorBrush x:Key="Hover_Button_Background">#e65100</SolidColorBrush>
-      <SolidColorBrush x:Key="Card_Color">#140f0a</SolidColorBrush>
-      <SolidColorBrush x:Key="CheckBox_Color">#ff8b4d</SolidColorBrush>
+        <SolidColorBrush x:Key="Primary_Background_Color">#0f0c09</SolidColorBrush>
+        <SolidColorBrush x:Key="Primary_SideMenu_Color">#2b231d</SolidColorBrush>
+        <SolidColorBrush x:Key="Primary_Seperator_Color">Wheat</SolidColorBrush>
+        <SolidColorBrush x:Key="Primary_Button_Background">Transparent</SolidColorBrush>
+        <SolidColorBrush x:Key="ButtonInactive">#b3b3b3</SolidColorBrush>
+        <SolidColorBrush x:Key="Primary_Button_Foreground">White</SolidColorBrush>
+        <SolidColorBrush x:Key="Hover_Button_Background">#e65100</SolidColorBrush>
+        <SolidColorBrush x:Key="Card_Color">#140f0a</SolidColorBrush>
+        <SolidColorBrush x:Key="CheckBox_Color">#ff8b4d</SolidColorBrush>
+        <SolidColorBrush x:Key="ContextMenuBG">#291e14</SolidColorBrush>
 
       <FontFamily x:Key="Fonts">SF Pro, Plus Jakarta Sans</FontFamily>
   </Application.Resources>

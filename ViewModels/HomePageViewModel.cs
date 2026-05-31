@@ -171,10 +171,10 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _favData, value); } 
         }
 
-        public void favouriteData(string MasterPassword)
+        public void favouriteData()
         {
             FavData = new ObservableCollection<FavDataTitle>();
-            List<string> raw_data = _appServices.favData(MasterPassword);
+            List<string> raw_data = _appServices.favData();
             FavData.Clear();
             foreach(string name in raw_data)
             {
@@ -192,10 +192,10 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _items, value); } 
         }
 
-        public void load_data_recent(string MasterPassword)
+        public void load_data_recent()
         {
             Items = new ObservableCollection<HomeCard>();
-            Dictionary<string, int> card_Data = _appServices.card_Data(MasterPassword);
+            Dictionary<string, int> card_Data = _appServices.card_Data();
             Items.Clear();
             foreach(var pair in card_Data)
             {
@@ -215,12 +215,12 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _statusData, value); }
         }
 
-        public void statusDataLoad(string MasterPassword)
+        public void statusDataLoad()
         {
             StatusData = new ObservableCollection<StatusData>();
             StatusData.Clear();
             
-            List<int> Statusdata = _appServices.statusdata(MasterPassword);
+            List<int> Statusdata = _appServices.statusdata();
             StatusData.Add(new StatusData
             {
                 total = Statusdata[0],

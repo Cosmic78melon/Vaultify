@@ -22,6 +22,7 @@ public class FilePickerService(Func<TopLevel?> toplevel)
             Title = "Select a Folder"
         });
         var path = folders.FirstOrDefault();
+        if (path ==  null) return null;
         return path.TryGetLocalPath();
     }
 }

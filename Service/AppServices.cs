@@ -166,49 +166,60 @@ namespace Password_Manager.Service
         }
 
         public List<vaultData> show_all_data(string password)
+{
+    // 1. Reject empty password immediately
+    if (string.IsNullOrEmpty(password)) return global_Data;
+
+    // 2. Return cache if user is not authenticated
+    if (isAuth != true) return global_Data;
+
+    using (var connection = new SqliteConnection($"Data Source={DPath}"))
+    {
+        connection.Open();
+
+        using var countCommand = new SqliteCommand(
+            "SELECT COUNT(*) FROM Credential_Data WHERE Id != 0;", connection);
+
+        int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
+
+        // 3. Return cache if row count hasn't changed
+        if (global_Data != null && global_Data.Count == dbCount) return global_Data;
+
+        // 4. Safe initialization — THIS is what fixes your crash
+        global_Data ??= new List<vaultData>();
+        global_Data.Clear();
+
+        var sql = "SELECT * FROM Credential_Data WHERE Id != 0 ORDER BY Updated_at DESC;";
+        using var command = new SqliteCommand(sql, connection);
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
         {
-            if (string.IsNullOrEmpty(password) || isAuth != true) return global_Data;
+            byte[] bsalt = Convert.FromHexString(reader.GetString(1));
+            string fernetKey = this.DeriveKey(bsalt, reader.GetInt32(2), password);
 
-            using (var connection = new SqliteConnection($"Data Source={DPath}"))
+            var allData = new vaultData
             {
-                connection.Open();
-                
-                // Get current database row count
-                using var countCommand = new SqliteCommand(
-                    "SELECT COUNT(*) FROM Credential_Data WHERE Id != 0;",
-                    connection);
-                
-                int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
-                if (global_Data.Count == dbCount) return global_Data;
-                    
-                global_Data.Clear();
-                var sql = "SELECT * FROM Credential_Data where Id != 0 ORDER BY Updated_at DESC;";
+                Id        = reader.GetString(0),
+                Salt      = reader.GetString(1),
+                Iteration = reader.GetInt32(2),
+                siteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
+                userName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
+                password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
+                notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
+                cateGory  = reader.GetString(7),
+                strength  = reader.GetString(8),
+                favourite = reader.GetInt16(9) == 1,
+                createdAt = reader.GetString(10),
+                updatedAt = reader.GetString(11)
+            };
 
-                using var command = new SqliteCommand(sql, connection);
-
-                using SqliteDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        vaultData allData = new vaultData { Id = reader.GetString(0), Salt = reader.GetString(1), Iteration = reader.GetInt32(2), cateGory = reader.GetString(7), 
-                            strength = reader.GetString(8), createdAt = reader.GetString(10), updatedAt = reader.GetString(11)};
-                        
-                        //Derived key 
-                        byte[] bsalt = Convert.FromHexString(reader.GetString(1));
-                        string fernetKey = this.DeriveKey(bsalt, reader.GetInt32(2), password);
-                        allData.siteName = Fernet.Decrypt(fernetKey, reader.GetString(3));
-                        allData.userName = Fernet.Decrypt(fernetKey, reader.GetString(4));
-                        allData.password = Fernet.Decrypt(fernetKey, reader.GetString(5));
-                        allData.notes = Fernet.Decrypt(fernetKey, reader.GetString(6));
-                        bool fav = reader.GetInt16(9) == 1;
-                        allData.favourite = fav;
-                        global_Data.Add(allData);
-                    }
-                }
-                return global_Data;
-            }
+            global_Data.Add(allData);
         }
+
+        return global_Data;
+    }
+}
 
         public bool isAuthenticated(string password)
         {
@@ -264,13 +275,13 @@ namespace Password_Manager.Service
         }
 
 
-        public async Task<(bool isAdded, string? Id, string? strength)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
+        public async Task<(bool isAdded, string? Id, string? strength, string? time)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
-            if (isAuthenticated(masterPass) == false && isNewUser() == true)
-                return (false, null, null);
+            if (!isAuthenticated(masterPass) && isNewUser())
+                return (false, null, null, null);
             
             try
             {
@@ -284,7 +295,7 @@ namespace Password_Manager.Service
                 string encUsername = Fernet.Encrypt(fernetKey, userName);
                 string encPass = Fernet.Encrypt(fernetKey, password);
                 string encMsg = Fernet.Encrypt(fernetKey, message);
-                string localNow = DateTime.UtcNow.ToString("O");
+                string localNow = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
                 using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
                 {
@@ -306,11 +317,11 @@ namespace Password_Manager.Service
                 };
                 await commandLate.ExecuteNonQueryAsync();
                 show_all_data(masterPass);
-                return (true, id, result.Result);
+                return (true, id, result.Result, localNow);
             }
             catch (Exception)
             {
-                return (false, null, null);
+                return (false, null, null, null);
             }
         }
         
@@ -332,7 +343,7 @@ namespace Password_Manager.Service
                 string fernetKey = DeriveKey(salt, iteration, password);
                 string encUsername = Fernet.Encrypt(fernetKey, userName);
                 string encPass = Fernet.Encrypt(fernetKey, password);
-                string localNow = DateTime.UtcNow.ToString("O");
+                string localNow = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
                 using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
                 {
@@ -373,11 +384,10 @@ namespace Password_Manager.Service
                 using var command = new SqliteCommand(sql, connection);
                 command.Parameters.AddWithValue("@id", Id);
 
-                int rowAffected = command.ExecuteNonQuery();
+                int rowAffected = await command.ExecuteNonQueryAsync();
                 if (rowAffected > 0)
                 {
                     show_all_data(password);
-                    await command.ExecuteNonQueryAsync();
                     return true;
                 }
                 return false;
@@ -396,18 +406,21 @@ namespace Password_Manager.Service
             int breached = 0;
             foreach (var item in global_Data)
             {
-                total++;
-                if (string.Equals(item.strength, "Strong", StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    strong++;
-                }                    
-                else if (string.Equals(item.strength, "Weak", StringComparison.OrdinalIgnoreCase))
-                {
-                    weak++;
-                }                 
-                else if (string.Equals(item.strength, "Breached", StringComparison.OrdinalIgnoreCase))
-                {
-                    breached++;
+                    total++;
+                    if (string.Equals(item.strength, "Strong", StringComparison.OrdinalIgnoreCase))
+                    {
+                        strong++;
+                    }                    
+                    else if (string.Equals(item.strength, "Weak", StringComparison.OrdinalIgnoreCase))
+                    {
+                        weak++;
+                    }                 
+                    else if (string.Equals(item.strength, "Breached", StringComparison.OrdinalIgnoreCase))
+                    {
+                        breached++;
+                    }
                 }
             }
 
@@ -421,7 +434,10 @@ namespace Password_Manager.Service
             
             foreach (var item in global_Data)
             {
-                if (card_data.Contains(item.siteName) != true) card_data.Add(item.siteName);
+                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (card_data.Contains(item.siteName) != true) card_data.Add(item.siteName);
+                }
             }
             return card_data;
         }
@@ -432,13 +448,16 @@ namespace Password_Manager.Service
             Dictionary<string, int> card_data = new();
             foreach (var item in global_Data)
             {
-                if (card_data.ContainsKey(item.siteName))
+                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    card_data[item.siteName]++;
-                }
-                else
-                {
-                    card_data.Add(item.siteName, 1);
+                    if (card_data.ContainsKey(item.siteName))
+                    {
+                        card_data[item.siteName]++;
+                    }
+                    else
+                    {
+                        card_data.Add(item.siteName, 1);
+                    }
                 }
             }
             return card_data;

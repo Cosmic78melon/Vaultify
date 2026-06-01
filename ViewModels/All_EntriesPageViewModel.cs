@@ -18,6 +18,7 @@ namespace Password_Manager.ViewModels
         public required string Strength { get; set; }
         public required string ColorS { get; set; }
         public required string Category { get; set; }
+        public required string Time { get; set; }
     }
     
     public class FileType
@@ -45,6 +46,9 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
         [ObservableProperty] private FileType _selectedItem;
+
+        [ObservableProperty] public bool _confimationDialog = false;
+        [ObservableProperty] public bool _confirmDelete = false;
 
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
@@ -91,6 +95,8 @@ namespace Password_Manager.ViewModels
                 Items = new ObservableCollection<Entry>();
                 var data = await Task.Run(() => _appServices.show_all_data(password));
                 foreach (var item in data)
+                {
+                    if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
                     {
                         Items.Add(new Entry
                         {
@@ -100,9 +106,11 @@ namespace Password_Manager.ViewModels
                             Password = item.password,
                             Strength = item.strength,
                             ColorS = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            Category = item.cateGory
+                            Category = item.cateGory,
+                            Time = item.createdAt
                         });
                     }
+                }
             }
             catch(Exception ex)
             {
@@ -114,7 +122,8 @@ namespace Password_Manager.ViewModels
                     Password = "Nothing",
                     Strength = "Nothing",
                     ColorS = "white",
-                    Category = "Nothing"
+                    Category = "Nothing",
+                    Time = "Loading................"
                 });
             }
             
@@ -162,7 +171,7 @@ namespace Password_Manager.ViewModels
                 bool isAuthenticated = _appServices.isAuthenticated(HomepagePassword);
                 if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase) && isAuthenticated)
                 {
-                    var (data, Id, strength) = await _appServices.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
+                    var (data, Id, strength, time) = await _appServices.addCredentials(HomepagePassword, Webname, userName: Name, password: Password, "Nothing", catagory:Catagory, false); 
                     if (data)
                     {
                         StatusMessage = "Password Saved Successfully";
@@ -175,7 +184,8 @@ namespace Password_Manager.ViewModels
                             Category = Catagory,
                             ColorS = ((string.Compare(strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
                             Password = Password,
-                            Strength = strength
+                            Strength = strength,
+                            Time = time
                         });
                     }
                     else
@@ -211,12 +221,23 @@ namespace Password_Manager.ViewModels
         private async Task DeleteItem(Entry items)
         {
             if (items == null) return;
-            bool isDeleted = await _appServices.remove_data(items.Id, HomepagePassword);
+            ConfimationDialog = true;
 
-            if (isDeleted)
+            await Task.Delay(1555);
+            if (ConfirmDelete)
             {
-                Items.Remove(items);
+                bool isDeleted = await _appServices.remove_data(items.Id, HomepagePassword);
+                if (isDeleted)
+                {
+                    Items.Remove(items);
+                }
             }
+        }
+        [RelayCommand]
+        private void yesButton()
+        {
+            ConfirmDelete = true;
+            ConfimationDialog = false;
         }
         [RelayCommand]
         private async Task GeneratePassword()

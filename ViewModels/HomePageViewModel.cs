@@ -11,7 +11,7 @@ namespace Password_Manager.ViewModels
 {
     public class HomeCard()
     {
-        public string title { get; set; }
+        public string? Title { get; set; }
         public int number { get; set; } 
     }
     public class FavDataTitle()
@@ -201,7 +201,7 @@ namespace Password_Manager.ViewModels
             {
                 Items.Add( new HomeCard
                     {
-                        title = pair.Key,
+                        Title = pair.Key,
                         number = pair.Value
                     });
             }

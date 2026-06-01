@@ -2,9 +2,219 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:viewmodels="using:Password_Manager.ViewModels"
+             xmlns:icons="using:FluentIcons.Avalonia"
+             mc:Ignorable="d"
+             d:DesignWidth="1700"
+             d:DesignHeight="800"
+             x:DataType="viewmodels:SecurityPageViewModel"
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
              x:Class="Password_Manager.SecurityPageView">
-  Welcome to Security Notes!
+
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
+        
+            <Grid Grid.Row="0" RowDefinitions="Auto,*" Margin="0">
+
+                <!-- Top Bar -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="32,28,32,12">
+                    <TextBlock Text="Your Security Notes"
+                               FontSize="34"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="12"
+                                VerticalAlignment="Center">
+                        <Button Classes="Vault" Command="{Binding NewNotesCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <icons:SymbolIcon Symbol="Add" FontSize="20" />
+                                <TextBlock Text="Add Notes" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            <!-- Main Content Area -->
+            <Grid Grid.Row="1" Margin="0">
+
+                <!-- Passwords Table Container -->
+                <Border Margin="32,0,32,32"
+                        Background="#1A1A1A"
+                        CornerRadius="16"
+                        ClipToBounds="True">
+
+                    <DockPanel LastChildFill="True">
+
+                        <!-- Header – always stays at top -->
+                        <Grid x:Name="HeaderGrid"
+                              DockPanel.Dock="Top"
+                              ColumnDefinitions="*, *"
+                              Height="56"
+                              Background="#222222">
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Notes"    
+                                       Classes="Headers"
+                                       Margin="16,0,8,0" />
+
+                            <TextBlock Grid.Column="1"
+                                       Text="Entry Created" 
+                                       Classes="Headers"
+                                       Margin="16,0,8,0" />
+                        </Grid>
+
+
+                        <!-- Scrollable list -->
+                        <ListBox Background="Transparent"
+                                 x:Name="ListBoxData"
+                                 ItemsSource="{Binding SecureNotes}"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*, *"
+                                          Background="Transparent"
+                                          Margin="0,0,0,1">
+
+                                        <!-- Hover highlight -->
+                                        <Border Grid.ColumnSpan="5"
+                                                Background="#252525"
+                                                IsVisible="{Binding $self.IsPointerOver}"
+                                                Opacity="0.6"
+                                                CornerRadius="4" />
+
+                                        <!-- Icon + Site/App -->
+                                        <StackPanel Grid.Column="0"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center"
+                                                    Margin="16,12,8,12"
+                                                    Spacing="12">
+                                            
+                                            <TextBlock Text="{Binding Description}"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="White"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Date}"
+                                                   Margin="16,12,8,12"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="White"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap" />
+
+                                        <!-- Actions column (empty for now) -->
+                                        <StackPanel Grid.Column="5"
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="8" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <!-- Selection & hover styles -->
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="#2A2A3A" />
+                                </Style>
+                                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="#252535" />
+                                </Style>
+                            </ListBox.Styles>
+                            
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Copy Note" Command="{Binding CopyNotesCommand}" CommandParameter="{Binding $parent[ListBox].SelectedItem}"></MenuItem>
+                                    <MenuItem Header="Delete Note" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding $parent[ListBox].SelectedItem}"></MenuItem>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+            </Grid>
+            <!-- Add New Security Note Popup -->
+            <Border Grid.RowSpan="2"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    IsVisible="{Binding SecurityDialougeVisible }" />
+
+            <Border Grid.RowSpan="2"
+                    IsVisible="{Binding SecurityDialougeVisible}"
+                    ZIndex="1001"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#1A1A1A"
+                    CornerRadius="16"
+                    Padding="24"
+                    Width="460"
+                    Height="340">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Add New Entry"
+                               FontSize="22"
+                               Foreground="White"
+                               FontWeight="Bold" />
+                    <TextBlock Text="Enter the details below"
+                               Foreground="#BBBBBB"
+                               FontSize="14" />
+                    <TextBox Watermark="Personal Notes"
+                             Text="{Binding SecurityNotesToSave}" />
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="{Binding ColorC}" />
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                Margin="0,12,0,0">
+                        <Button Classes="Vault"
+                                Content="Save"
+                                IsDefault="True"
+                                Command="{Binding SaveNotesCommand}" />
+                        <Button Classes="Vault"
+                                Content="Cancel"
+                                Command="{Binding CancelButtonCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <!-- Confirm Delete Popup -->
+            <Border Grid.RowSpan="2"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    IsVisible="{Binding ConfirmDialougeVisible}" />
+
+            <Border Grid.RowSpan="2"
+                    IsVisible="{Binding ConfirmDialougeVisible}"
+                    ZIndex="1001"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#1A1A1A"
+                    CornerRadius="16"
+                    Padding="24"
+                    Width="460"
+                    Height="340">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Are you sure??"
+                               FontSize="22"
+                               Foreground="White"
+                               FontWeight="Bold" />
+                    <TextBlock Text="Warning: Experimental feature"
+                               Foreground="#FF8C00"
+                               FontWeight="SemiBold" />
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                Margin="0,16,0,0">
+                        <Button Content="Yes" Background="Green" Foreground="Black" BorderThickness="1" BorderBrush="AliceBlue" Command="{Binding yesbuttonCommand }"/>
+                        <Button Background="Red" Foreground="Black" BorderThickness="1" BorderBrush="AliceBlue"
+                                Content="Cancel"
+                                Command="{Binding CancelButtonCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

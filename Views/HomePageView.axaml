@@ -29,7 +29,7 @@
             <TextBlock Grid.Column="1" 
                        FontSize="40"
                        FontWeight="Bold"
-                       Text="Welcome To Vaultify The Best Password Manager Made BY Adol"
+                       Text="Welcome To Vaultify "
                        HorizontalAlignment="Center"/>
         </Grid>
 
@@ -60,7 +60,7 @@
                                 <DataTemplate>
                                     <StackPanel>
                                        <Grid ColumnDefinitions="*,Auto">
-                                           <TextBlock Text="{Binding title}" Foreground="#d4d4d4" Margin="0,7"/>
+                                           <TextBlock Text="{Binding Title}" Foreground="#d4d4d4" Margin="0,7"/>
                                            <Border Grid.Column="1"
                                                    CornerRadius="10"
                                                    Padding="8,2">

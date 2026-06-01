@@ -2,12 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewmodels="using:Password_Manager.ViewModels"
+             xmlns:vm="using:Password_Manager.ViewModels"
              xmlns:icons="using:FluentIcons.Avalonia"
              mc:Ignorable="d"
              d:DesignWidth="1700"
              d:DesignHeight="800"
-             x:DataType="viewmodels:All_EntriesPageViewModel"
+             x:DataType="vm:All_EntriesPageViewModel"
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
              x:Class="Password_Manager.All_EntriesPageView">
@@ -98,7 +98,7 @@
                                    Margin="16,0,8,0" />
 
                         <TextBlock Grid.Column="4"
-                                   Text="Category"
+                                   Text="Password Created"
                                    Classes="Headers"
                                    Margin="16,0,8,0" />
 
@@ -166,7 +166,7 @@
                                                TextWrapping="NoWrap" />
 
                                     <TextBlock Grid.Column="4"
-                                               Text="{Binding Category}"
+                                               Text="{Binding Time}"
                                                Margin="16,12,8,12"
                                                VerticalAlignment="Center"
                                                Foreground="#BBBBBB"
@@ -205,12 +205,12 @@
             </Border>
         </Grid>
 
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 IsVisible="{Binding AddnewOP}"
                 Background="Black"
                 ZIndex="1000" />
 
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 ZIndex="1001"
                 IsVisible="{Binding AddnewPOP}"
                 HorizontalAlignment="Center"
@@ -257,12 +257,12 @@
         </Border>
 
         <!-- Share Popup -->
-        <Border Grid.RowSpan="2" 
+        <Border Grid.Row="0" Grid.RowSpan="2" 
                 Background="#80000000"
                 ZIndex="1000"
                 IsVisible="{Binding ShareOP}" />
 
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 IsVisible="{Binding SharePOP}"
                 ZIndex="1001"
                 HorizontalAlignment="Center"
@@ -282,7 +282,7 @@
                 IsEditable="False"
                 SelectedItem="{Binding SelectedItem}">
                     <ComboBox.DataTemplates>
-                        <DataTemplate DataType="viewmodels:FileType">
+                        <DataTemplate DataType="vm:FileType">
                             <StackPanel Orientation="Horizontal">
                                 <icons:SymbolIcon Symbol="{Binding Icons}"></icons:SymbolIcon>
                                 <TextBlock Text="{Binding Name}"></TextBlock>
@@ -306,12 +306,12 @@
         </Border>
 
         <!-- Change Password Popup -->
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 Background="#80000000"
                 ZIndex="1000"
                 IsVisible="{Binding ChangePasswordOP}" />
 
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 IsVisible="{Binding ChangePasswordPOP}"
                 ZIndex="1001"
                 HorizontalAlignment="Center"
@@ -344,6 +344,40 @@
                 </StackPanel>
             </StackPanel>
         </Border>
+        <!-- Confirm Delete Popup -->
+        <Border Grid.RowSpan="2"
+                Background="#80000000"
+                ZIndex="1000"
+                IsVisible="{Binding ConfimationDialog}" />
 
+        <Border Grid.RowSpan="2"
+                IsVisible="{Binding ConfimationDialog}"
+                ZIndex="1001"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#1A1A1A"
+                CornerRadius="16"
+                Padding="24"
+                Width="460"
+                Height="340">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Are you sure??"
+                           FontSize="22"
+                           Foreground="White"
+                           FontWeight="Bold" />
+                <TextBlock Text="Warning: Experimental feature"
+                           Foreground="#FF8C00"
+                           FontWeight="SemiBold" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            HorizontalAlignment="Right"
+                            Margin="0,16,0,0">
+                    <Button Content="Yes" Background="Green" Foreground="Black" BorderThickness="1" BorderBrush="AliceBlue" Command="{Binding yesButtonCommand }"/>
+                    <Button Background="Red" Foreground="Black" BorderThickness="1" BorderBrush="AliceBlue"
+                            Content="Cancel"
+                            Command="{Binding CancelButtonCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

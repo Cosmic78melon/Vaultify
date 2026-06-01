@@ -21,28 +21,15 @@
         <!-- SIDEBAR (Dark Black) -->
         <!-- ===================== -->
         <Border Grid.Column="0" Background="{DynamicResource Primary_SideMenu_Color}" CornerRadius="0,12,0,0">
-            <Grid RowDefinitions="Auto,Auto,*,Auto">
+            <Grid RowDefinitions="Auto,*,Auto">
               
                 <!-- Top: App Branding -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,16" Spacing="8" PointerPressed="DoubleClicked">
                     <Image Source="/Assets/avalonia-logo.ico" Height="{Binding IconSize}"  Margin="0,-8,0,0"/>
                 </StackPanel>
               
-                <!-- Search Bar -->
-                <TextBox Grid.Row="1"
-                         Margin="24,0,24,16"
-                         Watermark="Search passwords..."
-                         Width="220"
-                         IsVisible="{Binding SeacrhbarVisibility}"
-                         Background="#1E1E1E"
-                         BorderBrush="#2A2A2A"
-                         Foreground="#808080"
-                         FontSize="15"
-                         CornerRadius="8"
-                         Padding="16,12"/>
-              
                 <!-- Navigation Menu -->
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
                     <StackPanel Spacing="4" Margin="12,0">
 
                         <!-- Home -->
@@ -100,11 +87,11 @@
                 </ScrollViewer>
               
                 <!-- Bottom: Account -->
-                <StackPanel Grid.Row="3" Margin="24,16">
+                <StackPanel Grid.Row="2" Margin="24,16">
                     <Border Background="#1E1E1E" CornerRadius="8" Padding="16">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="My account" Foreground="#AAAAAA" FontSize="14"/>
-                            <TextBlock Text="danielle@email.com" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="15" FontWeight="Medium"/>
+                            <TextBlock Text="Created by: " Foreground="#AAAAAA" FontSize="14"/>
+                            <TextBlock Text="Tamjid Hossian Adol" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="15" FontWeight="Medium"/>
                         </StackPanel>
                     </Border>
                   
@@ -120,13 +107,13 @@
         </Border>
 
 <!-- Background overlay -->
-<Border Grid.ColumnSpan="2"
+<Border Grid.ColumnSpan="2" Grid.Column="0"
         IsVisible="{Binding BgPop}"
         Background="#80000000"
         ZIndex="1000"/>
 
 <!-- Centered Login Card -->
-<Grid Grid.ColumnSpan="2"
+<Grid Grid.ColumnSpan="2" Grid.Column="0"
       IsVisible="{Binding BgOp}"
       ZIndex="1001">
 
@@ -208,12 +195,12 @@
     </Border>
 </Grid>
         <!-- this is The Register Pop up window code -->
-        <Border Grid.ColumnSpan="2"
+        <Border Grid.ColumnSpan="2" Grid.Column="0"
                 IsVisible="{Binding BgOpSignUp}"
                 Background="#80000000"
                 ZIndex="1000"/>
         <!-- Interactive Popup for Add New (small "window" centered) -->
-        <Border Grid.ColumnSpan="2"
+        <Border Grid.ColumnSpan="2" Grid.Column="0"
                 ZIndex="1001"
                 IsVisible="{Binding BgPopSignUp}"
                 HorizontalAlignment="Stretch"

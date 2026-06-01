@@ -165,7 +165,14 @@ namespace Password_Manager.ViewModels
         [RelayCommand]
         public void GoToSecurity()
         {
-            CurrentPage = _pageFactory.GetPageViewModel<SecurityPageViewModel>();
+            CurrentPage = _pageFactory.GetPageViewModel<SecurityPageViewModel>((item =>
+            {
+               if (_masterPassword != null)
+               {
+                   item.PasswordSecureity = _masterPassword;
+                   _ = item.ItemLoadNotes(_masterPassword);
+               }
+            }));
             UpdateActiveState(PageViewData.Security);
         } 
         [RelayCommand]

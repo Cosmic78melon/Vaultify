@@ -64,7 +64,7 @@
                                            <Border Grid.Column="1"
                                                    CornerRadius="10"
                                                    Padding="8,2">
-                                               <TextBlock Text="{Binding number}"
+                                               <TextBlock Text="{Binding Number}"
                                                           FontSize="30"
                                                           Foreground="#666666"
                                                           FontWeight="Bold"/>
@@ -145,11 +145,11 @@
 
                     <Slider Minimum="12"
                             Maximum="64"
-                            x:Name="slider"
+                            x:Name="Slider"
                             Value="{Binding Lenght}"
                             Width="360"/>
 
-                    <TextBlock Text="{Binding #slider.Value}"
+                    <TextBlock Text="{Binding #Slider.Value}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -180,7 +180,7 @@
         <Separator Grid.Row="3" Margin="10, 19"/>
         <!-- Cards Area -->
         <Grid Grid.Row="4"
-              ColumnDefinitions="auto,Auto"
+              ColumnDefinitions="auto,Auto,*"
               ColumnSpacing="30">
 
             <!-- ===================== -->
@@ -208,13 +208,13 @@
 
                     <!-- Separator -->
                     <Separator Grid.Row="1"
-                               Grid.ColumnSpan="3"
+                               Grid.ColumnSpan="3" Grid.Column="0"
                                Margin="0 0 -18 0"
                                HorizontalAlignment="Stretch"/>
 
                     <!-- Content -->
                     <ItemsControl Grid.Row="2"
-                                  Grid.ColumnSpan="3"
+                                  Grid.ColumnSpan="3" Grid.Column="0"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Top"
                                   ItemsSource="{Binding StatusData}">
@@ -227,7 +227,7 @@
                                                    Foreground="CornflowerBlue"
                                                    FontSize="60"
                                                    FontFamily="Arial Bold"
-                                                   Text="{Binding total}"/>
+                                                   Text="{Binding Total}"/>
                                         <TextBlock Classes="status_Text"
                                                    Text="Saved Password"/>
                                     </StackPanel>
@@ -235,7 +235,7 @@
                                     <Separator Classes="Vertical_Seperator"/>
 
                                     <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding strongCount}"
+                                        <TextBlock Text="{Binding StrongCount}"
                                                    Foreground="LimeGreen"
                                                    FontFamily="Arial Bold"
                                                    FontSize="60"
@@ -247,7 +247,7 @@
                                     <Separator Classes="Vertical_Seperator"/>
 
                                     <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding weakCount}"
+                                        <TextBlock Text="{Binding WeakCount}"
                                                    Foreground="red"
                                                    FontFamily="Arial Bold"
                                                    FontSize="60"
@@ -259,7 +259,7 @@
                                     <Separator Classes="Vertical_Seperator"/>
 
                                     <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding breachCount}"
+                                        <TextBlock Text="{Binding BreachCount}"
                                                    Foreground="Yellow"
                                                    FontFamily="Arial Bold"
                                                    FontSize="60"
@@ -301,7 +301,7 @@
             <!-- Replace StackPanel with Grid for better vertical distribution -->
             <Grid Grid.Row="3"
                   RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
-                <TextBlock Grid.Row="0" Text="{Binding Password_result}" Foreground="{Binding FontC}" FontSize="20" TextWrapping="Wrap" />
+                <TextBlock Grid.Row="0" Text="{Binding PasswordResult}" Foreground="{Binding FontC}" FontSize="20" TextWrapping="Wrap" />
                 <TextBlock Grid.Row="1" Text="{Binding HasUpper}" Foreground="{Binding Font1}" FontSize="20" TextWrapping="Wrap"/>
                 <TextBlock Grid.Row="2" Text="{Binding HasLower}" Foreground="{Binding Font2}" FontSize="20" TextWrapping="Wrap"/>
                 <TextBlock Grid.Row="3" Text="{Binding HasNum}" Foreground="{Binding Font3}"  FontSize="20"  TextWrapping="Wrap"/>

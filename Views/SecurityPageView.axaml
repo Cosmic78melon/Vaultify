@@ -106,13 +106,6 @@
                                                    Foreground="White"
                                                    TextTrimming="CharacterEllipsis"
                                                    TextWrapping="NoWrap" />
-
-                                        <!-- Actions column (empty for now) -->
-                                        <StackPanel Grid.Column="5"
-                                                    Orientation="Horizontal"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Spacing="8" />
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -138,12 +131,12 @@
                 </Border>
             </Grid>
             <!-- Add New Security Note Popup -->
-            <Border Grid.RowSpan="2"
+            <Border Grid.Row="0" Grid.RowSpan="2"
                     Background="#80000000"
                     ZIndex="1000"
                     IsVisible="{Binding SecurityDialougeVisible }" />
 
-            <Border Grid.RowSpan="2"
+            <Border Grid.Row="0" Grid.RowSpan="2"
                     IsVisible="{Binding SecurityDialougeVisible}"
                     ZIndex="1001"
                     HorizontalAlignment="Center"
@@ -181,12 +174,12 @@
             </Border>
             
             <!-- Confirm Delete Popup -->
-            <Border Grid.RowSpan="2"
+            <Border Grid.Row="0" Grid.RowSpan="2"
                     Background="#80000000"
                     ZIndex="1000"
                     IsVisible="{Binding ConfirmDialougeVisible}" />
 
-            <Border Grid.RowSpan="2"
+            <Border Grid.Row="0" Grid.RowSpan="2"
                     IsVisible="{Binding ConfirmDialougeVisible}"
                     ZIndex="1001"
                     HorizontalAlignment="Center"

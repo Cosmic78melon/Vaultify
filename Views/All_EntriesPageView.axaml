@@ -345,12 +345,12 @@
             </StackPanel>
         </Border>
         <!-- Confirm Delete Popup -->
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 Background="#80000000"
                 ZIndex="1000"
                 IsVisible="{Binding ConfimationDialog}" />
 
-        <Border Grid.RowSpan="2"
+        <Border Grid.Row="0" Grid.RowSpan="2"
                 IsVisible="{Binding ConfimationDialog}"
                 ZIndex="1001"
                 HorizontalAlignment="Center"

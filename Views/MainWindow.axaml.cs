@@ -30,6 +30,7 @@ namespace Password_Manager.Views
                 if (current == null) return;
 
                 var parent = current.GetVisualParent();
+                if (parent == null) return;
                 var textboxes = parent.GetVisualDescendants().OfType<TextBox>().ToList();
 
                 int index = textboxes.IndexOf((TextBox)current);

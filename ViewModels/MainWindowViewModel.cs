@@ -142,8 +142,8 @@ namespace Password_Manager.ViewModels
                 {
                     if (string.IsNullOrEmpty(_masterPassword)) return;
                     item.load_data_recent();
-                    item.favouriteData();
-                    item.statusDataLoad();
+                    item.FavouriteData();
+                    item.StatusDataLoad();
                 }
             });
             UpdateActiveState(PageViewData.Home);

@@ -4,8 +4,6 @@ using Password_Manager.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 
 namespace Password_Manager.ViewModels
 {
@@ -52,7 +50,6 @@ namespace Password_Manager.ViewModels
 
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
-        public readonly CopyTextsServices _copyTexts;
 
         [RelayCommand]
         public void AddnewPopButton()
@@ -73,6 +70,7 @@ namespace Password_Manager.ViewModels
         public void CancelButton()
         {
             AddnewOP = AddnewPOP = ShareOP = SharePOP = ChangePasswordOP = ChangePasswordPOP = false;
+            ConfimationDialog = false;
         }
 
         private ObservableCollection<Entry> _items;
@@ -96,13 +94,13 @@ namespace Password_Manager.ViewModels
                 var data = await Task.Run(() => _appServices.show_all_data(password));
                 foreach (var item in data)
                 {
-                    if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                    if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                     {
                         Items.Add(new Entry
                         {
                             Id =  item.Id,
-                            Title = item.siteName,
-                            Username = item.userName,
+                            Title = item.SiteName,
+                            Username = item.UserName,
                             Password = item.password,
                             Strength = item.strength,
                             ColorS = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
@@ -116,7 +114,7 @@ namespace Password_Manager.ViewModels
             {
                 Items.Add(new Entry
                 {
-                    Id =  null,
+                    Id =  "Nothing",
                     Title = "Nothing",
                     Username = ex.Message,
                     Password = "Nothing",
@@ -154,6 +152,7 @@ namespace Password_Manager.ViewModels
                 SelectedItem.Extension = ".csv";
             }
             var path = await _filePickerService.SaveFile(HomepagePassword);
+            if (path == null) return; 
             bool result = _appServices.ExportVault(SelectedItem.Extension, path);
             if (result)
             {

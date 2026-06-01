@@ -8,12 +8,12 @@
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
              x:Class="Password_Manager.AccountPageView">
- <Grid RowDefinitions="Auto, *" Grid.ColumnDefinitions="0.4*, *">
+ <Grid RowDefinitions="Auto, *" ColumnDefinitions="0.4*, *">
 	 <Button Grid.Column="0" Grid.Row="0" 
           HorizontalAlignment="Stretch"
           VerticalAlignment="Center"
           Height="60">
-		 Login
+		 The page is currently under construction because the dev is too lazy to implement this now 😑😑😑
      </Button>
  </Grid>
 </UserControl>

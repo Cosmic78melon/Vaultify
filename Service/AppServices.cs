@@ -27,21 +27,22 @@ namespace Password_Manager.Service
         public static bool isAuth = false;
         
         public static List<vaultData> global_Data = new();
+        private static readonly HttpClient Client = new();
 
         public class vaultData
         {
-            public string Id {get; set;}
-            public string Salt {get; set;}
+            public string? Id {get; set;}
+            public string? Salt {get; set;}
             public int Iteration {get; set;}
-            public string siteName {get; set;}
-            public string userName {get; set;}
-            public string password {get; set;}
-            public string notes {get; set;}
-            public string cateGory {get; set;}
-            public string strength {get; set;}
-            public bool favourite {get; set;}
-            public string createdAt {get; set;}
-            public string updatedAt {get; set;}
+            public string? SiteName {get; set;}
+            public string? UserName {get; set;}
+            public string? password {get; set;}
+            public string? notes {get; set;}
+            public string? cateGory {get; set;}
+            public string? strength {get; set;}
+            public bool? favourite {get; set;}
+            public string? createdAt {get; set;}
+            public string? updatedAt {get; set;}
             
         }
         public class passwordCheckDetails
@@ -94,19 +95,16 @@ namespace Password_Manager.Service
                 string prefix = hash.Substring(0, 5);
                 string suffix = hash.Substring(5);
 
-                using (var client = new HttpClient())
+                using var isActive = await Client.GetAsync("https://www.google.com");
+                if (isActive.IsSuccessStatusCode != true) return 101;
+                string response = await Client.GetStringAsync($"https://api.pwnedpasswords.com/range/{prefix}");
+                if (response.Contains(suffix))
                 {
-                    using var isActive = await client.GetAsync("https://www.google.com");
-                    if (isActive.IsSuccessStatusCode != true) return 101;
-                    string response = await client.GetStringAsync($"https://api.pwnedpasswords.com/range/{prefix}");
-                    if (response.Contains(suffix))
-                    {
-                        return 200;
-                    }
-                    else
-                    {
-                        return 500;
-                    }
+                    return 200;
+                }
+                else
+                {
+                    return 500;
                 }
             }
             catch (HttpRequestException)
@@ -183,7 +181,7 @@ namespace Password_Manager.Service
         int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
 
         // 3. Return cache if row count hasn't changed
-        if (global_Data != null && global_Data.Count == dbCount) return global_Data;
+        if (global_Data.Count == dbCount) return global_Data;
 
         // 4. Safe initialization — THIS is what fixes your crash
         global_Data ??= new List<vaultData>();
@@ -203,8 +201,8 @@ namespace Password_Manager.Service
                 Id        = reader.GetString(0),
                 Salt      = reader.GetString(1),
                 Iteration = reader.GetInt32(2),
-                siteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
-                userName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
+                SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
+                UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
                 password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
                 notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
                 cateGory  = reader.GetString(7),
@@ -275,13 +273,13 @@ namespace Password_Manager.Service
         }
 
 
-        public async Task<(bool isAdded, string? Id, string? strength, string? time)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
+        public async Task<(bool isAdded, string Id, string strength, string time)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
             if (!isAuthenticated(masterPass) && isNewUser())
-                return (false, null, null, null);
+                return (false, "null", "null", "null");
             
             try
             {
@@ -321,7 +319,7 @@ namespace Password_Manager.Service
             }
             catch (Exception)
             {
-                return (false, null, null, null);
+                return (false, "null", "null", "null");
             }
         }
         
@@ -371,9 +369,9 @@ namespace Password_Manager.Service
                 return false;
             }
         }
-        public async Task<bool> remove_data(string Id, string password)
+        public async Task<bool> remove_data(string id, string password)
         {
-            if (string.IsNullOrEmpty(Id)) return false;
+            if (string.IsNullOrEmpty(id)) return false;
             if (string.IsNullOrEmpty(password)) return false;
             
             if (isAuth)
@@ -382,7 +380,7 @@ namespace Password_Manager.Service
                 connection.Open(); 
                 const string sql = "DELETE FROM Credential_Data WHERE id = @id";
                 using var command = new SqliteCommand(sql, connection);
-                command.Parameters.AddWithValue("@id", Id);
+                command.Parameters.AddWithValue("@id", id);
 
                 int rowAffected = await command.ExecuteNonQueryAsync();
                 if (rowAffected > 0)
@@ -406,7 +404,7 @@ namespace Password_Manager.Service
             int breached = 0;
             foreach (var item in global_Data)
             {
-                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
                     total++;
                     if (string.Equals(item.strength, "Strong", StringComparison.OrdinalIgnoreCase))
@@ -428,39 +426,38 @@ namespace Password_Manager.Service
         }
         public List<string> favData()
         {
-            if (isAuth != true) return null;
-            
-            List<string> card_data = new();
+            List<string> cardData = new();
+            if (isAuth != true) return cardData;
             
             foreach (var item in global_Data)
             {
-                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (card_data.Contains(item.siteName) != true) card_data.Add(item.siteName);
+                    if (item.SiteName != null && cardData.Contains(item.SiteName) != true) cardData.Add(item.SiteName);
                 }
             }
-            return card_data;
+            return cardData;
         }
 
         public Dictionary<string, int> card_Data()
         {
-            if (isAuth != true) return null;
-            Dictionary<string, int> card_data = new();
+            Dictionary<string, int> cardData = new();
+            if (isAuth != true) return cardData;
             foreach (var item in global_Data)
             {
-                if (!string.Equals(item.siteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (card_data.ContainsKey(item.siteName))
+                    if (item.SiteName != null && cardData.ContainsKey(item.SiteName))
                     {
-                        card_data[item.siteName]++;
+                        cardData[item.SiteName]++;
                     }
                     else
                     {
-                        card_data.Add(item.siteName, 1);
+                        if (item.SiteName != null) cardData.Add(item.SiteName, 1);
                     }
                 }
             }
-            return card_data;
+            return cardData;
         }
 
 

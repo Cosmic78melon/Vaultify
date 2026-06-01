@@ -12,22 +12,22 @@ namespace Password_Manager.ViewModels
     public class HomeCard()
     {
         public string? Title { get; set; }
-        public int number { get; set; } 
+        public int Number { get; set; } 
     }
     public class FavDataTitle()
     {
-        public string title { get; set; }
+        public required string title { get; set; }
     }
     public class StatusData()
     {
-        public int total {get; set;}
-        public int strongCount { get; set; }
-        public int weakCount { get; set; }
-        public  int breachCount {get; set; }
+        public int Total {get; set;}
+        public int StrongCount { get; set; }
+        public int WeakCount { get; set; }
+        public  int BreachCount {get; set; }
     }
     public partial class HomePageViewModel : PageViewModel
     {
-        public IAppServices _appServices;
+        private IAppServices _appServices;
         [ObservableProperty]
         private string _passwordGenerator = string.Empty;
 
@@ -36,13 +36,13 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _hasNumCase = true;
         [ObservableProperty] private bool _hasPuncCase = true;
         [ObservableProperty] private int _lenght;
-        [ObservableProperty] private string _master_pass;
+        [ObservableProperty] private string _masterPass;
 
 
         [ObservableProperty] 
         private string _passwordHaveToCheck;
 
-        [ObservableProperty] private string _password_result = "Password Status: Unknown";
+        [ObservableProperty] private string _passwordResult = "Password Status: Unknown";
         [ObservableProperty] private string _hasUpper = "Include Uppercase Letter";
         [ObservableProperty] private string _hasLower = "Include Lowercase Letter";
         [ObservableProperty] private string _hasNum = "Include Numbers";
@@ -73,25 +73,25 @@ namespace Password_Manager.ViewModels
             var details = await _appServices.PassswordCheck(PasswordHaveToCheck);
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.Result;
+                PasswordResult = "Password Status: " + details.Result;
                 FontC = "green";
                 CheckChar(details);
             }
             else if (string.Equals(details.Result, "Weak", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.Result;
+                PasswordResult = "Password Status: " + details.Result;
                 FontC = "red";
                 CheckChar(details);
             }
             else if (string.Equals(details.Result, "Breached", StringComparison.OrdinalIgnoreCase))
             {
-                Password_result = "Password Status: " + details.Result;
+                PasswordResult = "Password Status: " + details.Result;
                 CheckChar(details);
                 FontC = "yellow";
             }
             else
             {
-                Password_result = "Something Went Wrong⁉⁉";
+                PasswordResult = "Something Went Wrong⁉⁉";
                 CheckChar(details);
                 FontC = "Yellow";
             }
@@ -155,7 +155,7 @@ namespace Password_Manager.ViewModels
             }
             if (string.Equals(details.Result, "Breached", StringComparison.OrdinalIgnoreCase))
             {
-                HasUpper = HasLower = HasNum = HasPunc = Islong = null;
+                HasUpper = HasLower = HasNum = HasPunc = Islong = null!;
                 FontC = "White";
             }
             details.HasUppercase = false;
@@ -171,12 +171,12 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _favData, value); } 
         }
 
-        public void favouriteData()
+        public void FavouriteData()
         {
             FavData = new ObservableCollection<FavDataTitle>();
-            List<string> raw_data = _appServices.favData();
+            List<string> rawData = _appServices.favData();
             FavData.Clear();
-            foreach(string name in raw_data)
+            foreach(string name in rawData)
             {
                 FavData.Add( new FavDataTitle
                 {
@@ -195,14 +195,14 @@ namespace Password_Manager.ViewModels
         public void load_data_recent()
         {
             Items = new ObservableCollection<HomeCard>();
-            Dictionary<string, int> card_Data = _appServices.card_Data();
+            Dictionary<string, int> cardData = _appServices.card_Data();
             Items.Clear();
-            foreach(var pair in card_Data)
+            foreach(var pair in cardData)
             {
                 Items.Add( new HomeCard
                     {
                         Title = pair.Key,
-                        number = pair.Value
+                        Number = pair.Value
                     });
             }
         }
@@ -215,18 +215,18 @@ namespace Password_Manager.ViewModels
             set { SetProperty(ref _statusData, value); }
         }
 
-        public void statusDataLoad()
+        public void StatusDataLoad()
         {
             StatusData = new ObservableCollection<StatusData>();
             StatusData.Clear();
             
-            List<int> Statusdata = _appServices.statusdata();
+            List<int> statusdata = _appServices.statusdata();
             StatusData.Add(new StatusData
             {
-                total = Statusdata[0],
-                strongCount = Statusdata[1],
-                weakCount = Statusdata[2],
-                breachCount = Statusdata[3]
+                Total = statusdata[0],
+                StrongCount = statusdata[1],
+                WeakCount = statusdata[2],
+                BreachCount = statusdata[3]
             });
         }
     }

@@ -6,5 +6,5 @@
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
              x:Class="Password_Manager.SettingsPageView">
-  Welcome to Settings Page!
+    The page is currently under construction because the dev is too lazy to implement this now 😑😑😑
 </UserControl>

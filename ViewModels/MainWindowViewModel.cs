@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Password_Manager.Factory;
 using System;
+using System.Threading.Tasks;
 using Password_Manager.Models;
 using Password_Manager.Service;
 
@@ -100,7 +101,7 @@ namespace Password_Manager.ViewModels
         }
 
         [RelayCommand]
-        public void Register()
+        public async Task Register()
         {
             StatusMessage = string.Empty;
             if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
@@ -121,8 +122,8 @@ namespace Password_Manager.ViewModels
                     return;
                 }
 
-                bool register = _appServices.register(UserName, Password).GetAwaiter().GetResult();
-                if (register == false)
+                bool register = await _appServices.register(UserName, Password);
+                if (!register)
                 {
                     StatusMessage = "Your Password is Weak. please enter strong password";
                     ColorsC = "red";

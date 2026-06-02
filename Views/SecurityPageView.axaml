@@ -60,7 +60,7 @@
                                        Margin="16,0,8,0" />
 
                             <TextBlock Grid.Column="1"
-                                       Text="Entry Created" 
+                                       Text="Entry Added" 
                                        Classes="Headers"
                                        Margin="16,0,8,0" />
                         </Grid>

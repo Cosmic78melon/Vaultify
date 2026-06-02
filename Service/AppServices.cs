@@ -17,17 +17,21 @@ namespace Password_Manager.Service
 {
     public class AppServices: IAppServices
     {
-        public static char[] AsciiPuncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"'};
+        public static char[] AsciiPuncs = new char[] { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '<', '>', '?', '"', ',', '.', '`', '~'};
         public static char[] AsciiNumbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         char[] _asciiLowerLetters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
         char[] _asciiUpperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
         private const string Filename = "encrypted-data";
-        private readonly string DPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "DataBase"), $"{Filename}.db");
+        private static readonly string DPath = Path.Combine(Directory.GetCurrentDirectory(), "DataBase");
+        private static readonly string FPath = Path.Combine(DPath, $"{Filename}.db");
         private const int KeySize = 32;
         public static bool isAuth = false;
         
         public static List<vaultData> global_Data = new();
-        private static readonly HttpClient Client = new();
+        private static readonly HttpClient Client = new()
+        {
+          Timeout = TimeSpan.FromSeconds(5)  
+        };
 
         public class vaultData
         {
@@ -69,7 +73,8 @@ namespace Password_Manager.Service
             
             if (hasLowerLetters && hasNum && hasPunc && hasUpperLetters)
             {
-                while (true)
+                const int maxAttempt = 50;
+                for (int i = 0; i <= maxAttempt; i++)
                 {
                     string password = new string(RandomNumberGenerator.GetItems(rawData.ToString().AsSpan(), length));
                     var result = await this.PassswordCheck(password);
@@ -77,7 +82,6 @@ namespace Password_Manager.Service
                     {
                         return password;
                     }
-                    
                 }
             }
             return new string(RandomNumberGenerator.GetItems(rawData.ToString().AsSpan(), length));
@@ -116,7 +120,7 @@ namespace Password_Manager.Service
                 return 101;
             }
 
-        }
+        } 
         public async Task<dynamic> PassswordCheck(string? password = null)
         {
             var details = new passwordCheckDetails();
@@ -125,8 +129,17 @@ namespace Password_Manager.Service
                 details.Result = "No password";
                 return details;
             }
-
-            int isBreached = await this.IsPasswordBreached(password);
+            
+            int isBreached = 500;
+            try
+            {
+                isBreached = await this.IsPasswordBreached(password);
+            }
+            catch (Exception)
+            {
+                isBreached = 500;
+            }
+            
             if (isBreached == 200)
             {
                 details.Result = "Breached";
@@ -164,65 +177,65 @@ namespace Password_Manager.Service
         }
 
         public List<vaultData> show_all_data(string password)
-{
-    // 1. Reject empty password immediately
-    if (string.IsNullOrEmpty(password)) return global_Data;
-
-    // 2. Return cache if user is not authenticated
-    if (isAuth != true) return global_Data;
-
-    using (var connection = new SqliteConnection($"Data Source={DPath}"))
-    {
-        connection.Open();
-
-        using var countCommand = new SqliteCommand(
-            "SELECT COUNT(*) FROM Credential_Data WHERE Id != 0;", connection);
-
-        int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
-
-        // 3. Return cache if row count hasn't changed
-        if (global_Data.Count == dbCount) return global_Data;
-
-        // 4. Safe initialization — THIS is what fixes your crash
-        global_Data ??= new List<vaultData>();
-        global_Data.Clear();
-
-        var sql = "SELECT * FROM Credential_Data WHERE Id != 0 ORDER BY Updated_at DESC;";
-        using var command = new SqliteCommand(sql, connection);
-        using var reader = command.ExecuteReader();
-
-        while (reader.Read())
         {
-            byte[] bsalt = Convert.FromHexString(reader.GetString(1));
-            string fernetKey = this.DeriveKey(bsalt, reader.GetInt32(2), password);
-
-            var allData = new vaultData
+            // 1. Reject empty password immediately
+            if (string.IsNullOrEmpty(password)) return global_Data;
+        
+            // 2. Return cache if user is not authenticated
+            if (isAuth != true) return global_Data;
+        
+            using (var connection = new SqliteConnection($"Data Source={FPath}"))
             {
-                Id        = reader.GetString(0),
-                Salt      = reader.GetString(1),
-                Iteration = reader.GetInt32(2),
-                SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
-                UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
-                password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
-                notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
-                cateGory  = reader.GetString(7),
-                strength  = reader.GetString(8),
-                favourite = reader.GetInt16(9) == 1,
-                createdAt = reader.GetString(10),
-                updatedAt = reader.GetString(11)
-            };
-
-            global_Data.Add(allData);
+                connection.Open();
+        
+                using var countCommand = new SqliteCommand(
+                    "SELECT COUNT(*) FROM Credential_Data WHERE Id != 0;", connection);
+        
+                int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
+        
+                // 3. Return cache if row count hasn't changed
+                if (global_Data.Count == dbCount) return global_Data;
+        
+                // 4. Safe initialization — THIS is what fixes your crash
+                global_Data ??= new List<vaultData>();
+                global_Data.Clear();
+        
+                var sql = "SELECT * FROM Credential_Data WHERE Id != 0 ORDER BY Updated_at DESC;";
+                using var command = new SqliteCommand(sql, connection);
+                using var reader = command.ExecuteReader();
+        
+                while (reader.Read())
+                {
+                    byte[] bsalt = Convert.FromHexString(reader.GetString(1));
+                    string fernetKey = this.DeriveKey(bsalt, reader.GetInt32(2), password);
+        
+                    var allData = new vaultData
+                    {
+                        Id        = reader.GetString(0),
+                        Salt      = reader.GetString(1),
+                        Iteration = reader.GetInt32(2),
+                        SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
+                        UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
+                        password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
+                        notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
+                        cateGory  = reader.GetString(7),
+                        strength  = reader.GetString(8),
+                        favourite = reader.GetInt16(9) == 1,
+                        createdAt = reader.GetString(10),
+                        updatedAt = reader.GetString(11)
+                    };
+        
+                    global_Data.Add(allData);
+                }
+        
+                return global_Data;
+            }
         }
-
-        return global_Data;
-    }
-}
 
         public bool isAuthenticated(string password)
         {
-            if (string.IsNullOrEmpty(password) || Path.Exists(DPath) == false) return false;
-            using var connection = new SqliteConnection($"Data Source={DPath}");
+            if (string.IsNullOrEmpty(password) || Path.Exists(FPath) == false) return false;
+            using var connection = new SqliteConnection($"Data Source={FPath}");
             connection.Open();
 
             const string sql = "SELECT * FROM Credential_Data WHERE Id = @id";
@@ -283,8 +296,8 @@ namespace Password_Manager.Service
             
             try
             {
-                using var connection = new SqliteConnection($"Data Source={DPath}");
-                connection.Open();
+                using var connection = new SqliteConnection($"Data Source={FPath}");
+                await connection.OpenAsync();
                 
                 string fernetKey = DeriveKey(salt, iteration, masterPass);
                 Guid myguid = Guid.NewGuid();
@@ -327,44 +340,92 @@ namespace Password_Manager.Service
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
-            var result = await PassswordCheck(password).Result;
-            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || !isNewUser() || isAuthenticated(password)) return false;
+            var result = await PassswordCheck(password);
+    
+            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || 
+                !isNewUser() || 
+                isAuthenticated(password) || 
+                result.Result == null) 
+            {
+                return false;
+            }
+
             try
             {
-                using var connection = new SqliteConnection($"Data Source={DPath}");
-                connection.Open();
-                const string sql = @"CREATE TABLE IF NOT EXISTS Credential_Data(Id text, Salt text, Iteration int, Site_name text, User_name text, Password, Notes text, Category text, Strength text, Favourite Boolean, Created_at text, Updated_at text)";
-                
-                using var command = new SqliteCommand(sql, connection);
-                await command.ExecuteNonQueryAsync();
-                
+                if (!Directory.Exists(DPath))
+                {
+                    Directory.CreateDirectory(DPath);
+                }
+        
+                using (SqliteConnection connection = new SqliteConnection($"Data Source={FPath}"))
+                {
+                    await connection.OpenAsync();
+                    const string sql = @"CREATE TABLE IF NOT EXISTS Credential_Data(
+                                            Id text, 
+                                            Salt text, 
+                                            Iteration int, 
+                                            Site_name text, 
+                                            User_name text, 
+                                            Password text, 
+                                            Notes text, 
+                                            Category text, 
+                                            Strength text, 
+                                            Favourite Boolean, 
+                                            Created_at text, 
+                                            Updated_at text
+                                        );";
+                    using SqliteCommand command = new SqliteCommand(sql, connection);
+                    await command.ExecuteNonQueryAsync();
+                }
+        
                 string fernetKey = DeriveKey(salt, iteration, password);
                 string encUsername = Fernet.Encrypt(fernetKey, userName);
-                string encPass = Fernet.Encrypt(fernetKey, password);
+                string encPassword = Fernet.Encrypt(fernetKey, password);
+                string hexSalt = Convert.ToHexString(salt);
                 string localNow = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
-                using var commandLate = new SqliteCommand("INSERT INTO Credential_Data (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated)", connection)
+                if (encPassword == null || encUsername == null) 
                 {
-                    Parameters = 
-                    {
-                        new SqliteParameter("@id", "0"),
-                        new SqliteParameter("@salt", Convert.ToHexString(salt)), 
-                        new SqliteParameter("@iteration", iteration), 
-                        new SqliteParameter("@site", "Password Manager"), 
-                        new SqliteParameter("@user", encUsername), 
-                        new SqliteParameter("@pass", encPass), 
-                        new SqliteParameter("@notes", "Null"), 
-                        new SqliteParameter("@category", "Security"),
-                        new SqliteParameter("@strength", result),
-                        new SqliteParameter("@fav", false), 
-                        new SqliteParameter("@created", localNow),
-                        new SqliteParameter("@updated", localNow)
-                    }
-                };
-                await commandLate.ExecuteNonQueryAsync();
-                return true;
+                    return false;
+                }
+
+                return await InsertData(hexSalt, iteration, encUsername, encPassword, result.Result, localNow);
             }
             catch (Exception)
+            {
+                return false;
+            }
+        }
+        public async Task<bool> InsertData(string salt, int iteration, string encUsername, 
+            string encPassword, string result, string time)
+        {
+            try
+            {
+                using SqliteConnection connectionLate = new SqliteConnection($"Data Source={FPath}");
+                await connectionLate.OpenAsync();
+
+                const string insertSql = @"INSERT INTO Credential_Data 
+            (Id, Salt, Iteration, Site_name, User_name, Password, Notes, Category, Strength, Favourite, Created_at, Updated_at) 
+            VALUES (@id, @salt, @iteration, @site, @user, @pass, @notes, @category, @strength, @fav, @created, @updated);";
+
+                using SqliteCommand commandLate = new SqliteCommand(insertSql, connectionLate);
+                commandLate.Parameters.AddWithValue("@id", "0");
+                commandLate.Parameters.AddWithValue("@salt", salt);
+                commandLate.Parameters.AddWithValue("@iteration", iteration);
+                commandLate.Parameters.AddWithValue("@site", "Password Manager");
+                commandLate.Parameters.AddWithValue("@user", encUsername);
+                commandLate.Parameters.AddWithValue("@pass", encPassword);
+                commandLate.Parameters.AddWithValue("@notes", DBNull.Value);           // proper null
+                commandLate.Parameters.AddWithValue("@category", "Security");
+                commandLate.Parameters.AddWithValue("@strength", result);
+                commandLate.Parameters.AddWithValue("@fav", 0);
+                commandLate.Parameters.AddWithValue("@created", time);
+                commandLate.Parameters.AddWithValue("@updated", time);
+
+                int rowsAffected = await commandLate.ExecuteNonQueryAsync();
+                return rowsAffected > 0; // actually verify the insert happened
+            }
+            catch (Exception ex)
             {
                 return false;
             }
@@ -376,7 +437,7 @@ namespace Password_Manager.Service
             
             if (isAuth)
             {
-                using var connection = new SqliteConnection($"Data Source={DPath}");
+                using var connection = new SqliteConnection($"Data Source={FPath}");
                 connection.Open(); 
                 const string sql = "DELETE FROM Credential_Data WHERE id = @id";
                 using var command = new SqliteCommand(sql, connection);

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace Password_Manager
+namespace Vaultify
 {
     internal sealed class Program
     {

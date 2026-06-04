@@ -1,14 +1,15 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Password_Manager.ViewModels"
+        xmlns:vm="using:Vaultify.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:icons="using:FluentIcons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
-        x:Class="Password_Manager.Views.MainWindow"
+        x:Class="Vaultify.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="Password_Manager">
+        Icon="/Assets/vaultify.ico"
+        Title="Vaultify">
+    
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -21,15 +22,17 @@
         <!-- SIDEBAR (Dark Black) -->
         <!-- ===================== -->
         <Border Grid.Column="0" Background="{DynamicResource Primary_SideMenu_Color}" CornerRadius="0,12,0,0">
-            <Grid RowDefinitions="Auto,*,Auto">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
               
                 <!-- Top: App Branding -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,16" Spacing="8" PointerPressed="DoubleClicked">
-                    <Image Source="/Assets/avalonia-logo.ico" Height="{Binding IconSize}"  Margin="0,-8,0,0"/>
+                    <Image Source="/Assets/vaultify.ico" Height="{Binding IconSize}"  Margin="0,-8,0,0"/>
                 </StackPanel>
+                
+                <Separator Grid.Row="1" Margin="0, 0, 0, 10"></Separator>
               
                 <!-- Navigation Menu -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="8,0">
                     <StackPanel Spacing="4" Margin="12,0">
 
                         <!-- Home -->
@@ -87,11 +90,11 @@
                 </ScrollViewer>
               
                 <!-- Bottom: Account -->
-                <StackPanel Grid.Row="2" Margin="24,16">
-                    <Border Background="#1E1E1E" CornerRadius="8" Padding="16">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="Created by: " Foreground="#AAAAAA" FontSize="14"/>
-                            <TextBlock Text="Tamjid Hossian Adol" Foreground="#CCCCCC" IsVisible="{Binding IsExpanded}" FontSize="15" FontWeight="Medium"/>
+                <StackPanel Grid.Row="3" Margin="24,16">
+                    <Border Background="#1E1E1E" CornerRadius="8" Padding="16" IsVisible="{Binding IsExpanded}">
+                        <StackPanel  Spacing="4">
+                            <TextBlock  Text="Created by: " Foreground="#AAAAAA" FontSize="14"/>
+                            <TextBlock Text="Tamjid Hossian Adol" Foreground="#CCCCCC" FontSize="15" FontWeight="Medium"/>
                         </StackPanel>
                     </Border>
                   

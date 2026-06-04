@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:collections="using:System.Collections"
              xmlns:converters="using:Avalonia.Markup.Xaml.Converters"
-             x:Class="Password_Manager.App"
-             xmlns:local="using:Password_Manager"
+             x:Class="Vaultify.App"
+             xmlns:local="using:Vaultify"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 

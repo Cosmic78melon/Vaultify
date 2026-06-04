@@ -1,14 +1,7 @@
-﻿using Avalonia.Controls;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Password_Manager.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Vaultify.Models;
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     public partial class PageViewModel: ViewModelBase
     {

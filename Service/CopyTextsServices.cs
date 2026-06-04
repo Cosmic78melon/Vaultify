@@ -5,9 +5,9 @@ using Avalonia.VisualTree;
 using Avalonia.Input.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
 
-namespace Password_Manager.Service;
+namespace Vaultify.Service;
 
-public class CopyTextsServices(Func<TopLevel?> toplevel)
+public class CopyTextsServices()
 {
     public static IClipboard Get()
     {

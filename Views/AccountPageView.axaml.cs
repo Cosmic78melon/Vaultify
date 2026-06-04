@@ -1,8 +1,6 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
-namespace Password_Manager;
+namespace Vaultify.Views;
 
 public partial class AccountPageView : UserControl
 {

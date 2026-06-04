@@ -1,11 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Password_Manager.ViewModels;
+using Vaultify.ViewModels;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Password_Manager
+namespace Vaultify
 {
     /// <summary>
     /// Given a view model, returns the corresponding view if possible.
@@ -20,7 +19,7 @@ namespace Password_Manager
             if (param is null)
                 return null;
 
-            var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal).Replace(".Views.", ".", StringComparison.InvariantCultureIgnoreCase);
+            var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
             var type = Type.GetType(name);
 
             if (type != null)

@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Password_Manager.Service;
+using Vaultify.Service;
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     public class SecurityNote
     {
-        public string Id { get; set; }
-        public string Description { get; set; }
-        public string Date { get; set; }
+        public required string? Id { get; set; }
+        public required string Description { get; set; }
+        public required string Date { get; set; }
     }
 
     public partial class SecurityPageViewModel : PageViewModel
@@ -46,7 +43,6 @@ namespace Password_Manager.ViewModels
             try
             {
                 var data = await Task.Run(() => _appservices.show_all_data(password));
-                if (data == null) return;
                 foreach (var item in data)
                 {
                     if (!string.Equals(item.notes, "Nothing", StringComparison.OrdinalIgnoreCase) &&
@@ -67,6 +63,7 @@ namespace Password_Manager.ViewModels
             {
                 SecureNotes.Add(new SecurityNote
                 {
+                    Id = "null",
                     Description = "Nothing",
                     Date = "Nothing"
                 });
@@ -111,6 +108,7 @@ namespace Password_Manager.ViewModels
             await Task.Delay(1500);
             if (ConfirmDialouge)
             {
+                if (item.Id == null) return;
                 bool isRemoved = await _appservices.remove_data(item.Id, PasswordSecureity);
                 if (isRemoved)
                 {

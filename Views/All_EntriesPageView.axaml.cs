@@ -1,12 +1,9 @@
-using Avalonia;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
-using System;
-using System.Linq;
 
-namespace Password_Manager;
+namespace Vaultify.Views;
 
 public partial class All_EntriesPageView : UserControl
 {
@@ -23,6 +20,7 @@ public partial class All_EntriesPageView : UserControl
             if (current == null) return;
 
             var parent = current.GetVisualParent();
+            if (parent == null) return;
             var textboxes = parent.GetVisualDescendants().OfType<TextBox>().ToList();
 
             int index = textboxes.IndexOf((TextBox)current);

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     public abstract class ViewModelBase : ObservableObject
     {

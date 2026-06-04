@@ -3,20 +3,20 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Password_Manager.Service;
+using Vaultify.Service;
 using System.Collections.ObjectModel;
 
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     public class HomeCard()
     {
-        public string? Title { get; set; }
-        public int Number { get; set; } 
+        public required string Title { get; set; }
+        public required int Number { get; set; } 
     }
     public class FavDataTitle()
     {
-        public required string title { get; set; }
+        public required string? FTitle { get; set; }
     }
     public class StatusData()
     {
@@ -35,8 +35,8 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] private bool _hasLowerLetter = true;
         [ObservableProperty] private bool _hasNumCase = true;
         [ObservableProperty] private bool _hasPuncCase = true;
-        [ObservableProperty] private int _lenght;
-        [ObservableProperty] private string _masterPass;
+        [ObservableProperty] private int _lenght = 12;
+        [ObservableProperty] private string? _masterPass;
 
 
         [ObservableProperty] 
@@ -180,7 +180,7 @@ namespace Password_Manager.ViewModels
             {
                 FavData.Add( new FavDataTitle
                 {
-                    title = name
+                    FTitle = name
                 });
             }
         }

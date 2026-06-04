@@ -239,4 +239,10 @@
         <Setter Property="TickFrequency" Value="1"></Setter>
         <Setter Property="IsSnapToTickEnabled" Value="True"></Setter>
     </Style>
+	
+	<!-- TextBox -->
+	<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="OrangeRed"></Setter>
+		<Setter Property="BorderThickness" Value="1"></Setter>
+	</Style>
 </Styles>

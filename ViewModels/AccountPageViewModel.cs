@@ -1,4 +1,4 @@
-﻿namespace Password_Manager.ViewModels
+﻿namespace Vaultify.ViewModels
 {
     public partial class AccountPageViewModel: PageViewModel
     {

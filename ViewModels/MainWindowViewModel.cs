@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Password_Manager.Factory;
+using Vaultify.Factory;
 using System;
 using System.Threading.Tasks;
-using Password_Manager.Models;
-using Password_Manager.Service;
+using Vaultify.Models;
+using Vaultify.Service;
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     enum IconSizeList
     {
@@ -104,14 +104,14 @@ namespace Password_Manager.ViewModels
         public async Task Register()
         {
             StatusMessage = string.Empty;
-            if (string.IsNullOrEmpty(UserName) && string.IsNullOrEmpty(Password) && string.IsNullOrEmpty(Email) && string.IsNullOrEmpty(ConfirmationPassword))
+            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(ConfirmationPassword))
             {
                 StatusMessage = "Please Enter your Credentials";
                 ColorsC = "red";
                 return;
             }
 
-            if (string.Equals(Password, ConfirmationPassword, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(Password, ConfirmationPassword, StringComparison.Ordinal))
             {
                 bool isNewUser = _appServices.isNewUser();
                 bool isAuthenticated = _appServices.isAuthenticated(Password);
@@ -131,6 +131,10 @@ namespace Password_Manager.ViewModels
                 }
                 StatusMessage = "Account created successfully! Welcome to our platform.";
                 ColorsC = "green";
+                BgOpSignUp = false;
+                BgPopSignUp = false;
+                BgOp = true;
+                BgPop = true;
             }
         }
 

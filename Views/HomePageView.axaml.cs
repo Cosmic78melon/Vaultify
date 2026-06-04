@@ -1,5 +1,6 @@
 using Avalonia.Controls;
-namespace Password_Manager;
+
+namespace Vaultify.Views;
 
 public partial class HomePageView : UserControl
 {

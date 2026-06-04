@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Password_Manager.Service;
+using Vaultify.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
-namespace Password_Manager.ViewModels
+namespace Vaultify.ViewModels
 {
     public class Entry
     {
@@ -48,9 +48,27 @@ namespace Password_Manager.ViewModels
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
 
+        [ObservableProperty] public string _searchText = string.Empty;
+        private Entry? _pendingDeleteItem; 
+        
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
 
+        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService)
+        {
+            _appServices = appServices;
+            _filePickerService = filePickerService;
+            
+            Items = new ObservableCollection<Entry>();
+            FilteredItems = new ObservableCollection<Entry>();
+        }
+        
+        partial void OnSearchTextChanged(string _)
+        {
+            ApplyFilter();
+        }
+        
+        
         [RelayCommand]
         public void AddnewPopButton()
         {
@@ -66,12 +84,6 @@ namespace Password_Manager.ViewModels
         {
             ChangePasswordOP = ChangePasswordPOP = true;
         }
-        [RelayCommand]
-        public void CancelButton()
-        {
-            AddnewOP = AddnewPOP = ShareOP = SharePOP = ChangePasswordOP = ChangePasswordPOP = false;
-            ConfimationDialog = false;
-        }
 
         private ObservableCollection<Entry> _items;
         public ObservableCollection<Entry> Items
@@ -79,12 +91,13 @@ namespace Password_Manager.ViewModels
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
-
-        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService)
+        private ObservableCollection<Entry> _filteredItems;
+        public ObservableCollection<Entry> FilteredItems
         {
-            _appServices = appServices;
-            _filePickerService = filePickerService;
+            get { return _filteredItems; }
+            set { SetProperty(ref _filteredItems, value); }
         }
+
 
         public async Task LoadData(string password)
         {
@@ -96,6 +109,7 @@ namespace Password_Manager.ViewModels
                 {
                     if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                     {
+                        if (item.Id == null || item.SiteName == null || item.UserName == null || item.password == null || item.strength == null || item.cateGory == null || item.createdAt == null) continue;
                         Items.Add(new Entry
                         {
                             Id =  item.Id,
@@ -109,6 +123,7 @@ namespace Password_Manager.ViewModels
                         });
                     }
                 }
+                ApplyFilter();
             }
             catch(Exception ex)
             {
@@ -186,6 +201,12 @@ namespace Password_Manager.ViewModels
                             Strength = strength,
                             Time = time
                         });
+                        ApplyFilter();
+                        Webname = string.Empty;
+                        Name = string.Empty;
+                        Password = string.Empty;
+                        ConfirmationPassword = string.Empty;
+                        Catagory = string.Empty;
                     }
                     else
                     {
@@ -201,42 +222,75 @@ namespace Password_Manager.ViewModels
             }
         }
         
+        private void ApplyFilter()
+        {
+            FilteredItems.Clear();
+
+            foreach (var item in Items)
+            {
+                if (string.IsNullOrWhiteSpace(SearchText) ||
+                    item.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    item.Username.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                {
+                    FilteredItems.Add(item);
+                }
+            }
+        }
+        
         [RelayCommand]
-        private async Task CopyUsername(Entry items)
+        private async Task CopyUsername(Entry? items)
         {
             if (items == null) return;
             var clipboard = CopyTextsServices.Get();
             await clipboard.SetTextAsync(items.Username);
 
-        }        
+        }
+        
         [RelayCommand]
-        private async Task CopyPassword(Entry items)
+        public void CancelButton()
+        {
+            AddnewOP = AddnewPOP = ShareOP = SharePOP = ChangePasswordOP = ChangePasswordPOP = false;
+            ConfimationDialog = false;
+            _pendingDeleteItem = null;
+            Webname = string.Empty;
+            Name = string.Empty;
+            Password = string.Empty;
+            ConfirmationPassword = string.Empty;
+            Catagory = string.Empty;
+
+        }
+
+        [RelayCommand]
+        private async Task CopyPassword(Entry? items)
         {
             if (items == null) return;
             var clipboard = CopyTextsServices.Get();
             await clipboard.SetTextAsync(items.Password);
-        }        
+        }
+
+
         [RelayCommand]
-        private async Task DeleteItem(Entry items)
+        private async Task DeleteItem(Entry? items)
         {
             if (items == null) return;
             ConfimationDialog = true;
-
-            await Task.Delay(1555);
-            if (ConfirmDelete)
-            {
-                bool isDeleted = await _appServices.remove_data(items.Id, HomepagePassword);
-                if (isDeleted)
-                {
-                    Items.Remove(items);
-                }
-            }
+            _pendingDeleteItem = items;
+            
         }
         [RelayCommand]
-        private void yesButton()
+        private async Task yesButton()
         {
-            ConfirmDelete = true;
-            ConfimationDialog = false;
+            if (_pendingDeleteItem == null) return;
+            
+            bool isDeleted = await _appServices.remove_data(_pendingDeleteItem.Id, HomepagePassword);
+            if (isDeleted)
+            {
+                Items.Remove(_pendingDeleteItem);
+                ApplyFilter();
+            }
+
+            _pendingDeleteItem = null;
+            ConfimationDialog = false;            
         }
         [RelayCommand]
         private async Task GeneratePassword()

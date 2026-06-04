@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Password_Manager.Service
+namespace Vaultify.Service
 {
     public interface IAppServices
     {

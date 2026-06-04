@@ -1,12 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Password_Manager.ViewModels;
+using Vaultify.ViewModels;
 using Avalonia.VisualTree;
-using System;
 using System.Linq;
 
-namespace Password_Manager.Views
+namespace Vaultify.Views
 {
     public partial class MainWindow : Window
     {

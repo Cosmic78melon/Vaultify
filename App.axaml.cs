@@ -3,18 +3,17 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using Password_Manager.Factory;
-using Password_Manager.Service;
-using Password_Manager.ViewModels;
-using Password_Manager.Views;
+using Vaultify.Factory;
+using Vaultify.Service;
+using Vaultify.ViewModels;
+using Vaultify.Views;
 using System;
 using System.Linq;
 using Avalonia.Controls;
-using Avalonia.Dialogs;
 
-namespace Password_Manager
+namespace Vaultify
 {
-    public partial class App : Application
+    public class App : Application
     {
         public override void Initialize()
         {
@@ -34,6 +33,7 @@ namespace Password_Manager
 
             // service initialization
             collections.AddSingleton<IAppServices, AppServices>();
+            collections.AddSingleton<CopyTextsServices>();
             
             // Page View Models and Page View
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
@@ -49,7 +49,7 @@ namespace Password_Manager
             collections.AddSingleton<PageFactory>();
             //File Picker Service
             collections.AddSingleton<FilePickerService>();
-            collections.AddSingleton<Func<TopLevel?>>(x => () =>
+            collections.AddSingleton<Func<TopLevel?>>(_ => () =>
             {
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime window)
                 {
@@ -58,18 +58,6 @@ namespace Password_Manager
 
                 return null;
             });
-
-            collections.AddSingleton<CopyTextsServices>();
-            collections.AddSingleton<Func<TopLevel?>>(x => () =>
-            {
-                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime clipboards)
-                {
-                    return TopLevel.GetTopLevel(clipboards.MainWindow);
-                }
-
-                return null;
-            });
-            
             var service = collections.BuildServiceProvider();
            
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -84,7 +72,6 @@ namespace Password_Manager
 
             base.OnFrameworkInitializationCompleted();
         }
-
         private static void DisableAvaloniaDataAnnotationValidation()
         {
             // Get an array of plugins to remove

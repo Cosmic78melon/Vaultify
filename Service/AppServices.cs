@@ -13,7 +13,7 @@ using CsvHelper.Excel.EPPlus;
 using System.Security.Cryptography;
 using Microsoft.Data.Sqlite;
 
-namespace Password_Manager.Service
+namespace Vaultify.Service
 {
     public class AppServices: IAppServices
     {
@@ -24,6 +24,7 @@ namespace Password_Manager.Service
         private const string Filename = "encrypted-data";
         private static readonly string DPath = Path.Combine(Directory.GetCurrentDirectory(), "DataBase");
         private static readonly string FPath = Path.Combine(DPath, $"{Filename}.db");
+        
         private const int KeySize = 32;
         public static bool isAuth = false;
         
@@ -35,18 +36,18 @@ namespace Password_Manager.Service
 
         public class vaultData
         {
-            public string? Id {get; set;}
-            public string? Salt {get; set;}
-            public int Iteration {get; set;}
-            public string? SiteName {get; set;}
-            public string? UserName {get; set;}
-            public string? password {get; set;}
-            public string? notes {get; set;}
-            public string? cateGory {get; set;}
-            public string? strength {get; set;}
-            public bool? favourite {get; set;}
-            public string? createdAt {get; set;}
-            public string? updatedAt {get; set;}
+            public required string? Id {get; set;}
+            public required string? Salt {get; set;}
+            public required int Iteration {get; set;}
+            public required string? SiteName {get; set;}
+            public required string? UserName {get; set;}
+            public required string? password {get; set;}
+            public required string notes {get; set;}
+            public required string cateGory {get; set;}
+            public required string strength {get; set;}
+            public required bool favourite {get; set;}
+            public required string createdAt {get; set;}
+            public required string? updatedAt {get; set;}
             
         }
         public class passwordCheckDetails
@@ -133,7 +134,7 @@ namespace Password_Manager.Service
             int isBreached = 500;
             try
             {
-                isBreached = await this.IsPasswordBreached(password);
+                isBreached = await IsPasswordBreached(password);
             }
             catch (Exception)
             {
@@ -199,33 +200,41 @@ namespace Password_Manager.Service
                 // 4. Safe initialization — THIS is what fixes your crash
                 global_Data ??= new List<vaultData>();
                 global_Data.Clear();
-        
+                
                 var sql = "SELECT * FROM Credential_Data WHERE Id != 0 ORDER BY Updated_at DESC;";
                 using var command = new SqliteCommand(sql, connection);
                 using var reader = command.ExecuteReader();
         
                 while (reader.Read())
                 {
-                    byte[] bsalt = Convert.FromHexString(reader.GetString(1));
-                    string fernetKey = this.DeriveKey(bsalt, reader.GetInt32(2), password);
-        
-                    var allData = new vaultData
+                    try
                     {
-                        Id        = reader.GetString(0),
-                        Salt      = reader.GetString(1),
-                        Iteration = reader.GetInt32(2),
-                        SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
-                        UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
-                        password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
-                        notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
-                        cateGory  = reader.GetString(7),
-                        strength  = reader.GetString(8),
-                        favourite = reader.GetInt16(9) == 1,
-                        createdAt = reader.GetString(10),
-                        updatedAt = reader.GetString(11)
-                    };
-        
-                    global_Data.Add(allData);
+                        byte[] bsalt = Convert.FromHexString(reader.GetString(1));
+                        string fernetKey = DeriveKey(bsalt, reader.GetInt32(2), password);
+            
+                        var allData = new vaultData
+                        {
+                            Id        = reader.GetString(0),
+                            Salt      = reader.GetString(1),
+                            Iteration = reader.GetInt32(2),
+                            SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
+                            UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
+                            password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
+                            notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
+                            cateGory  = reader.GetString(7),
+                            strength  = reader.GetString(8),
+                            favourite = reader.GetInt16(9) == 1,
+                            createdAt = reader.GetString(10),
+                            updatedAt = reader.GetString(11)
+                        };
+            
+                        global_Data.Add(allData);
+                    }
+                    catch (Exception )
+                    {
+                        global_Data.Clear();
+                        return global_Data;
+                    }
                 }
         
                 return global_Data;
@@ -234,39 +243,43 @@ namespace Password_Manager.Service
 
         public bool isAuthenticated(string password)
         {
-            if (string.IsNullOrEmpty(password) || Path.Exists(FPath) == false) return false;
+            bool isNew = isNewUser();
+            if (string.IsNullOrEmpty(password) || isNew == true) return false;
+
             using var connection = new SqliteConnection($"Data Source={FPath}");
             connection.Open();
 
-            const string sql = "SELECT * FROM Credential_Data WHERE Id = @id";
+            const string sql = "SELECT * FROM Credential_Data WHERE Id = 0";
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", "0");
-            
-            using SqliteDataReader reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    byte[] salt = Convert.FromHexString(reader.GetString(1));
-                    int iteration = reader.GetInt32(2);
-                    string encPass = reader.GetString(5);
 
-                    try
-                    {
-                        string decPassword = this.DecryptedData(salt, iteration, encPass, password);
-                        if (password != decPassword)
-                        {
-                            return false;
-                        }
-                    }
-                    catch (Exception)
-                    {
+            using SqliteDataReader reader = command.ExecuteReader();
+
+            // Guard: no credential row means not authenticated
+            if (reader.HasRows != true) return false;
+
+            while (reader.Read())
+            {
+                byte[] salt      = Convert.FromHexString(reader.GetString(1));
+                int    iteration = reader.GetInt32(2);
+                string encPass   = reader.GetString(5);
+
+                try
+                {
+                    string dKey        = DeriveKey(salt, iteration, password);
+                    string decPassword = Fernet.Decrypt(dKey, encPass);
+
+                    if (password != decPassword)
                         return false;
-                    }
+                }
+                catch (CryptographicException)
+                {
+                    // Wrong password → HMAC mismatch → not authenticated
+                    return false;
                 }
             }
+
             isAuth = true;
-            return isAuth;
+            return true;
         }
         public bool loginAuth(string password)
         {
@@ -275,14 +288,28 @@ namespace Password_Manager.Service
                 show_all_data(password);
                 return true;
             }
-
             return false;
         }
         public bool isNewUser()
         {
-            if (string.IsNullOrEmpty(DPath)) return true;
-            if (Path.Exists(DPath)) return false;
-            return true;
+            bool is_ = File.Exists(FPath);
+            if (!is_) 
+                return true;
+
+            try
+            {
+                using var connection = new SqliteConnection($"Data Source={FPath}");
+                connection.Open();
+
+                const string sql = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Credential_Data';";
+                using var command = new SqliteCommand(sql, connection);
+                int count = Convert.ToInt32(command.ExecuteScalar());
+                return count == 0; // no table = new user
+            }
+            catch (Exception)
+            {
+                return true;
+            }
         }
 
 
@@ -425,7 +452,7 @@ namespace Password_Manager.Service
                 int rowsAffected = await commandLate.ExecuteNonQueryAsync();
                 return rowsAffected > 0; // actually verify the insert happened
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -562,13 +589,6 @@ namespace Password_Manager.Service
         public bool change_Data(string masterpassword, string id, string jsonObj)
         {
             return false;
-        }
-
-        private string DecryptedData(byte[] salt, int iteration, string encText, string password)
-        {
-            string fernetKeyString = DeriveKey(salt, iteration, password); 
-            string decryptedText = Fernet.Decrypt(fernetKeyString, encText);
-            return decryptedText;
         }
         
         private string DeriveKey(byte[] salt, int iteration, string password)

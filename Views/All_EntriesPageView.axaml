@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="using:Password_Manager.ViewModels"
+             xmlns:vm="using:Vaultify.ViewModels"
              xmlns:icons="using:FluentIcons.Avalonia"
              mc:Ignorable="d"
              d:DesignWidth="1700"
@@ -10,7 +10,7 @@
              x:DataType="vm:All_EntriesPageViewModel"
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
-             x:Class="Password_Manager.All_EntriesPageView">
+             x:Class="Vaultify.Views.All_EntriesPageView">
 
     <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
 
@@ -18,14 +18,28 @@
         <Grid Grid.Row="0" RowDefinitions="Auto,*" Margin="0">
 
             <!-- Top Bar -->
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="32,28,32,12">
-                <TextBlock Text="Your Passwords"
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,*,Auto"
+                  Margin="32,28,32,12">
+
+                <!-- Title -->
+                <TextBlock Grid.Column="0"
+                           Text="Your Passwords"
                            FontSize="34"
                            FontWeight="Bold"
                            Foreground="White"
-                           VerticalAlignment="Center" />
+                           VerticalAlignment="Center"
+                           Margin="0,0,24,0"/>
 
-                <StackPanel Grid.Column="1"
+                <!-- Search -->
+                <TextBox Grid.Column="1" Width="600"
+                         Height="40"
+                         Text="{Binding SearchText}"
+                         HorizontalAlignment="Center"
+                         Watermark="Search passwords..."
+                         VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
                             Spacing="12"
                             VerticalAlignment="Center">
@@ -109,7 +123,7 @@
                     <!-- Scrollable list -->
                     <ListBox Background="Transparent"
                              x:Name="ListBoxData"
-                             ItemsSource="{Binding Items}"
+                             ItemsSource="{Binding FilteredItems}"
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                         <ListBox.ItemTemplate>
@@ -228,15 +242,15 @@
                 <TextBlock Text="Enter the details below"
                            Foreground="#BBBBBB"
                            FontSize="14" />
-                <TextBox Watermark="Website / App / Service (e.g. example.com)"
+                <TextBox KeyDown="TextBox_KeyDown" Watermark="Website / App / Service (e.g. example.com)"
                          Text="{Binding Webname}" />
-                <TextBox Watermark="Username / Email"
+                <TextBox KeyDown="TextBox_KeyDown" Watermark="Username / Email"
                          Text="{Binding Name}" />
-                <TextBox Watermark="Password"
+                <TextBox KeyDown="TextBox_KeyDown" Watermark="Password"
                          Text="{Binding Password, Mode=TwoWay}"/>
-                <TextBox Watermark="Password"
+                <TextBox KeyDown="TextBox_KeyDown" Watermark="Password"
                          Text="{Binding ConfirmationPassword, Mode=TwoWay}" />
-                <TextBox Watermark="Category (optional)"
+                <TextBox KeyDown="TextBox_KeyDown" Watermark="Category (optional)"
                          Text="{Binding Catagory}" />
                 <TextBlock Text="{Binding StatusMessage}"
                            Foreground="{Binding ColorC}" />
@@ -247,7 +261,6 @@
                     <Button Classes="Vault" Command="{Binding GeneratePasswordCommand}" Content="Generate Password" />
                     <Button Classes="Vault"
                             Content="Save"
-                            IsDefault="True"
                             Command="{Binding saveCommand}" />
                     <Button Classes="Vault"
                             Content="Cancel"

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 
-namespace Password_Manager.Service;
+namespace Vaultify.Service;
 
 public class FilePickerService(Func<TopLevel?> toplevel)
 {

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewmodels="using:Password_Manager.ViewModels"
+             xmlns:viewmodels="using:Vaultify.ViewModels"
              xmlns:icons="using:FluentIcons.Avalonia"
              mc:Ignorable="d"
              d:DesignWidth="1700"
@@ -10,7 +10,7 @@
              x:DataType="viewmodels:SecurityPageViewModel"
              Background="{DynamicResource Primary_Background_Color}"
              Foreground="{DynamicResource Primary_Button_Foreground}"
-             x:Class="Password_Manager.SecurityPageView">
+             x:Class="Vaultify.Views.SecurityPageView">
 
     <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
         

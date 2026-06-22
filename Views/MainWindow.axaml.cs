@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Vaultify.ViewModels;
 using Avalonia.VisualTree;
 using System.Linq;
+using Avalonia.Interactivity;
 
 namespace Vaultify.Views
 {
@@ -11,6 +12,14 @@ namespace Vaultify.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+        
+        protected override void OnLoaded(RoutedEventArgs e)
+        {
+            base.OnLoaded(e);
+        
+            // Target your TextBox directly by its x:Name
+            LoginBox.Focus();
         }
 
         private void DoubleClicked(object? sender, Avalonia.Input.PointerPressedEventArgs e)

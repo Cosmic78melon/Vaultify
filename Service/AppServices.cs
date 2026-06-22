@@ -265,7 +265,7 @@ namespace Vaultify.Service
 
                 try
                 {
-                    string dKey        = DeriveKey(salt, iteration, password);
+                    string dKey = DeriveKey(salt, iteration, password);
                     string decPassword = Fernet.Decrypt(dKey, encPass);
 
                     if (password != decPassword)

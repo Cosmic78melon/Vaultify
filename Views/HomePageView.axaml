@@ -114,7 +114,7 @@
             </Border>
             
         <!-- ===================== -->
-        <!-- Password Generator Card -->
+        <!-- Password Generator -->
         <!-- ===================== -->
         <Border Grid.Column="2"
                 Margin="0, 37, 0, 0"
@@ -130,11 +130,22 @@
                 <Label Content="Password Generator"
                        FontSize="20"
                        Foreground="Orange"/>
-
-                <TextBox Grid.Row="1"
-                         Text="{Binding PasswordGenerator, Mode=OneWay}"
-                         IsReadOnly="True"
-                         CornerRadius="7"/>
+                
+                <StackPanel Grid.Row="1" 
+                            Orientation="Horizontal"
+                            Spacing="9">
+                    <TextBox Text="{Binding PasswordGenerator, Mode=OneWay}"
+                             HorizontalAlignment="Stretch"
+                             Width="420"
+                             TextWrapping="Wrap"
+                             IsReadOnly="True"
+                             CornerRadius="7"/>
+                    <Button Height="48" Width="90" Classes="CardButton" Foreground="AliceBlue" Command="{Binding copyPassCommand}">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Copy" Foreground="AliceBlue"></Label>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
 
                 <StackPanel Grid.Row="2"
                             Orientation="Horizontal"

@@ -188,7 +188,7 @@
                     CornerRadius="16"
                     Padding="24"
                     Width="460"
-                    Height="340">
+                    Height="240">
                 <StackPanel Spacing="16">
                     <TextBlock Text="Are you sure??"
                                FontSize="22"

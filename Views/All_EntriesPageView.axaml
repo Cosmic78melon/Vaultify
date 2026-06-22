@@ -32,10 +32,11 @@
                            Margin="0,0,24,0"/>
 
                 <!-- Search -->
-                <TextBox Grid.Column="1" Width="600"
+                <TextBox Grid.Column="1"
                          Height="40"
+                         Margin=" 0 0 10 0"
                          Text="{Binding SearchText}"
-                         HorizontalAlignment="Center"
+                         HorizontalAlignment="Stretch"
                          Watermark="Search passwords..."
                          VerticalAlignment="Center"/>
 
@@ -372,7 +373,7 @@
                 CornerRadius="16"
                 Padding="24"
                 Width="460"
-                Height="340">
+                Height="240">
             <StackPanel Spacing="16">
                 <TextBlock Text="Are you sure??"
                            FontSize="22"

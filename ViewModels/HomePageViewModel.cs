@@ -229,5 +229,13 @@ namespace Vaultify.ViewModels
                 BreachCount = statusdata[3]
             });
         }
+       [RelayCommand]
+       public async Task copyPass()
+       {
+           if (PasswordGenerator == null) return;
+           var clipboard = CopyTextsServices.Get();
+           await clipboard.SetTextAsync(PasswordGenerator);
+       }
+        
     }
 }

@@ -157,6 +157,7 @@
                          Height="40"
                          Width="330"
                          Padding="10"
+                         x:Name="LoginBox"
                          BorderBrush="#444"
                          CornerRadius="8"
                          Text="{Binding Password}"/>

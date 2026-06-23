@@ -94,7 +94,7 @@
                     <Border Background="#1E1E1E" CornerRadius="8" Padding="16" IsVisible="{Binding IsExpanded}">
                         <StackPanel  Spacing="4">
                             <TextBlock  Text="Created by: " Foreground="#AAAAAA" FontSize="14"/>
-                            <TextBlock Text="Tamjid Hossian Adol" Foreground="#CCCCCC" FontSize="15" FontWeight="Medium"/>
+                            <TextBlock Text="Tamjid Hossain Adol" Foreground="#CCCCCC" FontSize="15" FontWeight="Medium"/>
                         </StackPanel>
                     </Border>
                   

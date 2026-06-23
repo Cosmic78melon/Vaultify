@@ -170,8 +170,8 @@
             </StackPanel>
             
             <!--Progress Bar -->
-            <ProgressBar Margin="0 10" 
-                         Height="32" 
+            <ProgressBar Margin="0 -8" 
+                         Height="27" 
                          IsVisible="{Binding ProgressBarVisible}"
                          Minimum="0" 
                          Maximum="100" 

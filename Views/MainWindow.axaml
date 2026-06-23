@@ -168,7 +168,17 @@
                     <icons:SymbolIcon Symbol="{Binding EyeIcon}"></icons:SymbolIcon>
                 </Button>
             </StackPanel>
-
+            
+            <!--Progress Bar -->
+            <ProgressBar Margin="0 10" 
+                         Height="32" 
+                         IsVisible="{Binding ProgressBarVisible}"
+                         Minimum="0" 
+                         Maximum="100" 
+                         ShowProgressText="False" 
+                         Foreground="Orangered"
+                         IsIndeterminate="True"
+                         CornerRadius="0"></ProgressBar>
             <!-- Status -->
             <TextBlock Text="{Binding StatusMessage}"
                        Foreground="{Binding ColorsC}"

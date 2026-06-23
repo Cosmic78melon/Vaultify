@@ -262,7 +262,6 @@ namespace Vaultify.Service
                 byte[] salt      = Convert.FromHexString(reader.GetString(1));
                 int    iteration = reader.GetInt32(2);
                 string encPass   = reader.GetString(5);
-
                 try
                 {
                     string dKey = DeriveKey(salt, iteration, password);
@@ -277,19 +276,10 @@ namespace Vaultify.Service
                     return false;
                 }
             }
-
             isAuth = true;
             return true;
         }
-        public bool loginAuth(string password)
-        {
-            if (isAuthenticated(password))
-            {
-                show_all_data(password);
-                return true;
-            }
-            return false;
-        }
+        
         public bool isNewUser()
         {
             bool is_ = File.Exists(FPath);

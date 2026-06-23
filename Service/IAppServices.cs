@@ -17,7 +17,6 @@ namespace Vaultify.Service
         public List<int> statusdata();
         public bool ExportVault(string Command, dynamic file_path);
         public Task<bool> remove_data(string Id, string password);
-        public bool loginAuth(string password);
 
     }
 }

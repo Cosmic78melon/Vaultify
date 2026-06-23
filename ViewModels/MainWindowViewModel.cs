@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Vaultify.Factory;
 using System;
 using System.Threading.Tasks;
+using Tmds.DBus.Protocol;
 using Vaultify.Models;
 using Vaultify.Service;
 
@@ -22,14 +23,12 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _statusMessage = null!;
         [ObservableProperty] private string _colorsC = null!;            
         [ObservableProperty] private bool _bgOp = true;
-        
         [ObservableProperty] private bool _bgPop = true;
-        
         [ObservableProperty] private bool _bgOpSignUp = false;
-        
         [ObservableProperty] private bool _bgPopSignUp = false;
         [ObservableProperty] private bool _revealPass = false;
         [ObservableProperty] private string _eyeIcon = "EyeOff";
+        [ObservableProperty] private bool _progressBarVisible;
         public required PageFactory _pageFactory;
         public required IAppServices _appServices;
 
@@ -146,6 +145,7 @@ namespace Vaultify.ViewModels
                 if (_masterPassword != null)
                 {
                     if (string.IsNullOrEmpty(_masterPassword)) return;
+                    item.MasterPass = _masterPassword;
                     item.load_data_recent();
                     item.FavouriteData();
                     item.StatusDataLoad();
@@ -212,24 +212,30 @@ namespace Vaultify.ViewModels
         }
 
         [RelayCommand]
-        public void LoginCommand()
+        public async Task LoginCommand()
         {
+            ProgressBarVisible = true;
+            ColorsC = "White";
+            StatusMessage = "This may take few seconds...";
             if (string.IsNullOrWhiteSpace(Password))
             {
+                ProgressBarVisible = false;
                 StatusMessage = "Please enter your password.";
                 ColorsC = "red";
                 return;
             }
-            bool passwordStatus = _appServices.loginAuth(Password);
 
+            bool passwordStatus = await Task.Run(() => _appServices.isAuthenticated(Password));
             if (passwordStatus != true)
             {
+                ProgressBarVisible = false;
                 StatusMessage = "Invalid Password.";
                 ColorsC = "red";
                 return;
             }
-            
+
             _masterPassword = Password;
+            await Task.Run(() => _appServices.show_all_data(Password));
             BgOp = false;
             BgPop = false;
             Password = string.Empty;

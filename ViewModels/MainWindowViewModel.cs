@@ -220,25 +220,25 @@ namespace Vaultify.ViewModels
             if (string.IsNullOrWhiteSpace(Password))
             {
                 ProgressBarVisible = false;
-                StatusMessage = "Please enter your password.";
+                StatusMessage = "Please enter your password";
                 ColorsC = "red";
                 return;
             }
 
             bool passwordStatus = await Task.Run(() => _appServices.isAuthenticated(Password));
-            if (passwordStatus != true)
+            if (!passwordStatus)
             {
                 ProgressBarVisible = false;
-                StatusMessage = "Invalid Password.";
+                StatusMessage = "Invalid Password";
                 ColorsC = "red";
                 return;
             }
 
             _masterPassword = Password;
             await Task.Run(() => _appServices.show_all_data(Password));
-            BgOp = false;
-            BgPop = false;
             Password = string.Empty;
+            BgPop = false;
+            BgOp = false;
             GoToHome();
         }
 

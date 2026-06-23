@@ -155,13 +155,15 @@
                                Foreground="#BBBBBB"
                                FontSize="14" />
                     <TextBox Watermark="Personal Notes"
+                             TextWrapping="Wrap"
+                             Height="150"
                              Text="{Binding SecurityNotesToSave}" />
                     <TextBlock Text="{Binding StatusMessage}"
                                Foreground="{Binding ColorC}" />
                     <StackPanel Orientation="Horizontal"
                                 Spacing="12"
-                                HorizontalAlignment="Right"
-                                Margin="0,12,0,0">
+                                Margin="0 -30 0 0"
+                                HorizontalAlignment="Right">
                         <Button Classes="Vault"
                                 Content="Save"
                                 IsDefault="True"

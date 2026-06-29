@@ -8,8 +8,7 @@ namespace Vaultify.Service;
 
 public class FilePickerService(Func<TopLevel?> toplevel)
 {
-    public async Task<string?> SaveFile(
-        string masterPass)
+    public async Task<string?> SaveFile()
     {
         var topLevel = toplevel();
 

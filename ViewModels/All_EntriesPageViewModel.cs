@@ -166,7 +166,7 @@ namespace Vaultify.ViewModels
             {
                 SelectedItem.Extension = ".csv";
             }
-            var path = await _filePickerService.SaveFile(HomepagePassword);
+            var path = await _filePickerService.SaveFile();
             if (path == null) return; 
             bool result = _appServices.ExportVault(SelectedItem.Extension, path);
             if (result)

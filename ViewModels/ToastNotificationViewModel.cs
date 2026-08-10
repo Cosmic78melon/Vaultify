@@ -11,6 +11,8 @@ public partial class ToastNotificationViewModel: PageViewModel
     [ObservableProperty] public string _title = "red";
     [ObservableProperty] public string _message = "red";
     [ObservableProperty] public string _iconName = string.Empty;
+    [ObservableProperty] public bool _hasLink = false;
+    [ObservableProperty] public string _link = string.Empty;
 
     [RelayCommand]
     public void isVisible()

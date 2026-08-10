@@ -12,7 +12,8 @@ public class ToastService: IToastService
 
     public ToastNotificationViewModel Notification { get; } = new();
 
-    public async Task ShowMessageAsync(string title, string message, bool isVisible, string iconName, string hexCodeBG, string hexCodeSFG, int durationMilliseconds = 3000)
+    public async Task ShowMessageAsync(string title, string message, bool isVisible, string iconName, string hexCodeBG,
+        string hexCodeSFG, int durationMilliseconds = 3000, bool hasLink = false, string link = "")
     {
         _cts?.Cancel();
         _cts?.Dispose();
@@ -29,6 +30,8 @@ public class ToastService: IToastService
             Notification.ColorBG = hexCodeBG;
             Notification.ColorSFG = hexCodeSFG;
             Notification.IsVisible = isVisible;
+            Notification.HasLink = hasLink;
+            Notification.Link = link;
         });
 
         try

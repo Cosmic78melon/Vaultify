@@ -49,6 +49,8 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _selectedpassword;
         [ObservableProperty] private string _selectedcategory;
 
+        public IToastService _toastService;
+
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
 
@@ -58,11 +60,11 @@ namespace Vaultify.ViewModels
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
 
-        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService)
+        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService, IToastService toastService)
         {
             _appServices = appServices;
             _filePickerService = filePickerService;
-            
+            _toastService = toastService;
             Items = new ObservableCollection<Entry>();
             FilteredItems = new ObservableCollection<Entry>();
         }
@@ -106,7 +108,6 @@ namespace Vaultify.ViewModels
         public ObservableCollection<string> userName { get; } = new();
         public ObservableCollection<string> category { get; } = new();
         public ObservableCollection<string> autoCompletepassword { get; } = new();
-        
         public async Task LoadData(string password)
         {
             try

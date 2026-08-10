@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Vaultify.Factory;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Tmds.DBus.Protocol;
 using System.Reflection;
@@ -64,32 +65,17 @@ namespace Vaultify.ViewModels
             _updateServices = updateServices;
             _toastService = toastService;
             
-            CheckUserandVersion();
+            CheckUser();
             GoToHome();
+            CheckVersion();
         }
         public MainWindowViewModel()
         {
             if (_appServices != null) CurrentPage = new HomePageViewModel(_appServices);
         }
 
-        public async Task CheckUserandVersion()
+        public void CheckUser()
         {
-            var updateInfo = await _updateServices.CheckUpdateInfoAsync();
-            string? rawNewVersion = updateInfo?.TagName;
-            string? newVersionText = rawNewVersion?.TrimStart('v', 'V');
-            
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            
-            if (currentVersion != null && System.Version.TryParse(newVersionText, out var newVersion))
-            {
-                Version = currentVersion.ToString();
-
-                if (newVersion > currentVersion)
-                {
-                    await _toastService.ShowMessageAsync("New Version is Available",
-                        $"New {newVersion} is Available", true, "Info", "#0F52BA", "#ADD8E6", 25000);
-                }
-            }
 
             bool isNewUser = _appServices.isNewUser();
             if (isNewUser)
@@ -109,6 +95,26 @@ namespace Vaultify.ViewModels
 
                 BgOpSignUp = false;
                 BgPopSignUp = false;
+            }
+        }
+
+        public async Task CheckVersion()
+        {
+            var updateInfo = await _updateServices.CheckUpdateInfoAsync();
+            string? rawNewVersion = updateInfo?.TagName;
+            string? newVersionText = rawNewVersion?.TrimStart('v', 'V');
+            
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            
+            if (currentVersion != null && System.Version.TryParse(newVersionText, out var newVersion))
+            {
+                Version = currentVersion.ToString();
+
+                if (newVersion > currentVersion)
+                {
+                    await _toastService.ShowMessageAsync("New Version is Available",
+                        $"New {newVersion} is Available Download Link: ", true, "Info", "#0F52BA", "#ADD8E6", 25000, true, updateInfo?.HtmlUrl);
+                }
             }
         }
         

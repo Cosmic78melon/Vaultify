@@ -55,11 +55,15 @@
                     Foreground="White"
                     Text="{Binding Title}" />
 
-                <TextBlock
-                    FontSize="13"
-                    Foreground="#D0D0D0"
-                    Text="{Binding Message}"
-                    TextWrapping="Wrap" />
+                <StackPanel Spacing="4">
+                    <TextBlock
+                        FontSize="13"
+                        Foreground="#D0D0D0"
+                        Text="{Binding Message}"
+                        TextWrapping="Wrap" />
+
+                    <HyperlinkButton Content="{Binding Link}" NavigateUri="{Binding Link}" />
+                </StackPanel>
 
             </StackPanel>
             <Button

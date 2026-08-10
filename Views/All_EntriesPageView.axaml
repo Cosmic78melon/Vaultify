@@ -286,25 +286,40 @@
                     FontSize="14"
                     Foreground="#BBBBBB"
                     Text="Enter the details below" />
-                <TextBox
+                <AutoCompleteBox
+                    IsTextCompletionEnabled="True"
+                    ItemsSource="{Binding websitesNames}"
                     KeyDown="TextBox_KeyDown"
-                    Text="{Binding Webname}"
+                    SelectedItem="{Binding Selectedwebsite}"
+                    Text="{Binding Webname, Mode=TwoWay}"
                     Watermark="Website / App / Service (e.g. example.com)" />
-                <TextBox
+                <AutoCompleteBox
+                    IsTextCompletionEnabled="True"
+                    ItemsSource="{Binding userName}"
                     KeyDown="TextBox_KeyDown"
-                    Text="{Binding Name}"
+                    SelectedItem="{Binding SelecteduserName}"
+                    Text="{Binding Name, Mode=TwoWay}"
                     Watermark="Username / Email" />
-                <TextBox
+                <AutoCompleteBox
+                    IsTextCompletionEnabled="True"
+                    ItemsSource="{Binding autoCompletepassword}"
                     KeyDown="TextBox_KeyDown"
+                    SelectedItem="{Binding Selectedpassword}"
                     Text="{Binding Password, Mode=TwoWay}"
                     Watermark="Password" />
-                <TextBox
+                <AutoCompleteBox
+                    IsTextCompletionEnabled="True"
+                    ItemsSource="{Binding autoCompletepassword}"
                     KeyDown="TextBox_KeyDown"
+                    SelectedItem="{Binding Selectedpassword}"
                     Text="{Binding ConfirmationPassword, Mode=TwoWay}"
                     Watermark="Password" />
-                <TextBox
+                <AutoCompleteBox
+                    IsTextCompletionEnabled="True"
+                    ItemsSource="{Binding category}"
                     KeyDown="TextBox_KeyDown"
-                    Text="{Binding Catagory}"
+                    SelectedItem="{Binding Selectedcategory}"
+                    Text="{Binding Catagory, Mode=TwoWay}"
                     Watermark="Category (optional)" />
                 <TextBlock Foreground="{Binding ColorC}" Text="{Binding StatusMessage}" />
                 <StackPanel

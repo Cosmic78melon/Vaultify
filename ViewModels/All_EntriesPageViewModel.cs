@@ -44,6 +44,10 @@ namespace Vaultify.ViewModels
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
         [ObservableProperty] private FileType _selectedItem;
+        [ObservableProperty] private string _selectedwebsite;
+        [ObservableProperty] private string _selecteduserName;
+        [ObservableProperty] private string _selectedpassword;
+        [ObservableProperty] private string _selectedcategory;
 
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
@@ -98,19 +102,24 @@ namespace Vaultify.ViewModels
             set { SetProperty(ref _filteredItems, value); }
         }
 
-
+        public ObservableCollection<string> websitesNames { get; } = new();
+        public ObservableCollection<string> userName { get; } = new();
+        public ObservableCollection<string> category { get; } = new();
+        public ObservableCollection<string> autoCompletepassword { get; } = new();
+        
         public async Task LoadData(string password)
         {
             try
             {
                 Items = new ObservableCollection<Entry>();
                 var data = await Task.Run(() => _appServices.show_all_data(password));
+                websitesNames.Clear();
                 foreach (var item in data)
                 {
                     if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                     {
                         if (item.Id == null || item.SiteName == null || item.UserName == null || item.password == null || item.strength == null || item.cateGory == null || item.createdAt == null) continue;
-                        Items.Add(new Entry
+                        var entry = new Entry
                         {
                             Id =  item.Id,
                             Title = item.SiteName,
@@ -120,7 +129,12 @@ namespace Vaultify.ViewModels
                             ColorS = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
                             Category = item.cateGory,
                             Time = item.createdAt
-                        });
+                        };
+                        Items.Add(entry);
+                        websitesNames.Add(entry.Title);
+                        userName.Add(entry.Username);
+                        category.Add(entry.Category);
+                        autoCompletepassword.Add(entry.Password);
                     }
                 }
                 ApplyFilter();
@@ -230,7 +244,8 @@ namespace Vaultify.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(SearchText) ||
                     item.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    item.Username.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                    item.Username.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || 
+                    item.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
                 {
                     FilteredItems.Add(item);
                 }

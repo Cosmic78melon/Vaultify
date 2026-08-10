@@ -76,7 +76,6 @@ namespace Vaultify.ViewModels
 
         public void CheckUser()
         {
-
             bool isNewUser = _appServices.isNewUser();
             if (isNewUser)
             {
@@ -105,11 +104,10 @@ namespace Vaultify.ViewModels
             string? newVersionText = rawNewVersion?.TrimStart('v', 'V');
             
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            Version = currentVersion.ToString();
             
             if (currentVersion != null && System.Version.TryParse(newVersionText, out var newVersion))
             {
-                Version = currentVersion.ToString();
-
                 if (newVersion > currentVersion)
                 {
                     await _toastService.ShowMessageAsync("New Version is Available",

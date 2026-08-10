@@ -3,11 +3,11 @@
         public enum PageViewData
         {
             Login,
-            Register,
             Home,
             All_Entries,
             Security,
             Settings,
+            ToastNotification,
             Accounts
         };
 }

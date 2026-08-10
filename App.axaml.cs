@@ -33,8 +33,9 @@ namespace Vaultify
 
             // service initialization
             collections.AddSingleton<IAppServices, AppServices>();
+            collections.AddSingleton<IUpdateService, UpdateService>();
+            collections.AddSingleton<IToastService, ToastService>();
             collections.AddSingleton<CopyTextsServices>();
-            
             // Page View Models and Page View
             collections.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
             {

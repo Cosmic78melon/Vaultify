@@ -4,6 +4,7 @@ using Vaultify.Factory;
 using System;
 using System.Threading.Tasks;
 using Tmds.DBus.Protocol;
+using System.Reflection;
 using Vaultify.Models;
 using Vaultify.Service;
 
@@ -29,8 +30,12 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private bool _revealPass = false;
         [ObservableProperty] private string _eyeIcon = "EyeOff";
         [ObservableProperty] private bool _progressBarVisible;
+        [ObservableProperty] private string _version;
         public required PageFactory _pageFactory;
         public required IAppServices _appServices;
+        public required IUpdateService _updateServices;
+        public required IToastService _toastService;
+        
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
@@ -49,13 +54,17 @@ namespace Vaultify.ViewModels
         [ObservableProperty] public bool _securityNotesActive;
         [ObservableProperty] public bool _settingsPageActive;
         [ObservableProperty] public bool _accountPageActive;
-        
+        public ToastNotificationViewModel Toast =>
+                _toastService.Notification;
 
-        public MainWindowViewModel(PageFactory pageFactory, IAppServices appServices)
+        public MainWindowViewModel(PageFactory pageFactory, IAppServices appServices, IUpdateService updateServices, IToastService toastService)
         {
             _pageFactory = pageFactory;
             _appServices = appServices;
-            CheckUser();
+            _updateServices = updateServices;
+            _toastService = toastService;
+            
+            CheckUserandVersion();
             GoToHome();
         }
         public MainWindowViewModel()
@@ -63,8 +72,25 @@ namespace Vaultify.ViewModels
             if (_appServices != null) CurrentPage = new HomePageViewModel(_appServices);
         }
 
-        public void CheckUser()
+        public async Task CheckUserandVersion()
         {
+            var updateInfo = await _updateServices.CheckUpdateInfoAsync();
+            string? rawNewVersion = updateInfo?.TagName;
+            string? newVersionText = rawNewVersion?.TrimStart('v', 'V');
+            
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            
+            if (currentVersion != null && System.Version.TryParse(newVersionText, out var newVersion))
+            {
+                Version = currentVersion.ToString();
+
+                if (newVersion > currentVersion)
+                {
+                    await _toastService.ShowMessageAsync("New Version is Available",
+                        $"New {newVersion} is Available", true, "Info", "#0F52BA", "#ADD8E6", 25000);
+                }
+            }
+
             bool isNewUser = _appServices.isNewUser();
             if (isNewUser)
             {

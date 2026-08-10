@@ -133,7 +133,7 @@ namespace Vaultify.ViewModels
         public async Task Register()
         {
             StatusMessage = string.Empty;
-            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(ConfirmationPassword))
+            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(ConfirmationPassword))
             {
                 StatusMessage = "Please Enter your Credentials";
                 ColorsC = "red";

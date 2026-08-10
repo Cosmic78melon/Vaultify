@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -358,11 +359,8 @@ namespace Vaultify.Service
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
-    
-            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || 
-                !isNewUser() || 
-                isAuthenticated(password) || 
-                result.Result == null) 
+  
+            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || !isNewUser() || result.Result == null) 
             {
                 return false;
             }

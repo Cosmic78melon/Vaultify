@@ -1,248 +1,285 @@
-<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:icons="using:FluentIcons.Avalonia"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Design.PreviewWith>
-    <Border Padding="30" Background="Black" BoxShadow="2 5 100 0 blue">
-      <!-- Add Controls for Previewer Here -->
-      <StackPanel Spacing="30">
-          <Button Classes="CardButton">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="100">
-              <icons:SymbolIcon Margin="10 0 0 0"></icons:SymbolIcon>
-		      <Label Margin="-10 2 0 0">Home</Label>
-          </StackPanel>      
-          </Button>     
-          
-          <Button>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="100">
-              <icons:SymbolIcon Margin="10 0 0 0"></icons:SymbolIcon>
-		      <Label Margin="-10 2 0 0">Home</Label>
-          </StackPanel>      
-          </Button>       
-        <Border Classes="Card">
-			<TextBlock Text="Box"></TextBlock>
+<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:icons="using:FluentIcons.Avalonia"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border
+            Background="Black"
+            BoxShadow="2 5 100 0 blue"
+            Padding="30">
+            <!--  Add Controls for Previewer Here  -->
+            <StackPanel Spacing="30">
+                <Button Classes="CardButton">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Width="100">
+                        <icons:SymbolIcon Margin="10,0,0,0" />
+                        <Label Margin="-10,2,0,0">Home</Label>
+                    </StackPanel>
+                </Button>
+
+                <Button>
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Width="100">
+                        <icons:SymbolIcon Margin="10,0,0,0" />
+                        <Label Margin="-10,2,0,0">Home</Label>
+                    </StackPanel>
+                </Button>
+                <Border Classes="Card">
+                    <TextBlock Text="Box" />
+                </Border>
+
+                <CheckBox Foreground="White">Checkbox</CheckBox>
+                <TextBlock Text="Length:" VerticalAlignment="Center" />
+
+                <Slider
+                    Maximum="64"
+                    Minimum="12"
+                    Width="200"
+                    x:Name="slider" />
+                <TextBlock
+                    Foreground="White"
+                    Text="{Binding #slider.Value}"
+                    VerticalAlignment="Center" />
+            </StackPanel>
         </Border>
+    </Design.PreviewWith>
 
-        <CheckBox Foreground="White">Checkbox</CheckBox>
-         <TextBlock Text="Length:"
-                               VerticalAlignment="Center"/>
 
-                    <Slider Minimum="12"
-                            Maximum="64"
-                            x:Name="slider"
-                            Width="200"/>
-                    <TextBlock Foreground="White" Text="{Binding #slider.Value}"
-                               VerticalAlignment="Center"/>
-    </StackPanel>
-    </Border>
-  </Design.PreviewWith>
-	
-	
-	<!-- Context Menu Styles -->
-	<Style Selector="ContextMenu">
-		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"></Setter>
-		<Setter Property="Padding" Value="4"></Setter>
-		<Setter Property="Opacity" Value=".78"></Setter>
-	</Style>
-	
-	<Style Selector="ContextMenu > Border">
-		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"/>
-	</Style>	
-	<Style Selector="ContextMenu > TextBox">
-		<Setter Property="Background" Value="{DynamicResource ContextMenuBG}"/>
-	</Style>
+    <!--  Context Menu Styles  -->
+    <Style Selector="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource ContextMenuBG}" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Opacity" Value=".78" />
+    </Style>
 
-	<Style Selector="MenuItem">
-		<Setter Property="Foreground" Value="Azure"/>
-		<Setter Property="FontWeight" Value="Medium"/>
-	</Style>
+    <Style Selector="ContextMenu &gt; Border">
+        <Setter Property="Background" Value="{DynamicResource ContextMenuBG}" />
+    </Style>
+    <Style Selector="ContextMenu &gt; TextBox">
+        <Setter Property="Background" Value="{DynamicResource ContextMenuBG}" />
+    </Style>
 
-	<Style Selector="MenuItem:pointerover > Border">
-		<Setter Property="Background" Value="#2a2a2a"/>
-	</Style>
-	
-	<!-- Headers Styles for Font -->
-	<Style Selector="TextBlock.Headers">
-		<Setter Property="FontSize" Value="18"></Setter>
-		<Setter Property="FontWeight" Value="SemiBold"></Setter>
-		<Setter Property="Foreground" Value="#AAAAAA"></Setter>
-		<Setter Property="VerticalAlignment" Value="Center"></Setter>
-	</Style>
-    
-    <!--Label Fonts Set-->
-  <Style Selector="Label">
-	  <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
-  </Style>
-    <!--TextBox Fonts Set-->
-  <Style Selector="TextBlock">
-	  <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
-  </Style>
-    <!--Seperator Color Set Very Important-->
-  <Style Selector="Separator">
-      <Setter Property="Background" Value="{DynamicResource Primary_Seperator_Color}"></Setter>
-  </Style>
+    <Style Selector="MenuItem">
+        <Setter Property="Foreground" Value="Azure" />
+        <Setter Property="FontWeight" Value="Medium" />
+    </Style>
 
-    <!-- Generel Button Design-->
+    <Style Selector="MenuItem:pointerover &gt; Border">
+        <Setter Property="Background" Value="#2a2a2a" />
+    </Style>
+
+    <!--  Headers Styles for Font  -->
+    <Style Selector="TextBlock.Headers">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#AAAAAA" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!--  Label Fonts Set  -->
+    <Style Selector="Label">
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}" />
+    </Style>
+    <!--  TextBox Fonts Set  -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}" />
+    </Style>
+    <!--  Seperator Color Set Very Important  -->
+    <Style Selector="Separator">
+        <Setter Property="Background" Value="{DynamicResource Primary_Seperator_Color}" />
+    </Style>
+
+    <!--  Generel Button Design  -->
     <Style Selector="Button">
-		<Setter Property="Background" Value="{DynamicResource Primary_Button_Background}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource ButtonInactive}"></Setter>
-        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-        <Setter Property="FontSize" Value="20"></Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
-        <Setter Property="RenderTransform" Value="scale(1)"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Primary_Button_Background}" />
+        <Setter Property="Foreground" Value="{DynamicResource ButtonInactive}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
         <Setter Property="Transitions">
-			<Transitions>
-				<TransformOperationsTransition 
-                                   Property="RenderTransform"
-                                   Duration="0:0:0:0.04">
-                </TransformOperationsTransition>
+            <Transitions>
+                <TransformOperationsTransition Duration="0:0:0:0.04" Property="RenderTransform" />
             </Transitions>
         </Setter>
     </Style>
     <Style Selector="Button:pointerover/template/ContentPresenter">
-		<Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
-        <Setter Property="FontSize" Value="20"></Setter>
-        <Setter Property="CornerRadius" Value="10"></Setter>
-        <Setter Property="FontFamily" Value="{DynamicResource Fonts}"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Hover_Button_Background}" />
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}" />
     </Style>
 
     <Style Selector="Button:pointerover">
-        <Setter Property="RenderTransform" Value="scale(1.045)"></Setter>
+        <Setter Property="RenderTransform" Value="scale(1.045)" />
     </Style>
     <Style Selector="Button:pointerover Label/template/ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
     </Style>
     <Style Selector="Button:pointerover icons|SymbolIcon/template/ContentPresenter">
-        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
     </Style>
 
     <Style Selector="Button:pressed">
-        <Setter Property="Opacity" Value=".84"></Setter>        
-        <Setter Property="RenderTransform" Value="scale(1)"></Setter>
+        <Setter Property="Opacity" Value=".84" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
     </Style>
 
     <Style Selector="Button StackPanel">
-		<Setter Property="Spacing" Value="10"></Setter>
+        <Setter Property="Spacing" Value="10" />
     </Style>
 
 
-    
-    <!-- Actives Side menu buttons -->
-    <Style Selector="Button.active /template/ContentPresenter"> 
-		<Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
-		<Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+
+    <!--  Actives Side menu buttons  -->
+    <Style Selector="Button.active /template/ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Hover_Button_Background}" />
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
     </Style>
 
-    <!-- Card Buttons Styles -->
+    <!--  Card Buttons Styles  -->
     <Style Selector="Button.CardButton">
-		<Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
-        <Setter Property="RenderTransform" Value="scale(1)"></Setter>
-        <Setter Property="CornerRadius" Value="10"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Hover_Button_Background}" />
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
+        <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Transitions">
-			<Transitions>
-				<TransformOperationsTransition 
-                                   Property="RenderTransform"
-                                   Duration="0:0:0:0.04">
-                </TransformOperationsTransition>
+            <Transitions>
+                <TransformOperationsTransition Duration="0:0:0:0.04" Property="RenderTransform" />
             </Transitions>
         </Setter>
     </Style>
     <Style Selector="Button.CardButton:pointerover">
-        <Setter Property="Background" Value="{DynamicResource Hover_Button_Background}"></Setter>
-        <Setter Property="RenderTransform" Value="scale(1.0154)"></Setter>
-        <Setter Property="CornerRadius" Value="10"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Hover_Button_Background}" />
+        <Setter Property="RenderTransform" Value="scale(1.0154)" />
+        <Setter Property="CornerRadius" Value="10" />
     </Style>
 
     <Style Selector="Button.CardButton:pressed">
-        <Setter Property="RenderTransform" Value="scale(1)"></Setter>
+        <Setter Property="RenderTransform" Value="scale(1)" />
     </Style>
 
     <Style Selector="Button.CardButton StackPanel">
-	    <Setter Property="Spacing" Value="10"></Setter>
-        <Setter Property="Height" Value="40"></Setter>
+        <Setter Property="Spacing" Value="10" />
+        <Setter Property="Height" Value="40" />
     </Style>
 
-    <!-- Card Borders Style -->
+    <!--  Card Borders Style  -->
     <Style Selector="Border.Card">
-		<Setter Property="Background" Value="{DynamicResource Card_Color}"></Setter>
-		<Setter Property="Height" Value="300"></Setter>
-        <Setter Property="BorderBrush" Value="#4d4d4d"></Setter>
-        <Setter Property="BorderThickness" Value="2"></Setter>
-		<Setter Property="Width" Value="500"></Setter>
-		<Setter Property="CornerRadius" Value="10"></Setter>
-        <Setter Property="RenderTransform" Value="scale(1)"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Card_Color}" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="BorderBrush" Value="#4d4d4d" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Width" Value="500" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
         <Setter Property="Transitions">
-			<Transitions>               
-                <TransformOperationsTransition Property="RenderTransform"
-                                               Duration="0:0:0:0.1">
-                </TransformOperationsTransition>
+            <Transitions>
+                <TransformOperationsTransition Duration="0:0:0:0.1" Property="RenderTransform" />
             </Transitions>
         </Setter>
     </Style>
 
     <Style Selector="Border.Card:pointerover">
-        <Setter Property="RenderTransform" Value="scale(1.0026)"></Setter>
-        <Setter Property="BoxShadow" Value="0 0 60 0 White"></Setter>
+        <Setter Property="RenderTransform" Value="scale(1.0026)" />
+        <Setter Property="BoxShadow" Value="0 0 60 0 White" />
     </Style>
 
 
     <Style Selector="Border.Card Label">
-        <Setter Property="FontSize" Value="20"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Hover_Button_Background}"></Setter>
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{DynamicResource Hover_Button_Background}" />
     </Style>
     <Style Selector="Border.Card TextBlock">
-        <Setter Property="FontSize" Value="27"></Setter>
-        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="FontSize" Value="27" />
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
     </Style>
 
     <Style Selector="Separator.CardSep">
-		<Setter Property="Foreground" Value="WhiteSmoke"></Setter>
-		<Setter Property="Opacity" Value="460"></Setter>
+        <Setter Property="Foreground" Value="WhiteSmoke" />
+        <Setter Property="Opacity" Value="460" />
     </Style>
 
     <Style Selector=":is(Button).CheckBoxP">
-		<Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
     </Style>
     <Style Selector="CheckBox:pointerover/template/ContentPresenter">
-		<Setter Property="Foreground" Value="{DynamicResource CheckBox_Color}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource CheckBox_Color}" />
     </Style>
 
     <Style Selector="TextBlock.status_Text">
-		<Setter Property="FontSize" Value="26"></Setter>
-		<Setter Property="Padding" Value="10"></Setter>
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="Padding" Value="10" />
     </Style>
 
     <Style Selector="Separator.Vertical_Seperator">
-		<Setter Property="Opacity" Value="960"></Setter>
-		<Setter Property="Height" Value="255"></Setter>
-		<Setter Property="Width" Value="1"></Setter>
-		<Setter Property="Margin" Value="30,05,0,0"></Setter>
+        <Setter Property="Opacity" Value="960" />
+        <Setter Property="Height" Value="255" />
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Margin" Value="30,05,0,0" />
     </Style>
 
 
     <Style Selector="Button.Vault">
-		<Setter Property="Background" Value="{DynamicResource Primary_Button_Background}"></Setter>
-		<Setter Property="BorderBrush" Value="#FF8C00"></Setter>
-		<Setter Property="BorderThickness" Value="2"></Setter>
-		<Setter Property="FontSize" Value="19"></Setter>
-		<Setter Property="FontWeight" Value="SemiBold"></Setter>
-		<Setter Property="Foreground" Value="Orange"></Setter>
-		<Setter Property="Padding" Value="28,12"></Setter>
-		<Setter Property="Height" Value="55"></Setter>
-		<Setter Property="CornerRadius" Value="0"></Setter>
+        <Setter Property="Background" Value="{DynamicResource Primary_Button_Background}" />
+        <Setter Property="BorderBrush" Value="#FF8C00" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="FontSize" Value="19" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="Orange" />
+        <Setter Property="Padding" Value="28,12" />
+        <Setter Property="Height" Value="55" />
+        <Setter Property="CornerRadius" Value="0" />
     </Style>
 
     <Style Selector="Slider">
-		<Setter Property="SmallChange" Value="3"></Setter>
-		<Setter Property="LargeChange" Value="6"></Setter>
-        <Setter Property="TickFrequency" Value="1"></Setter>
-        <Setter Property="IsSnapToTickEnabled" Value="True"></Setter>
+        <Setter Property="SmallChange" Value="3" />
+        <Setter Property="LargeChange" Value="6" />
+        <Setter Property="TickFrequency" Value="1" />
+        <Setter Property="IsSnapToTickEnabled" Value="True" />
     </Style>
-	
-	<!-- TextBox -->
-	<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
-		<Setter Property="BorderBrush" Value="OrangeRed"></Setter>
-		<Setter Property="BorderThickness" Value="1"></Setter>
-	</Style>
+
+    <!--  TextBox  -->
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="OrangeRed" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="Button.ToastButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="Red" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Duration="0:0:0:0.04" Property="RenderTransform" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button.ToastButton:pointerover/template/ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="DarkRed" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="FontFamily" Value="{DynamicResource Fonts}" />
+    </Style>
+
+    <Style Selector="Button.ToastButton:pointerover">
+        <Setter Property="RenderTransform" Value="scale(1.07)" />
+    </Style>
+    <Style Selector="Button.ToastButton:pointerover Label/template/ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
+    </Style>
+    <Style Selector="Button.ToastButton:pointerover icons|SymbolIcon/template/ContentPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource Primary_Button_Foreground}" />
+    </Style>
+
+    <Style Selector="Button.ToastButton:pressed">
+        <Setter Property="Opacity" Value=".84" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
 </Styles>

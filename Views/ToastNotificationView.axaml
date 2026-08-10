@@ -21,7 +21,7 @@
         Opacity="65"
         Width="380">
 
-        <Grid ColumnDefinitions="6,Auto,*,Auto">
+        <Grid ColumnDefinitions="6,Auto,*,Auto, Auto">
 
             <!--  Left Accent  -->
             <Border CornerRadius="10,0,0,10" Grid.Column="0" />
@@ -60,7 +60,14 @@
                     Foreground="#D0D0D0"
                     Text="{Binding Message}"
                     TextWrapping="Wrap" />
+
             </StackPanel>
+            <Button
+                Classes="ToastButton"
+                Command="{Binding isVisibleCommand}"
+                Grid.Column="4">
+                X
+            </Button>
         </Grid>
     </Border>
 </UserControl>

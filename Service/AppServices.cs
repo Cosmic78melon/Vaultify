@@ -22,8 +22,10 @@ namespace Vaultify.Service
         public static char[] AsciiNumbers = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         char[] _asciiLowerLetters = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
         char[] _asciiUpperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-        private const string Filename = "encrypted-data";
-        private static readonly string DPath = Path.Combine(Directory.GetCurrentDirectory(), "DataBase");
+        private const string Filename = "vaultify";
+        private static readonly string DPath =  Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Vaultify");
         private static readonly string FPath = Path.Combine(DPath, $"{Filename}.db");
         
         private const int KeySize = 32;
@@ -113,12 +115,14 @@ namespace Vaultify.Service
                     return 500;
                 }
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException httpEx)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {httpEx.ToString()}");
                 return 101;
             }
-            catch (TimeoutException)
+            catch (TimeoutException tmt)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {tmt.ToString()}");
                 return 101;
             }
 
@@ -137,8 +141,9 @@ namespace Vaultify.Service
             {
                 isBreached = await IsPasswordBreached(password);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
                 isBreached = 500;
             }
             
@@ -231,8 +236,9 @@ namespace Vaultify.Service
             
                         global_Data.Add(allData);
                     }
-                    catch (Exception )
+                    catch (Exception ex)
                     {
+                        File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
                         global_Data.Clear();
                         return global_Data;
                     }
@@ -283,10 +289,7 @@ namespace Vaultify.Service
         
         public bool isNewUser()
         {
-            bool is_ = File.Exists(FPath);
-            if (!is_) 
-                return true;
-
+            if (!File.Exists(FPath)) return true;
             try
             {
                 using var connection = new SqliteConnection($"Data Source={FPath}");
@@ -296,9 +299,11 @@ namespace Vaultify.Service
                 using var command = new SqliteCommand(sql, connection);
                 int count = Convert.ToInt32(command.ExecuteScalar());
                 return count == 0; // no table = new user
+                connection.Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
                 return true;
             }
         }
@@ -348,30 +353,45 @@ namespace Vaultify.Service
                 show_all_data(masterPass);
                 return (true, id, result.Result, localNow);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
                 return (false, "null", "null", "null");
             }
         }
         
-        public async Task<bool> register(string userName, string password)
+        public async Task<(bool, string)> register(string userName, string password)
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
   
-            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase) || !isNewUser() || result.Result == null) 
+            if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
-                return false;
+                if (!result.HasUppercase)
+                    return (false, "Has No Uppercase Letter");
+                if (!result.HasLowercase)
+                    return (false, "Has No Lowercase Letter");
+                if (!result.HasDigits)
+                    return (false, "Has No Digits");
+                if (!result.HasPunctuation)
+                    return (false, "Has No punctuation Letter");
+                if (!result.IsLongEnough)
+                    return (false, "Minimum 12 letters");
+            }
+            
+            if (isNewUser() == false)
+            {
+                return (false, "User exists in our database");
             }
 
             try
             {
-                if (!Directory.Exists(DPath))
+
+                if (DPath != null)
                 {
                     Directory.CreateDirectory(DPath);
                 }
-        
                 using (SqliteConnection connection = new SqliteConnection($"Data Source={FPath}"))
                 {
                     await connection.OpenAsync();
@@ -392,23 +412,25 @@ namespace Vaultify.Service
                     using SqliteCommand command = new SqliteCommand(sql, connection);
                     await command.ExecuteNonQueryAsync();
                 }
-        
+
                 string fernetKey = DeriveKey(salt, iteration, password);
                 string encUsername = Fernet.Encrypt(fernetKey, userName);
                 string encPassword = Fernet.Encrypt(fernetKey, password);
                 string hexSalt = Convert.ToHexString(salt);
                 string localNow = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
-                if (encPassword == null || encUsername == null) 
-                {
-                    return false;
-                }
-
-                return await InsertData(hexSalt, iteration, encUsername, encPassword, result.Result, localNow);
+                return (await InsertData(hexSalt, iteration, encUsername, encPassword, result.Result, localNow),
+                    "Strong");
             }
-            catch (Exception)
+            catch (SqliteException sqx)
             {
-                return false;
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {sqx.ToString()}");
+                return (false, "something gone wrong when adding data");
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                return (false, "Something Went Wrong");
             }
         }
         public async Task<bool> InsertData(string salt, int iteration, string encUsername, 
@@ -440,8 +462,9 @@ namespace Vaultify.Service
                 int rowsAffected = await commandLate.ExecuteNonQueryAsync();
                 return rowsAffected > 0; // actually verify the insert happened
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
                 return false;
             }
         }

@@ -6,7 +6,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\vaultify.ico</ApplicationIcon>
-    <Version>2.8.10</Version>
+    <Version>2.10.11</Version>
   </PropertyGroup>
 
   <ItemGroup>

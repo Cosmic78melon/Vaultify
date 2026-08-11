@@ -10,7 +10,7 @@ namespace Vaultify.Service
         public List<AppServices.vaultData> show_all_data(string password);
         public bool isAuthenticated(string password);
         public bool isNewUser();
-        public Task<bool> register(string userName, string password);
+        public Task<(bool, string)> register(string userName, string password);
         public Task<(bool isAdded, string Id, string strength, string time)> addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
         public Dictionary<string, int> card_Data();
         public List<string> favData();

@@ -19,7 +19,6 @@ namespace Vaultify.ViewModels
     {
         private string? _masterPassword = string.Empty;
         [ObservableProperty] private string _userName = null!;
-        [ObservableProperty] private string _email = null!;
         [ObservableProperty] private string _password = null!;
         [ObservableProperty] private string _confirmationPassword = null!;
         [ObservableProperty] private string _statusMessage = null!;
@@ -140,31 +139,36 @@ namespace Vaultify.ViewModels
                 return;
             }
 
-            if (string.Equals(Password, ConfirmationPassword, StringComparison.Ordinal))
+            if (string.Equals(Password, ConfirmationPassword, StringComparison.Ordinal) == false)
             {
-                bool isNewUser = _appServices.isNewUser();
-                bool isAuthenticated = _appServices.isAuthenticated(Password);
-                if (isNewUser != true && isAuthenticated)
-                {
-                    StatusMessage = "Welcome back! You are already registered with us.";
-                    ColorsC = "yellow";
-                    return;
-                }
-
-                bool register = await _appServices.register(UserName, Password);
-                if (!register)
-                {
-                    StatusMessage = "Your Password is Weak. please enter strong password";
-                    ColorsC = "red";
-                    return;
-                }
-                StatusMessage = "Account created successfully! Welcome to our platform.";
-                ColorsC = "green";
-                BgOpSignUp = false;
-                BgPopSignUp = false;
-                BgOp = true;
-                BgPop = true;
+                StatusMessage = "Please Type the same password in both fields";
+                ColorsC = "yellow";
+                return;
             }
+            bool isNewUser = _appServices.isNewUser();
+            bool isAuthenticated = _appServices.isAuthenticated(Password);
+            if (isNewUser != true && isAuthenticated)
+            {
+                StatusMessage = "Welcome back! You are already registered with us.";
+                ColorsC = "yellow";
+                return;
+            }
+
+            bool register;
+            string info;
+            (register, info) = await _appServices.register(UserName, Password);
+            if (register == false)
+            {
+                StatusMessage = info;
+                ColorsC = "red";
+                return;
+            }
+            StatusMessage = "Account created successfully! Welcome to our platform.";
+            ColorsC = "green";
+            BgOpSignUp = false;
+            BgPopSignUp = false;
+            BgOp = true;
+            BgPop = true;
         }
 
         [RelayCommand]

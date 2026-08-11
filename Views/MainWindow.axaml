@@ -320,7 +320,7 @@
         </Grid>
         <!--  this is The Register Pop up window code  -->
         <Border
-            Background="Black"
+            Background="{DynamicResource Primary_Background_Color}"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             IsVisible="{Binding BgOpSignUp}"
@@ -331,10 +331,10 @@
             CornerRadius="16"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            HorizontalAlignment="Stretch"
+            HorizontalAlignment="Center"
             IsVisible="{Binding BgPopSignUp}"
             Padding="20"
-            VerticalAlignment="Stretch"
+            VerticalAlignment="Center"
             ZIndex="1001">
             <StackPanel HorizontalAlignment="Center" Spacing="10">
                 <TextBlock
@@ -346,30 +346,51 @@
                 <TextBlock Foreground="#CCCCCC" Text="UserName" />
                 <TextBox
                     KeyDown="TextBoxKeyDown"
+                    Margin="0,0,60,0"
                     Text="{Binding UserName}"
-                    Watermark="Cruid55mustard7oil, technoblade etc." />
-                <TextBlock Foreground="#CCCCCC" Text="Email address" />
-                <TextBox
-                    KeyDown="TextBoxKeyDown"
-                    Text="{Binding Email}"
-                    Watermark="Your Email" />
-                <TextBlock Foreground="#CCCCCC" Text="Passoword" />
-                <TextBox
-                    KeyDown="TextBoxKeyDown"
-                    PasswordChar="*"
-                    Text="{Binding Password}"
-                    Watermark="Password" />
-                <TextBlock Foreground="#CCCCCC" Text="Confirm Passoword" />
-                <TextBox
-                    KeyDown="TextBoxKeyDown"
-                    PasswordChar="*"
-                    Text="{Binding ConfirmationPassword}"
-                    Watermark="Confirm Password" />
-                <TextBlock Foreground="{Binding ColorsC}" Text="{Binding StatusMessage}" />
+                    Watermark="Crud55mustard7oil, techno blade etc."
+                    Width="575" />
+                <TextBlock Foreground="#CCCCCC" Text="Password" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBox
+                        KeyDown="TextBoxKeyDown"
+                        PasswordChar="*"
+                        RevealPassword="{Binding RevealPass}"
+                        Text="{Binding Password}"
+                        Watermark="Enter your password"
+                        Width="575" />
+                    <Button
+                        Background="Transparent"
+                        Command="{Binding RevealPasswordCommand}"
+                        Height="40"
+                        Width="50">
+                        <icons:SymbolIcon Symbol="{Binding EyeIcon}" />
+                    </Button>
+                </StackPanel>
+                <TextBlock Foreground="#CCCCCC" Text="Confirm Password" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBox
+                        KeyDown="TextBoxKeyDown"
+                        PasswordChar="*"
+                        RevealPassword="{Binding RevealPass}"
+                        Text="{Binding ConfirmationPassword}"
+                        Watermark="Confirm your password"
+                        Width="575" />
+                    <TextBlock Foreground="{Binding ColorsC}" Text="{Binding StatusMessage}" />
+                    <Button
+                        Background="Transparent"
+                        Command="{Binding RevealPasswordCommand}"
+                        Height="40"
+                        Width="50">
+                        <icons:SymbolIcon Symbol="{Binding EyeIcon}" />
+                    </Button>
+                </StackPanel>
+
                 <Button
                     Background="{DynamicResource Hover_Button_Background}"
                     Command="{Binding RegisterCommand}"
                     Content="Sign Up"
+                    Foreground="AliceBlue"
                     HorizontalAlignment="Center" />
                 <StackPanel
                     HorizontalAlignment="Right"
@@ -379,7 +400,8 @@
                     <Button
                         Background="{DynamicResource Hover_Button_Background}"
                         Command="{Binding GotLoginCommand}"
-                        Content="Got to Login page" />
+                        Content="Got to Login page"
+                        Foreground="AliceBlue" />
                 </StackPanel>
             </StackPanel>
         </Border>

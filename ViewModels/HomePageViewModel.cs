@@ -70,7 +70,14 @@ namespace Vaultify.ViewModels
         [RelayCommand]
         public async Task PasswordChecker()
         {
+            if (string.IsNullOrEmpty(PasswordHaveToCheck))
+            {
+                PasswordResult = "Please Enter your password";
+                FontC = "yellow";
+                return;
+            }
             var details = await _appServices.PassswordCheck(PasswordHaveToCheck);
+            
             if (string.Equals(details.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 PasswordResult = "Password Status: " + details.Result;
@@ -205,6 +212,9 @@ namespace Vaultify.ViewModels
                         Number = pair.Value
                     });
             }
+
+            _ = this.GeneratePassword();
+
         }
         
         private ObservableCollection<StatusData> _statusData;

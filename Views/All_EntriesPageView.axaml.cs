@@ -21,15 +21,31 @@ public partial class All_EntriesPageView : UserControl
 
             var parent = current.GetVisualParent();
             if (parent == null) return;
-            var textboxes = parent.GetVisualDescendants().OfType<TextBox>().ToList();
-
-            int index = textboxes.IndexOf((TextBox)current);
-
-            int nextindex = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? index - 1 : index + 1;
-
-            if (nextindex != -1 && (nextindex >= 0 && nextindex < textboxes.Count))
+            if (parent is AutoCompleteBox autoCompleteBox)
             {
-                textboxes[nextindex].Focus();
+                var autoCompleteBoxes = parent.GetVisualDescendants().OfType<AutoCompleteBox>().ToList();
+
+                int index = autoCompleteBoxes.IndexOf((AutoCompleteBox)current);
+
+                int nextindex = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? index - 1 : index + 1;
+
+                if (nextindex != -1 && (nextindex >= 0 && nextindex < autoCompleteBoxes.Count))
+                {
+                    autoCompleteBoxes[nextindex].Focus();
+                }
+            }
+            else if (parent is TextBox textBox)
+            {
+                var textboxes = parent.GetVisualDescendants().OfType<TextBox>().ToList();
+
+                int index = textboxes.IndexOf((TextBox)current);
+
+                int nextindex = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? index - 1 : index + 1;
+
+                if (nextindex != -1 && (nextindex >= 0 && nextindex < textboxes.Count))
+                {
+                    textboxes[nextindex].Focus();
+                }
             }
         }
     }

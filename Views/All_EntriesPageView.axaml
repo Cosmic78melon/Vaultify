@@ -148,7 +148,7 @@
                 Background="Transparent"
                 Grid.Row="1"
                 ItemsSource="{Binding FilteredItems}"
-                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 x:Name="ListBoxData">
 

@@ -172,10 +172,8 @@
     <!--  Card Borders Style  -->
     <Style Selector="Border.Card">
         <Setter Property="Background" Value="{DynamicResource Card_Color}" />
-        <Setter Property="Height" Value="300" />
         <Setter Property="BorderBrush" Value="#4d4d4d" />
         <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="Width" Value="500" />
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="RenderTransform" Value="scale(1)" />
         <Setter Property="Transitions">

@@ -1,341 +1,528 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vw="using:Vaultify.ViewModels"
-             mc:Ignorable="d"
-             x:DataType="vw:HomePageViewModel"
-             d:DesignWidth="1700"
-             d:DesignHeight="800"
-             xmlns:icons="using:FluentIcons.Avalonia"
-             Foreground="{DynamicResource Primary_Button_Foreground}"
-             Background="{DynamicResource Primary_Background_Color}"
-             x:Class="Vaultify.Views.HomePageView">
+﻿<UserControl
+    Background="{DynamicResource Primary_Background_Color}"
+    Foreground="{DynamicResource Primary_Button_Foreground}"
+    d:DesignHeight="800"
+    d:DesignWidth="1200"
+    mc:Ignorable="d"
+    x:Class="Vaultify.Views.HomePageView"
+    x:DataType="vw:HomePageViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icons="using:FluentIcons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vw="using:Vaultify.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Main Layout -->
-    <Grid RowDefinitions="Auto,Auto,Auto,auto, *"
-          Margin="10">
+    <!--
+        Responsive redesign:
+        - No fixed card widths.
+        - Content can scroll vertically on smaller laptop screens.
+        - Existing bindings/commands are preserved exactly.
+    -->
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid
+            Margin="24"
+            RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+            RowSpacing="18">
 
-        <!-- Header -->
-        <Grid Grid.Row="0"
-              ColumnDefinitions="Auto,*"
-              Margin="0,0,0,5">
+            <!--  Header  -->
+            <Grid
+                ColumnDefinitions="*,Auto"
+                Grid.Row="0"
+                VerticalAlignment="Center">
 
-            <Label FontSize="30"
-                   Margin="10, 0, -110, 0"
-                   VerticalAlignment="Center"
-                   Content="DashBoard"/>
+                <StackPanel Spacing="3">
+                    <TextBlock
+                        FontSize="30"
+                        FontWeight="SemiBold"
+                        Text="Dashboard" />
 
-            <TextBlock Grid.Column="1" 
-                       FontSize="40"
-                       FontWeight="Bold"
-                       Text="Welcome To Vaultify "
-                       HorizontalAlignment="Center"/>
-        </Grid>
-
-        <!-- Top Separator -->
-        <Separator Grid.Row="1"/>
-
-        <!-- Cards Area -->
-        <Grid Grid.Row="2"
-              ColumnDefinitions="Auto,Auto,Auto"
-              ColumnSpacing="30">
-
-            <!-- ===================== -->
-            <!-- Recent Card -->
-            <!-- ===================== -->
-            <Border Classes="Card" 
-                    Height="350"
-                    Margin="10, 27, 0, 0"
-                    HorizontalAlignment="Left">
-                <Grid RowDefinitions="Auto,*"
-                      Margin="20">
-                    <Label FontSize="20"
-                           Foreground="Orange"
-                           Content="Recent"/>
-                    <ScrollViewer Grid.Row="1"
-                                  VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding Items}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel>
-                                       <Grid ColumnDefinitions="*,Auto">
-                                           <TextBlock Text="{Binding Title}" Foreground="#d4d4d4" Margin="0,7"/>
-                                           <Border Grid.Column="1"
-                                                   CornerRadius="10"
-                                                   Padding="8,2">
-                                               <TextBlock Text="{Binding Number}"
-                                                          FontSize="30"
-                                                          Foreground="#666666"
-                                                          FontWeight="Bold"/>
-                                           </Border>
-                                       </Grid>
-                                        <Separator Classes="CardSep"/>               
-                                    </StackPanel>
-                                </DataTemplate>    
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
-            </Border>
-
-
-            <!-- ===================== -->
-            <!-- Favourite Card -->
-            <!-- ===================== -->
-            <Border Grid.Column="1"
-                    Height="350"
-                    Margin="0, 27, 0, 0"
-                    HorizontalAlignment="Stretch" Classes="Card">
-
-                <Grid RowDefinitions="Auto,*"
-                      Margin="10">
-
-                    <Label FontSize="20"
-                           Margin="10 7 0 05"
-                           Foreground="Orange"
-                           Content="Favourite"/>
-
-                    <ScrollViewer Grid.Row="1"
-                          Margin="10 0 10 -10"
-                          VerticalScrollBarVisibility="Auto">
-                          <ItemsControl ItemsSource="{Binding FavData}">
-                              <ItemsControl.ItemTemplate>
-                                  <DataTemplate>
-                                      <StackPanel>
-                                          <TextBlock Text="{Binding FTitle}" Foreground="#d4d4d4" Margin="0,7"/>
-                                          <Separator Classes="CardSep"/>
-                                      </StackPanel>
-                                  </DataTemplate>
-                              </ItemsControl.ItemTemplate>
-                          </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
-            </Border>
-            
-        <!-- ===================== -->
-        <!-- Password Generator -->
-        <!-- ===================== -->
-        <Border Grid.Column="2"
-                Margin="0, 37, 0, 0"
-                Classes="Card"
-                Height="400"
-                Width="555"
-                HorizontalAlignment="Stretch">
-
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
-                  Margin="20"
-                  RowSpacing="10">
-
-                <Label Content="Password Generator"
-                       FontSize="20"
-                       Foreground="Orange"/>
-                
-                <StackPanel Grid.Row="1" 
-                            Orientation="Horizontal"
-                            Spacing="9">
-                    <TextBox Text="{Binding PasswordGenerator, Mode=OneWay}"
-                             HorizontalAlignment="Stretch"
-                             Width="420"
-                             TextWrapping="Wrap"
-                             IsReadOnly="True"
-                             CornerRadius="7"/>
-                    <Button Height="48" Width="90" Classes="CardButton" Foreground="AliceBlue" Command="{Binding copyPassCommand}">
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Copy" Foreground="AliceBlue"></Label>
-                        </StackPanel>
-                    </Button>
+                    <TextBlock
+                        FontSize="14"
+                        Opacity="0.62"
+                        Text="Your vault at a glance" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="2"
-                            Orientation="Horizontal"
-                            Spacing="10">
-
-                    <TextBlock Text="Length:"
-                               VerticalAlignment="Center"/>
-
-                    <Slider Minimum="12"
-                            Maximum="64"
-                            x:Name="Slider"
-                            Value="{Binding Lenght}"
-                            Width="360"/>
-
-                    <TextBlock Text="{Binding #Slider.Value}"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
-
-                <StackPanel Grid.Row="3"
-                            Spacing="5">
-                    <CheckBox Classes="CheckBoxP" Content="Include Uppercase Letters" IsChecked="{Binding HasUpperLetter}"/>
-                    <CheckBox Classes="CheckBoxP" Content="Include Lowercase Letters" IsChecked="{Binding HasLowerLetter}"/>
-                    <CheckBox Classes="CheckBoxP" Content="Include Numbers" IsChecked="{Binding HasNumCase}"/>
-                    <CheckBox Classes="CheckBoxP" Content="Include Symbols" IsChecked="{Binding HasPuncCase}"/>
-                </StackPanel>
-
-               <Button Grid.Row="4"
-                    Command="{Binding GeneratePasswordCommand}"
-                    Height="45"
-                    Foreground="White"
-                    Classes="CardButton">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-					<icons:SymbolIcon Symbol="Markdown"></icons:SymbolIcon>
-                    <Label Foreground="White">Generate Password</Label>
-                </StackPanel>
-            </Button>
-    </Grid>
-</Border>
-
-
-        </Grid>
-
-        <Separator Grid.Row="3" Margin="10, 19"/>
-        <!-- Cards Area -->
-        <Grid Grid.Row="4"
-              ColumnDefinitions="auto,Auto,*"
-              ColumnSpacing="30">
-
-            <!-- ===================== -->
-            <!-- Status Card -->
-            <!-- ===================== -->
-            <Border Classes="Card"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Width="1000">
-
-                <Grid Margin="10"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      RowDefinitions="Auto,Auto,*"
-                      ColumnDefinitions="Auto,Auto,Auto">
-
-                    <!-- Title -->
-                    <Label Grid.Row="0"
-                           Grid.Column="0"
-                           FontSize="20"
-                           Foreground="Orange"
-                           Content="Status"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"/>
-
-                    <!-- Separator -->
-                    <Separator Grid.Row="1"
-                               Grid.ColumnSpan="3" Grid.Column="0"
-                               Margin="0 0 -18 0"
-                               HorizontalAlignment="Stretch"/>
-
-                    <!-- Content -->
-                    <ItemsControl Grid.Row="2"
-                                  Grid.ColumnSpan="3" Grid.Column="0"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Top"
-                                  ItemsSource="{Binding StatusData}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-
-                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Margin="6, 0, 0, 0"
-                                                   Foreground="CornflowerBlue"
-                                                   FontSize="60"
-                                                   FontFamily="Arial Bold"
-                                                   Text="{Binding Total}"/>
-                                        <TextBlock Classes="status_Text"
-                                                   Text="Saved Password"/>
-                                    </StackPanel>
-
-                                    <Separator Classes="Vertical_Seperator"/>
-
-                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding StrongCount}"
-                                                   Foreground="LimeGreen"
-                                                   FontFamily="Arial Bold"
-                                                   FontSize="60"
-                                                   Margin="6, 0, 0, 0"/>
-                                        <TextBlock Classes="status_Text"
-                                                   Text="Strong Password"/>
-                                    </StackPanel>
-
-                                    <Separator Classes="Vertical_Seperator"/>
-
-                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding WeakCount}"
-                                                   Foreground="red"
-                                                   FontFamily="Arial Bold"
-                                                   FontSize="60"
-                                                   Margin="6, 0, 0, 0"/>
-                                        <TextBlock Classes="status_Text"
-                                                   Text="Weak Password"/>
-                                    </StackPanel>
-
-                                    <Separator Classes="Vertical_Seperator"/>
-
-                                    <StackPanel Orientation="Vertical" Margin="0, 20, 0, 0">
-                                        <TextBlock Text="{Binding BreachCount}"
-                                                   Foreground="Yellow"
-                                                   FontFamily="Arial Bold"
-                                                   FontSize="60"
-                                                   Margin="6, 0, 0, 0"/>
-                                        <TextBlock Classes="status_Text"
-                                                   Text="Breached Password"/>
-                                    </StackPanel>
-
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                </Grid>
-            </Border>
-            
-        <!-- ===================== -->
-        <!-- Password Strength check Card -->
-        <!-- ===================== -->
-            <Border Grid.Column="2"
-            Margin="0"
-            Classes="Card"
-            Height="400"
-            Width="600"
-            VerticalAlignment="Top">
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"  
-              Margin="18"
-              RowSpacing="10">
-
-            <Label Content="Password Strength checker"
-                   FontSize="20"
-                   Foreground="Orange"/>
-
-            <TextBox Grid.Row="1"
-                     Watermark="Enter your password"
-                     Text="{Binding PasswordHaveToCheck}"
-                     CornerRadius="7"/>
-
-            <!-- Replace StackPanel with Grid for better vertical distribution -->
-            <Grid Grid.Row="3"
-                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
-                <TextBlock Grid.Row="0" Text="{Binding PasswordResult}" Foreground="{Binding FontC}" FontSize="20" TextWrapping="Wrap" />
-                <TextBlock Grid.Row="1" Text="{Binding HasUpper}" Foreground="{Binding Font1}" FontSize="20" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="2" Text="{Binding HasLower}" Foreground="{Binding Font2}" FontSize="20" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="3" Text="{Binding HasNum}" Foreground="{Binding Font3}"  FontSize="20"  TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="4" Text="{Binding HasPunc}" Foreground="{Binding Font4}"  FontSize="20"  TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="5" Text="{Binding Islong}" Foreground="{Binding Font5}"  FontSize="20"  TextWrapping="Wrap"/>
+                <Border
+                    Background="#171A20"
+                    BorderBrush="#2B3038"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Grid.Column="1"
+                    Padding="14,9"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        FontSize="13"
+                        Opacity="0.75"
+                        Text="Vaultify" />
+                </Border>
             </Grid>
 
-            <Button Grid.Row="4"
-                    Command="{Binding PasswordCheckerCommand}"
-                    Height="45"
-                    Foreground="White"
-                    Classes="CardButton">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-					<icons:SymbolIcon Symbol="Markdown"></icons:SymbolIcon>
-                    <Label Foreground="White">Check Password</Label>
-                </StackPanel>
-            </Button>
+            <Separator Grid.Row="1" Opacity="0.35" />
+
+            <!--  Recent / Favourite  -->
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="18"
+                Grid.Row="2">
+
+                <!--  Recent  -->
+                <Border
+                    Classes="Card"
+                    Height="400"
+                    HorizontalAlignment="Stretch">
+
+                    <Grid
+                        Margin="20"
+                        RowDefinitions="Auto,*"
+                        RowSpacing="14">
+
+                        <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Text="Recent" />
+
+                                <TextBlock
+                                    FontSize="12"
+                                    Opacity="0.55"
+                                    Text="Recently added entries" />
+                            </StackPanel>
+
+                            <Border
+                                Background="Transparent"
+                                CornerRadius="9"
+                                Grid.Column="1"
+                                Padding="9,5">
+                                <TextBlock
+                                    FontSize="12"
+                                    Opacity="0.7"
+                                    Text="Latest" />
+                            </Border>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock
+                                                    Foreground="#D4D4D4"
+                                                    Margin="8,10"
+                                                    Text="{Binding Title}"
+                                                    TextTrimming="CharacterEllipsis" />
+
+                                                <Border
+                                                    Background="Transparent"
+                                                    CornerRadius="8"
+                                                    Grid.Column="1"
+                                                    Padding="8,3">
+                                                    <TextBlock
+                                                        FontSize="18"
+                                                        FontWeight="SemiBold"
+                                                        Foreground="#777D87"
+                                                        Text="{Binding Number}" />
+                                                </Border>
+                                            </Grid>
+
+                                            <Separator Classes="CardSep" Opacity="0.35" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!--  Favourite  -->
+                <Border
+                    Classes="Card"
+                    Grid.Column="1"
+                    Height="400"
+                    HorizontalAlignment="Stretch">
+
+                    <Grid
+                        Margin="20"
+                        RowDefinitions="Auto,*"
+                        RowSpacing="14">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Text="Favourite" />
+
+                                <TextBlock
+                                    FontSize="12"
+                                    Opacity="0.55"
+                                    Text="Your starred entries" />
+                            </StackPanel>
+
+                            <TextBlock
+                                FontSize="20"
+                                Grid.Column="1"
+                                Opacity="0.65"
+                                Text="★"
+                                VerticalAlignment="Center" />
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding FavData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock
+                                                Foreground="#D4D4D4"
+                                                Margin="0,8"
+                                                Text="{Binding FTitle}"
+                                                TextTrimming="CharacterEllipsis" />
+                                            <Separator Classes="CardSep" Opacity="0.35" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!--  Password Generator  -->
+            <Border
+                Classes="Card"
+                Grid.Row="3"
+                HorizontalAlignment="Stretch">
+                <Grid
+                    Margin="20"
+                    RowDefinitions="Auto,Auto,Auto,Auto,*"
+                    RowSpacing="12">
+                    <StackPanel Spacing="2">
+                        <TextBlock
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Text="Password Generator" />
+
+                        <TextBlock
+                            FontSize="12"
+                            Opacity="0.55"
+                            Text="Create a strong password instantly" />
+                    </StackPanel>
+
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        ColumnSpacing="10"
+                        Grid.Row="1">
+
+                        <TextBox
+                            CornerRadius="9"
+                            IsReadOnly="True"
+                            MinWidth="0"
+                            Text="{Binding PasswordGenerator, Mode=OneWay}"
+                            TextWrapping="NoWrap"
+                            VerticalContentAlignment="Center" />
+
+                        <Button
+                            Background="OrangeRed"
+                            Command="{Binding copyPassCommand}"
+                            Grid.Column="1"
+                            Height="45"
+                            HorizontalContentAlignment="Center"
+                            MaxWidth="100"
+                            MinWidth="80"
+                            VerticalAlignment="Top"
+                            VerticalContentAlignment="Top">
+                            <Label Foreground="White">Copy</Label>
+                        </Button>
+                    </Grid>
+
+                    <Grid
+                        ColumnDefinitions="Auto,*,Auto"
+                        ColumnSpacing="12"
+                        Grid.Row="2"
+                        VerticalAlignment="Center">
+
+                        <TextBlock
+                            FontSize="13"
+                            Opacity="0.75"
+                            Text="Length"
+                            VerticalAlignment="Center" />
+
+                        <Slider
+                            Grid.Column="1"
+                            Maximum="100"
+                            Minimum="12"
+                            Value="{Binding Lenght}"
+                            VerticalAlignment="Center"
+                            x:Name="Slider" />
+
+                        <Border
+                            Background="Transparent"
+                            CornerRadius="8"
+                            Grid.Column="2"
+                            MinWidth="44"
+                            Padding="8,4">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Text="{Binding #Slider.Value}"
+                                VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+
+                    <UniformGrid
+                        Columns="2"
+                        Grid.Row="3"
+                        HorizontalAlignment="Stretch"
+                        Rows="2">
+                        <CheckBox
+                            Classes="CheckBoxP"
+                            Content="Include Uppercase Letters"
+                            IsChecked="{Binding HasUpperLetter}"
+                            Margin="0,3,10,3" />
+
+                        <CheckBox
+                            Classes="CheckBoxP"
+                            Content="Include Lowercase Letters"
+                            IsChecked="{Binding HasLowerLetter}"
+                            Margin="10,3,0,3" />
+
+                        <CheckBox
+                            Classes="CheckBoxP"
+                            Content="Include Numbers"
+                            IsChecked="{Binding HasNumCase}"
+                            Margin="0,3,10,3" />
+
+                        <CheckBox
+                            Classes="CheckBoxP"
+                            Content="Include Symbols"
+                            IsChecked="{Binding HasPuncCase}"
+                            Margin="10,3,0,3" />
+                    </UniformGrid>
+
+                    <Button
+                        Classes="CardButton"
+                        Command="{Binding GeneratePasswordCommand}"
+                        Grid.Row="4"
+                        Height="44"
+                        HorizontalAlignment="Stretch">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <icons:SymbolIcon Symbol="Markdown" />
+                            <TextBlock Text="Generate Password" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!--  Security overview  -->
+            <Grid
+                ColumnDefinitions="*,*"
+                ColumnSpacing="18"
+                Grid.Row="4">
+
+                <!--  Status  -->
+                <Border Classes="Card" HorizontalAlignment="Stretch">
+
+                    <Grid
+                        Margin="20"
+                        RowDefinitions="Auto,Auto,*"
+                        RowSpacing="12">
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Text="Security Overview" />
+
+                            <TextBlock
+                                FontSize="12"
+                                Opacity="0.55"
+                                Text="Current state of your saved passwords" />
+                        </StackPanel>
+
+                        <Separator Grid.Row="1" Opacity="0.35" />
+
+                        <ItemsControl Grid.Row="2" ItemsSource="{Binding StatusData}">
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <UniformGrid
+                                        Columns="2"
+                                        HorizontalAlignment="Stretch"
+                                        Rows="2">
+
+                                        <StackPanel Margin="0,12,10,12" Spacing="2">
+                                            <TextBlock
+                                                FontSize="34"
+                                                FontWeight="Bold"
+                                                Foreground="CornflowerBlue"
+                                                Margin="30,0,0,0"
+                                                Text="{Binding Total}" />
+                                            <TextBlock
+                                                Classes="status_Text"
+                                                FontSize="12"
+                                                Text="Saved Passwords" />
+                                        </StackPanel>
+
+                                        <StackPanel Margin="10,12,0,12" Spacing="2">
+                                            <TextBlock
+                                                FontSize="34"
+                                                FontWeight="Bold"
+                                                Foreground="LimeGreen"
+                                                Margin="30,0,0,0"
+                                                Text="{Binding StrongCount}" />
+                                            <TextBlock
+                                                Classes="status_Text"
+                                                FontSize="12"
+                                                Text="Strong Passwords" />
+                                        </StackPanel>
+
+                                        <StackPanel Margin="0,12,10,12" Spacing="2">
+                                            <TextBlock
+                                                FontSize="34"
+                                                FontWeight="Bold"
+                                                Foreground="Red"
+                                                Margin="30,0,0,0"
+                                                Text="{Binding WeakCount}" />
+                                            <TextBlock
+                                                Classes="status_Text"
+                                                FontSize="12"
+                                                Text="Weak Passwords" />
+                                        </StackPanel>
+
+                                        <StackPanel Margin="10,12,0,12" Spacing="2">
+                                            <TextBlock
+                                                FontSize="34"
+                                                FontWeight="Bold"
+                                                Foreground="Yellow"
+                                                Margin="30,0,0,0"
+                                                Text="{Binding BreachCount}" />
+                                            <TextBlock
+                                                Classes="status_Text"
+                                                FontSize="12"
+                                                Text="Breached Passwords" />
+                                        </StackPanel>
+                                    </UniformGrid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <!--  Password Strength Checker  -->
+                <Border
+                    Classes="Card"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch">
+
+                    <Grid
+                        Margin="20"
+                        RowDefinitions="Auto,Auto,*,Auto"
+                        RowSpacing="12">
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Text="Password Strength Checker" />
+
+                            <TextBlock
+                                FontSize="12"
+                                Opacity="0.55"
+                                Text="Check whether a password meets your security requirements" />
+                        </StackPanel>
+
+                        <TextBox
+                            Grid.Row="1"
+                            Text="{Binding PasswordHaveToCheck}"
+                            Watermark="Enter The password" />
+
+                        <Border
+                            Background="#15181D"
+                            BorderBrush="#292E36"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Grid.Row="2"
+                            Padding="14">
+
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                                <TextBlock
+                                    FontSize="18"
+                                    Foreground="{Binding FontC}"
+                                    Text="{Binding PasswordResult}"
+                                    TextWrapping="Wrap" />
+
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{Binding Font1}"
+                                    Grid.Row="1"
+                                    Margin="0,7,0,0"
+                                    Text="{Binding HasUpper}"
+                                    TextWrapping="Wrap" />
+
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{Binding Font2}"
+                                    Grid.Row="2"
+                                    Margin="0,7,0,0"
+                                    Text="{Binding HasLower}"
+                                    TextWrapping="Wrap" />
+
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{Binding Font3}"
+                                    Grid.Row="3"
+                                    Margin="0,7,0,0"
+                                    Text="{Binding HasNum}"
+                                    TextWrapping="Wrap" />
+
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{Binding Font4}"
+                                    Grid.Row="4"
+                                    Margin="0,7,0,0"
+                                    Text="{Binding HasPunc}"
+                                    TextWrapping="Wrap" />
+
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{Binding Font5}"
+                                    Grid.Row="5"
+                                    Margin="0,7,0,0"
+                                    Text="{Binding Islong}"
+                                    TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+
+                        <Button
+                            Classes="CardButton"
+                            Command="{Binding PasswordCheckerCommand}"
+                            Grid.Row="3"
+                            Height="44"
+                            HorizontalAlignment="Stretch"
+                            IsDefault="True">
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <icons:SymbolIcon Symbol="Markdown" />
+                                <TextBlock Text="Check Password" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!--  Bottom breathing room  -->
+            <Border
+                Background="Transparent"
+                Grid.Row="5"
+                Height="4" />
+
         </Grid>
-    </Border>
-
-
-        </Grid>
-
-    </Grid>
-
+    </ScrollViewer>
 </UserControl>

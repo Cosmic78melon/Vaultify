@@ -1,6 +1,7 @@
 <Window
     Icon="/Assets/vaultify.ico"
     Title="Vaultify"
+    WindowState="Maximized"
     d:DesignHeight="600"
     d:DesignWidth="1024"
     mc:Ignorable="d"

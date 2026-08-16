@@ -60,17 +60,18 @@
 
             <Separator Grid.Row="1" Opacity="0.35" />
 
+
             <!--  Recent / Favourite  -->
             <Grid
                 ColumnDefinitions="*,*"
                 ColumnSpacing="18"
                 Grid.Row="2">
-
                 <!--  Recent  -->
                 <Border
                     Classes="Card"
-                    Height="400"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    MaxHeight="400"
+                    MinHeight="180">
 
                     <Grid
                         Margin="20"
@@ -103,7 +104,25 @@
                             </Border>
                         </Grid>
 
-                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer
+                            Grid.Row="1"
+                            IsVisible="{Binding IsLoading}"
+                            VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Boxes}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <Border Classes="Skeleton" />
+                                            <Separator Classes="CardSep" Opacity="0.35" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <ScrollViewer
+                            Grid.Row="1"
+                            IsVisible="{Binding !IsLoading}"
+                            VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -141,8 +160,9 @@
                 <Border
                     Classes="Card"
                     Grid.Column="1"
-                    Height="400"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    MaxHeight="400"
+                    MinHeight="180">
 
                     <Grid
                         Margin="20"
@@ -169,7 +189,21 @@
                                 Text="★"
                                 VerticalAlignment="Center" />
                         </Grid>
-
+                        <ScrollViewer
+                            Grid.Row="1"
+                            IsVisible="{Binding IsLoading}"
+                            VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Boxes}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <Border Classes="Skeleton" />
+                                            <Separator Classes="CardSep" Opacity="0.35" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding FavData}">
                                 <ItemsControl.ItemTemplate>

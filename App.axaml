@@ -1,27 +1,28 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:collections="using:System.Collections"
-             xmlns:converters="using:Avalonia.Markup.Xaml.Converters"
-             x:Class="Vaultify.App"
-             xmlns:local="using:Vaultify"
-             RequestedThemeVariant="Dark">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+<Application
+    RequestedThemeVariant="Dark"
+    x:Class="Vaultify.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:collections="using:System.Collections"
+    xmlns:converters="using:Avalonia.Markup.Xaml.Converters"
+    xmlns:local="using:Vaultify"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
-  
+
     <Application.Styles>
         <FluentTheme />
-            <StyleInclude Source="Styles/DefaulteStyel.axaml"></StyleInclude>
+        <StyleInclude Source="Styles/DefaulteStyle.axaml" />
     </Application.Styles>
 
     <Application.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<MergeResourceInclude Source="Controls/CheckBox.axaml"></MergeResourceInclude>
-				<MergeResourceInclude Source="Controls/Sliders.axaml"></MergeResourceInclude>
-				<MergeResourceInclude Source="Controls/MenuItem.axaml"></MergeResourceInclude>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="Controls/CheckBox.axaml" />
+                <MergeResourceInclude Source="Controls/Sliders.axaml" />
+                <MergeResourceInclude Source="Controls/MenuItem.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
@@ -36,6 +37,6 @@
         <SolidColorBrush x:Key="CheckBox_Color">#ff8b4d</SolidColorBrush>
         <SolidColorBrush x:Key="ContextMenuBG">#291e14</SolidColorBrush>
 
-      <FontFamily x:Key="Fonts">SF Pro, Plus Jakarta Sans</FontFamily>
-  </Application.Resources>
+        <FontFamily x:Key="Fonts">SF Pro, Plus Jakarta Sans</FontFamily>
+    </Application.Resources>
 </Application>

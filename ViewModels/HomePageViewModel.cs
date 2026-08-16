@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Vaultify.Service;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 
 namespace Vaultify.ViewModels
@@ -37,6 +38,7 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private bool _hasPuncCase = true;
         [ObservableProperty] private int _lenght = 12;
         [ObservableProperty] private string? _masterPass;
+        
 
 
         [ObservableProperty] 
@@ -54,10 +56,11 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _font3 = "White";
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
-        
+        [ObservableProperty] private bool _isLoading = true;
         public HomePageViewModel(IAppServices appServices)
         {
             _appServices = appServices;
+            _ = GeneratePassword();
         }
 
         [RelayCommand]
@@ -65,6 +68,15 @@ namespace Vaultify.ViewModels
         {
             string result = await Task.Run(() => _appServices.CustomeGen(length: Lenght, hasUpperLetters: HasUpperLetter, hasLowerLetters: HasLowerLetter, hasNum: HasNumCase, hasPunc: HasPuncCase));
             PasswordGenerator = result;
+        }
+        public ObservableCollection<int> Boxes { get; } = new(Enumerable.Range(1, 6));
+        partial void OnMasterPassChanged(string? value)
+        {
+            if (value == null) return;
+            IsLoading = false;
+            StatusDataLoad();
+            load_data_recent();
+            FavouriteData();
         }
 
         [RelayCommand]
@@ -212,8 +224,6 @@ namespace Vaultify.ViewModels
                         Number = pair.Value
                     });
             }
-
-            _ = this.GeneratePassword();
 
         }
         

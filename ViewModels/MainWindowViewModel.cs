@@ -54,8 +54,7 @@ namespace Vaultify.ViewModels
         [ObservableProperty] public bool _securityNotesActive;
         [ObservableProperty] public bool _settingsPageActive;
         [ObservableProperty] public bool _accountPageActive;
-        public ToastNotificationViewModel Toast =>
-                _toastService.Notification;
+        public ToastNotificationViewModel Toast => _toastService.Notification;
 
         public MainWindowViewModel(PageFactory pageFactory, IAppServices appServices, IUpdateService updateServices, IToastService toastService)
         {
@@ -66,17 +65,15 @@ namespace Vaultify.ViewModels
             
             CheckUser();
             GoToHome();
-            CheckVersion();
+            _ = CheckVersion();
         }
         public MainWindowViewModel()
         {
             if (_appServices != null) CurrentPage = new HomePageViewModel(_appServices);
         }
-
         public void CheckUser()
         {
-            bool isNewUser = _appServices.isNewUser();
-            if (isNewUser)
+            if (_appServices.isNewUser())
             {
                 // Show SIGNUP
                 BgOp = false;
@@ -103,9 +100,10 @@ namespace Vaultify.ViewModels
             string? newVersionText = rawNewVersion?.TrimStart('v', 'V');
             
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            Version = currentVersion.ToString();
+            if (currentVersion == null) return;
             
-            if (currentVersion != null && System.Version.TryParse(newVersionText, out var newVersion))
+            Version = currentVersion.ToString();
+            if (System.Version.TryParse(newVersionText, out var newVersion))
             {
                 if (newVersion > currentVersion)
                 {
@@ -176,13 +174,9 @@ namespace Vaultify.ViewModels
         {
             CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>(item =>
             {
-                if (_masterPassword != null)
+                if (!string.IsNullOrEmpty(_masterPassword))
                 {
-                    if (string.IsNullOrEmpty(_masterPassword)) return;
                     item.MasterPass = _masterPassword;
-                    item.load_data_recent();
-                    item.FavouriteData();
-                    item.StatusDataLoad();
                 }
             });
             UpdateActiveState(PageViewData.Home);
@@ -193,7 +187,7 @@ namespace Vaultify.ViewModels
         {
             CurrentPage = _pageFactory.GetPageViewModel<All_EntriesPageViewModel>((item) =>
             {
-                if (_masterPassword != null)
+                if (!string.IsNullOrEmpty(_masterPassword))
                 {
                     item.HomepagePassword = _masterPassword;
                     _ = item.LoadData(_masterPassword);
@@ -205,8 +199,8 @@ namespace Vaultify.ViewModels
         public void GoToSecurity()
         {
             CurrentPage = _pageFactory.GetPageViewModel<SecurityPageViewModel>((item =>
-            {
-               if (_masterPassword != null)
+            { 
+                if (!string.IsNullOrEmpty(_masterPassword))
                {
                    item.PasswordSecureity = _masterPassword;
                    _ = item.ItemLoadNotes(_masterPassword);
@@ -235,14 +229,19 @@ namespace Vaultify.ViewModels
             AccountPageActive = activepage == PageViewData.Accounts;
             SettingsPageActive = activepage == PageViewData.Settings;
         }
-        [RelayCommand]
-        public void SideMenuResize() => IsExpanded = !IsExpanded;
+        [RelayCommand] public void SideMenuResize() => IsExpanded = !IsExpanded;
+        [RelayCommand] public void RevealPassword() => RevealPass = !RevealPass;
 
-        [RelayCommand]
-        public void RevealPassword()
+        partial void OnRevealPassChanged(bool value)
         {
-            RevealPass = !RevealPass;
-            EyeIcon = RevealPass ? "Eye" : "EyeOff";
+            if (value)
+            {
+                EyeIcon = "EyeOff";
+            }
+            else
+            {
+                EyeIcon = "Eye";
+            }
         }
 
         [RelayCommand]
@@ -250,6 +249,7 @@ namespace Vaultify.ViewModels
         {
             ProgressBarVisible = true;
             ColorsC = "White";
+            RevealPass = false;
             StatusMessage = "This may take few seconds...";
             if (string.IsNullOrWhiteSpace(Password))
             {
@@ -267,8 +267,9 @@ namespace Vaultify.ViewModels
                 ColorsC = "red";
                 return;
             }
-
+            StatusMessage = "You are authenticated!";
             _masterPassword = Password;
+            StatusMessage = "Authentication successful. Decrypting your data...";
             await Task.Run(() => _appServices.show_all_data(Password));
             Password = string.Empty;
             BgPop = false;

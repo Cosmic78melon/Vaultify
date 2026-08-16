@@ -311,7 +311,7 @@ namespace Vaultify.ViewModels
         [RelayCommand]
         private async Task GeneratePassword()
         {
-            string password = await _appServices.CustomeGen(true, true, true, true);
+            string password = await Task.Run(() => _appServices.CustomeGen(true, true, true, true));
             Password = ConfirmationPassword = password;
         }        
     }

@@ -14,39 +14,33 @@ public partial class All_EntriesPageView : UserControl
 
     private void TextBox_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if(e.Key != Key.Enter)
+        return;
+
+        if (e.Source is not Control current)
+            return;
+
+        if (current is not TextBox && current is not AutoCompleteBox)
+            return;
+
+        var controls = this.GetVisualDescendants()
+            .Where(x => x is TextBox || x is AutoCompleteBox)
+            .Cast<Control>()
+            .ToList();
+
+        int index = controls.IndexOf(current);
+
+        if (index == -1)
+            return;
+
+        int nextIndex = e.KeyModifiers.HasFlag(KeyModifiers.Shift)
+            ? index - 1
+            : index + 1;
+
+        if (nextIndex >= 0 && nextIndex < controls.Count)
         {
-            var current = sender as Control;
-            if (current == null) return;
-
-            var parent = current.GetVisualParent();
-            if (parent == null) return;
-            if (parent is AutoCompleteBox autoCompleteBox)
-            {
-                var autoCompleteBoxes = parent.GetVisualDescendants().OfType<AutoCompleteBox>().ToList();
-
-                int index = autoCompleteBoxes.IndexOf((AutoCompleteBox)current);
-
-                int nextindex = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? index - 1 : index + 1;
-
-                if (nextindex != -1 && (nextindex >= 0 && nextindex < autoCompleteBoxes.Count))
-                {
-                    autoCompleteBoxes[nextindex].Focus();
-                }
-            }
-            else if (parent is TextBox textBox)
-            {
-                var textboxes = parent.GetVisualDescendants().OfType<TextBox>().ToList();
-
-                int index = textboxes.IndexOf((TextBox)current);
-
-                int nextindex = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? index - 1 : index + 1;
-
-                if (nextindex != -1 && (nextindex >= 0 && nextindex < textboxes.Count))
-                {
-                    textboxes[nextindex].Focus();
-                }
-            }
+            e.Handled = true;
+            controls[nextIndex].Focus();
         }
     }
 }

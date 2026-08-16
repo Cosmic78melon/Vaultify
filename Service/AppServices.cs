@@ -313,7 +313,7 @@ namespace Vaultify.Service
         {
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
-            var result = await PassswordCheck(password);
+            var result = await Task.Run(() => PassswordCheck(password));
             if (!isAuthenticated(masterPass) && isNewUser())
                 return (false, "null", "null", "null");
             

@@ -177,7 +177,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!--  Premium Plan  -->
+                    <!--  Version Check  -->
                     <Border
                         Background="#1E1E1E"
                         CornerRadius="8"
@@ -305,6 +305,9 @@
                             Height="45"
                             IsDefault="True" />
 
+                        <Separator />
+                        <TextBlock Foreground="DarkGray" Text="If you forgot your password, you can register again" />
+
                         <Button
                             BorderBrush="#666"
                             BorderThickness="1"
@@ -377,7 +380,6 @@
                         Text="{Binding ConfirmationPassword}"
                         Watermark="Confirm your password"
                         Width="575" />
-                    <TextBlock Foreground="{Binding ColorsC}" Text="{Binding StatusMessage}" />
                     <Button
                         Background="Transparent"
                         Command="{Binding RevealPasswordCommand}"
@@ -387,6 +389,7 @@
                     </Button>
                 </StackPanel>
 
+                <TextBlock Foreground="{Binding ColorsC}" Text="{Binding StatusMessage}" />
                 <Button
                     Background="{DynamicResource Hover_Button_Background}"
                     Command="{Binding RegisterCommand}"
@@ -403,6 +406,65 @@
                         Command="{Binding GotLoginCommand}"
                         Content="Got to Login page"
                         Foreground="AliceBlue" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+
+        <!--  Confirm Register Popup  -->
+        <Border
+            Background="#80000000"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding ConfimationDialog}"
+            ZIndex="1200" />
+
+        <Border
+            Background="#1A1A1A"
+            CornerRadius="16"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Height="240"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding ConfimationDialog}"
+            Padding="24"
+            VerticalAlignment="Center"
+            Width="460"
+            ZIndex="1201">
+            <StackPanel Spacing="16">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    Text="Are you sure??" />
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Foreground="#FF8C00"
+                    Text="Warning: Experimental feature" />
+                <TextBlock
+                    FontWeight="SemiBold"
+                    Foreground="Red"
+                    Text="You will lose all your data if you create a new account. We recommend exporting your data first. Are you sure you want to proceed?"
+                    TextWrapping="Wrap" />
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0"
+                    Orientation="Horizontal"
+                    Spacing="12">
+                    <Button
+                        Background="Green"
+                        BorderBrush="AliceBlue"
+                        BorderThickness="1"
+                        Command="{Binding YesButtonCommand}"
+                        Content="Yes"
+                        Foreground="Black" />
+                    <Button
+                        Background="Red"
+                        BorderBrush="AliceBlue"
+                        BorderThickness="1"
+                        Command="{Binding CancelButtonCommand}"
+                        Content="Cancel"
+                        Foreground="Black" />
                 </StackPanel>
             </StackPanel>
         </Border>

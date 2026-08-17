@@ -274,15 +274,16 @@ namespace Vaultify.Service
                     string dKey = DeriveKey(salt, iteration, password);
                     string decPassword = Fernet.Decrypt(dKey, encPass);
 
-                    if (password != decPassword)
-                        return false;
+                    if (!String.Equals(password, decPassword)) return false;
                 }
                 catch (CryptographicException)
                 {
+                    connection.Close();
                     // Wrong password → HMAC mismatch → not authenticated
                     return false;
                 }
             }
+            connection.Close();
             isAuth = true;
             return true;
         }
@@ -362,10 +363,19 @@ namespace Vaultify.Service
         
         public async Task<(bool, string)> register(string userName, string password)
         {
+            
+            SqliteConnection.ClearAllPools();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            
+            if (Directory.Exists(DPath))
+            {
+                Directory.Delete(DPath, true);
+            }
             int iteration = 299990;
             byte[] salt = RandomNumberGenerator.GetBytes(16);
             var result = await PassswordCheck(password);
-  
+
             if (!string.Equals(result.Result, "Strong", StringComparison.OrdinalIgnoreCase))
             {
                 if (!result.HasUppercase)
@@ -379,12 +389,6 @@ namespace Vaultify.Service
                 if (!result.IsLongEnough)
                     return (false, "Minimum 12 letters");
             }
-            
-            if (isNewUser() == false)
-            {
-                return (false, "User exists in our database");
-            }
-
             try
             {
 

@@ -35,7 +35,8 @@ namespace Vaultify.ViewModels
         public required IAppServices _appServices;
         public required IUpdateService _updateServices;
         public required IToastService _toastService;
-        
+
+        [ObservableProperty] private bool _confimationDialog = false;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IconSize))]
@@ -143,17 +144,25 @@ namespace Vaultify.ViewModels
                 ColorsC = "yellow";
                 return;
             }
-            bool isNewUser = _appServices.isNewUser();
+            
             bool isAuthenticated = _appServices.isAuthenticated(Password);
-            if (isNewUser != true && isAuthenticated)
+            if (isAuthenticated)
             {
-                StatusMessage = "Welcome back! You are already registered with us.";
+                StatusMessage = "Hey the Password you typed now is same as before";
                 ColorsC = "yellow";
+                return;
+            }
+            
+            bool isNewUser = _appServices.isNewUser();
+            if (isNewUser == false)
+            {
+                BgPopSignUp = false;
+                ConfimationDialog = true;
                 return;
             }
 
             bool register;
-            string info;
+            string info;            
             (register, info) = await _appServices.register(UserName, Password);
             if (register == false)
             {
@@ -167,6 +176,31 @@ namespace Vaultify.ViewModels
             BgPopSignUp = false;
             BgOp = true;
             BgPop = true;
+        }
+
+        [RelayCommand]
+        public async Task YesButton()
+        {
+            bool register;
+            string info;
+            (register, info) = await _appServices.register(UserName, Password);
+            if (register == false)
+            {
+                StatusMessage = info;
+                ColorsC = "red";
+            }
+
+            StatusMessage = "Your New account is Successfully created!!!";
+            ColorsC = "green";
+            ConfimationDialog = false;
+            GotLogin();
+        }
+
+        [RelayCommand]
+        public void CancelButton()
+        {
+            BgPopSignUp = BgOpSignUp = true;
+            ConfimationDialog = false;
         }
 
         [RelayCommand]

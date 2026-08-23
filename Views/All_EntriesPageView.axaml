@@ -181,7 +181,7 @@
                                     Foreground="#4DA6FF"
                                     Symbol="Globe" />
 
-                                <TextBlock
+                                <SelectableTextBlock
                                     Foreground="White"
                                     Text="{Binding Title}"
                                     TextTrimming="CharacterEllipsis"
@@ -191,7 +191,7 @@
                             </StackPanel>
 
                             <!--  Username  -->
-                            <TextBlock
+                            <SelectableTextBlock
                                 Foreground="White"
                                 Grid.Column="1"
                                 Margin="16,12,8,12"
@@ -201,7 +201,7 @@
                                 VerticalAlignment="Center" />
 
                             <!--  Password  -->
-                            <TextBlock
+                            <SelectableTextBlock
                                 Foreground="#D0D0D0"
                                 Grid.Column="2"
                                 Margin="16,12,8,12"
@@ -211,7 +211,7 @@
                                 VerticalAlignment="Center" />
 
                             <!--  Strength  -->
-                            <TextBlock
+                            <SelectableTextBlock
                                 Foreground="{Binding ColorS}"
                                 Grid.Column="3"
                                 Margin="16,12,8,12"
@@ -221,7 +221,7 @@
                                 VerticalAlignment="Center" />
 
                             <!--  Created  -->
-                            <TextBlock
+                            <SelectableTextBlock
                                 Foreground="#BBBBBB"
                                 Grid.Column="4"
                                 Margin="16,12,8,12"

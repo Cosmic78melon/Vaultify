@@ -303,7 +303,7 @@ namespace Vaultify.ViewModels
             }
             StatusMessage = "You are authenticated!";
             _masterPassword = Password;
-            StatusMessage = "Authentication successful. Decrypting your data...";
+            StatusMessage = "Authentication is successful. Decrypting your data...";
             await Task.Run(() => _appServices.show_all_data(Password));
             Password = string.Empty;
             BgPop = false;

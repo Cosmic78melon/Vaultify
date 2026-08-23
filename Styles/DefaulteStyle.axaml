@@ -185,7 +185,7 @@
 
     <Style Selector="Border.Card:pointerover">
         <Setter Property="RenderTransform" Value="scale(1.0026)" />
-        <Setter Property="BoxShadow" Value="0 0 60 0 White" />
+        <Setter Property="BoxShadow" Value="7 15 60 0 White" />
     </Style>
 
 

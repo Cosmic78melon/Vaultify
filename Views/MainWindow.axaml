@@ -164,16 +164,47 @@
                         CornerRadius="8"
                         IsVisible="{Binding IsExpanded}"
                         Padding="16">
-                        <StackPanel Spacing="4">
+                        <StackPanel Spacing="6">
                             <TextBlock
-                                FontSize="14"
-                                Foreground="#AAAAAA"
-                                Text="Created by: " />
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Foreground="#FFFFFF"
+                                Text="About" />
+
+                            <Border
+                                Background="#2A2A2A"
+                                Height="1"
+                                Margin="0,4,0,8" />
+
                             <TextBlock
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="#777777"
+                                Text="CREATED BY" />
+
+                            <SelectableTextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Foreground="#EEEEEE"
+                                Text="Tamjid Hossain Adol" />
+
+                            <TextBlock
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="#777777"
+                                Margin="0,10,0,0"
+                                Text="CONTACT" />
+
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="#999999"
+                                Text="For bug reports or suggestions" />
+
+                            <SelectableTextBlock
                                 FontSize="15"
                                 FontWeight="Medium"
-                                Foreground="#CCCCCC"
-                                Text="Tamjid Hossain Adol" />
+                                Foreground="#FF9D2E"
+                                Text="thadol881@gmail.com" />
                         </StackPanel>
                     </Border>
 

@@ -2,9 +2,12 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Vaultify.Service;
+using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 
 
@@ -57,10 +60,18 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _font4 = "White";
         [ObservableProperty] private string _font5 = "White";
         [ObservableProperty] private bool _isLoading = true;
-        public HomePageViewModel(IAppServices appServices)
+
+       public HomePageViewModel(IAppServices appServices)
         {
             _appServices = appServices;
             _ = GeneratePassword();
+            
+            // Subscribe to favourites changes
+            WeakReferenceMessenger.Default.Register<FavouritesChangedMessage>(this, (r, m) =>
+            {
+                Debug.WriteLine("Favourite Message Received");
+                FavouriteData(MasterPass);
+            });
         }
 
         [RelayCommand]
@@ -76,7 +87,7 @@ namespace Vaultify.ViewModels
             IsLoading = false;
             StatusDataLoad();
             load_data_recent();
-            FavouriteData();
+            FavouriteData(value);
         }
 
         [RelayCommand]
@@ -190,11 +201,13 @@ namespace Vaultify.ViewModels
             set { SetProperty(ref _favData, value); } 
         }
 
-        public void FavouriteData()
+        public void FavouriteData(string password)
         {
             FavData = new ObservableCollection<FavDataTitle>();
-            List<string> rawData = _appServices.favData();
             FavData.Clear();
+            
+            var rawData = _appServices.favData(password);
+            Debug.WriteLine($"Favourite Count: {rawData.Count}");
             foreach(string name in rawData)
             {
                 FavData.Add( new FavDataTitle

@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Vaultify.Service;
 using System;
+using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Vaultify.ViewModels
@@ -14,6 +17,7 @@ namespace Vaultify.ViewModels
         public required string Password { get; set; }
         public required string Username { get; set; }
         public required string Strength { get; set; }
+        public required bool isFav { get; set; }
         public required string ColorS { get; set; }
         public required string Category { get; set; }
         public required string Time { get; set; }
@@ -49,8 +53,6 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _selectedpassword;
         [ObservableProperty] private string _selectedcategory;
 
-        public IToastService _toastService;
-
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
 
@@ -64,7 +66,6 @@ namespace Vaultify.ViewModels
         {
             _appServices = appServices;
             _filePickerService = filePickerService;
-            _toastService = toastService;
             Items = new ObservableCollection<Entry>();
             FilteredItems = new ObservableCollection<Entry>();
         }
@@ -119,17 +120,18 @@ namespace Vaultify.ViewModels
                 {
                     if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (item.Id == null || item.SiteName == null || item.UserName == null || item.password == null || item.strength == null || item.cateGory == null || item.createdAt == null) continue;
+                        if (item.Id == null || item.SiteName == null || item.UserName == null || item.Password == null || item.Strength == null || item.CateGory == null || item.CreatedAt == null) continue;
                         var entry = new Entry
                         {
                             Id =  item.Id,
                             Title = item.SiteName,
                             Username = item.UserName,
-                            Password = item.password,
-                            Strength = item.strength,
-                            ColorS = ((string.Compare(item.strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            Category = item.cateGory,
-                            Time = item.createdAt
+                            Password = item.Password,
+                            Strength = item.Strength,
+                            ColorS = ((string.Compare(item.Strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
+                            isFav = Convert.ToBoolean(item.Favourite),
+                            Category = item.CateGory,
+                            Time = item.CreatedAt
                         };
                         Items.Add(entry);
                         websitesNames.Add(entry.Title);
@@ -150,6 +152,7 @@ namespace Vaultify.ViewModels
                     Password = "Nothing",
                     Strength = "Nothing",
                     ColorS = "white",
+                    isFav = false,
                     Category = "Nothing",
                     Time = "Loading................"
                 });
@@ -212,6 +215,7 @@ namespace Vaultify.ViewModels
                             Username =  Name,
                             Category = Catagory,
                             ColorS = ((string.Compare(strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
+                            isFav = false,
                             Password = Password,
                             Strength = strength,
                             Time = time
@@ -293,6 +297,24 @@ namespace Vaultify.ViewModels
             _pendingDeleteItem = items;
             
         }
+
+
+        [RelayCommand]
+        private async Task AddToFav(Entry? items)
+        {
+            if (items == null) return;
+            if (items.isFav) return;
+            
+            items.isFav = true;
+            bool success = _appServices.AddFavourites(items.Id, items.isFav, HomepagePassword);
+            if (success)
+            {
+                Debug.WriteLine("Favourite Message Sending");
+                WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
+                Debug.WriteLine("Favourite Message Sent");
+            }
+        }
+        
         [RelayCommand]
         private async Task yesButton()
         {

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
@@ -29,31 +30,31 @@ namespace Vaultify.Service
         private static readonly string FPath = Path.Combine(DPath, $"{Filename}.db");
         
         private const int KeySize = 32;
-        public static bool isAuth = false;
+        public static bool IsAuth = false;
         
-        public static List<vaultData> global_Data = new();
+        public static List<VaultData> GlobalData = new();
         private static readonly HttpClient Client = new()
         {
           Timeout = TimeSpan.FromSeconds(5)  
         };
 
-        public class vaultData
+        public class VaultData
         {
             public required string? Id {get; set;}
             public required string? Salt {get; set;}
             public required int Iteration {get; set;}
             public required string? SiteName {get; set;}
             public required string? UserName {get; set;}
-            public required string? password {get; set;}
-            public required string notes {get; set;}
-            public required string cateGory {get; set;}
-            public required string strength {get; set;}
-            public required bool favourite {get; set;}
-            public required string createdAt {get; set;}
-            public required string? updatedAt {get; set;}
+            public required string? Password {get; set;}
+            public required string Notes {get; set;}
+            public required string CateGory {get; set;}
+            public required string Strength {get; set;}
+            public required bool Favourite {get; set;}
+            public required string CreatedAt {get; set;}
+            public required string? UpdatedAt {get; set;}
             
         }
-        public class passwordCheckDetails
+        public class PasswordCheckDetails
         {
             public string Result { get; set; } = "Weak";
             public bool? HasUppercase { get; set; } = false;
@@ -62,6 +63,15 @@ namespace Vaultify.Service
             public bool? HasPunctuation { get; set; } = false;
             public bool? IsLongEnough { get; set; } = false;
         }
+
+        private void Logger(string? locationOfError, string? error)
+        {
+            File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Minute}:{DateTime.Now.Second}. " +
+                                                               $"Date:{DateTime.UtcNow.Day}/{DateTime.UtcNow.Month}/{DateTime.UtcNow.Year}" +
+                                                               $"Location of the error: {locationOfError}" +
+                                                               $" Error: {error}");
+        }
+        
         public async Task<string> CustomeGen(bool hasUpperLetters, bool hasLowerLetters, bool hasNum, bool hasPunc, int length = 12)
         {
             bool[] lenResult = { hasLowerLetters, hasUpperLetters, hasNum, hasPunc};
@@ -117,19 +127,20 @@ namespace Vaultify.Service
             }
             catch (HttpRequestException httpEx)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {httpEx.ToString()}");
+
+                Logger($"{MethodBase.GetCurrentMethod().Name}", httpEx.Message);
                 return 101;
             }
             catch (TimeoutException tmt)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {tmt.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", tmt.Message);
                 return 101;
             }
 
         } 
         public async Task<dynamic> PassswordCheck(string? password = null)
         {
-            var details = new passwordCheckDetails();
+            var details = new PasswordCheckDetails();
             if (string.IsNullOrEmpty(password))
             {
                 details.Result = "No password";
@@ -143,7 +154,7 @@ namespace Vaultify.Service
             }
             catch (Exception ex)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
                 isBreached = 500;
             }
             
@@ -183,13 +194,13 @@ namespace Vaultify.Service
             return details;
         }
 
-        public List<vaultData> show_all_data(string password)
+        public List<VaultData> show_all_data(string password, bool foreceLoad = false)
         {
             // 1. Reject empty password immediately
-            if (string.IsNullOrEmpty(password)) return global_Data;
+            if (string.IsNullOrEmpty(password)) return GlobalData;
         
             // 2. Return cache if user is not authenticated
-            if (isAuth != true) return global_Data;
+            if (IsAuth != true) return GlobalData;
         
             using (var connection = new SqliteConnection($"Data Source={FPath}"))
             {
@@ -197,15 +208,16 @@ namespace Vaultify.Service
         
                 using var countCommand = new SqliteCommand(
                     "SELECT COUNT(*) FROM Credential_Data WHERE Id != 0;", connection);
-        
-                int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
-        
-                // 3. Return cache if row count hasn't changed
-                if (global_Data.Count == dbCount) return global_Data;
+                
+                if (!foreceLoad)
+                {
+                    int dbCount = Convert.ToInt32(countCommand.ExecuteScalar());
+                    if (GlobalData.Count == dbCount) return GlobalData;
+                }
         
                 // 4. Safe initialization — THIS is what fixes your crash
-                global_Data ??= new List<vaultData>();
-                global_Data.Clear();
+                GlobalData ??= new List<VaultData>();
+                GlobalData.Clear();
                 
                 var sql = "SELECT * FROM Credential_Data WHERE Id != 0 ORDER BY Updated_at DESC;";
                 using var command = new SqliteCommand(sql, connection);
@@ -218,33 +230,33 @@ namespace Vaultify.Service
                         byte[] bsalt = Convert.FromHexString(reader.GetString(1));
                         string fernetKey = DeriveKey(bsalt, reader.GetInt32(2), password);
             
-                        var allData = new vaultData
+                        var allData = new VaultData
                         {
                             Id        = reader.GetString(0),
                             Salt      = reader.GetString(1),
                             Iteration = reader.GetInt32(2),
                             SiteName  = Fernet.Decrypt(fernetKey, reader.GetString(3)),
                             UserName  = Fernet.Decrypt(fernetKey, reader.GetString(4)),
-                            password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
-                            notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
-                            cateGory  = reader.GetString(7),
-                            strength  = reader.GetString(8),
-                            favourite = reader.GetInt16(9) == 1,
-                            createdAt = reader.GetString(10),
-                            updatedAt = reader.GetString(11)
+                            Password  = Fernet.Decrypt(fernetKey, reader.GetString(5)),
+                            Notes     = Fernet.Decrypt(fernetKey, reader.GetString(6)),
+                            CateGory  = reader.GetString(7),
+                            Strength  = reader.GetString(8),
+                            Favourite = reader.GetInt16(9) == 1,
+                            CreatedAt = reader.GetString(10),
+                            UpdatedAt = reader.GetString(11)
                         };
             
-                        global_Data.Add(allData);
+                        GlobalData.Add(allData);
                     }
                     catch (Exception ex)
                     {
-                        File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
-                        global_Data.Clear();
-                        return global_Data;
+                        Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
+                        GlobalData.Clear();
+                        return GlobalData;
                     }
                 }
         
-                return global_Data;
+                return GlobalData;
             }
         }
 
@@ -284,7 +296,7 @@ namespace Vaultify.Service
                 }
             }
             connection.Close();
-            isAuth = true;
+            IsAuth = true;
             return true;
         }
         
@@ -300,15 +312,13 @@ namespace Vaultify.Service
                 using var command = new SqliteCommand(sql, connection);
                 int count = Convert.ToInt32(command.ExecuteScalar());
                 return count == 0; // no table = new user
-                connection.Close();
             }
             catch (Exception ex)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
                 return true;
             }
         }
-
 
         public async Task<(bool isAdded, string Id, string strength, string time)> addCredentials(string masterPass,string siteName, string userName, string password, string message = "unknown", string category = "unknown", bool favourite = false) 
         {
@@ -356,7 +366,7 @@ namespace Vaultify.Service
             }
             catch (Exception ex)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
                 return (false, "null", "null", "null");
             }
         }
@@ -428,12 +438,12 @@ namespace Vaultify.Service
             }
             catch (SqliteException sqx)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {sqx.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", sqx.Message);
                 return (false, "something gone wrong when adding data");
             }
             catch (Exception ex)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
                 return (false, "Something Went Wrong");
             }
         }
@@ -468,7 +478,7 @@ namespace Vaultify.Service
             }
             catch (Exception ex)
             {
-                File.WriteAllText(Path.Combine(DPath, "logs.txt"), $"Time: {DateTime.Now.Hour}:{DateTime.Now.Hour}:{DateTime.Now.Hour}. Error: {ex.ToString()}");
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
                 return false;
             }
         }
@@ -477,7 +487,7 @@ namespace Vaultify.Service
             if (string.IsNullOrEmpty(id)) return false;
             if (string.IsNullOrEmpty(password)) return false;
             
-            if (isAuth)
+            if (IsAuth)
             {
                 using var connection = new SqliteConnection($"Data Source={FPath}");
                 connection.Open(); 
@@ -499,26 +509,26 @@ namespace Vaultify.Service
         
         public List<int> statusdata()
         {
-            if (isAuth != true) return new List<int>{0,0,0,0};
+            if (IsAuth != true) return new List<int>{0,0,0,0};
             
             int total = 0;
             int weak = 0;
             int strong = 0; 
             int breached = 0;
-            foreach (var item in global_Data)
+            foreach (var item in GlobalData)
             {
                 if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
                     total++;
-                    if (string.Equals(item.strength, "Strong", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(item.Strength, "Strong", StringComparison.OrdinalIgnoreCase))
                     {
                         strong++;
                     }                    
-                    else if (string.Equals(item.strength, "Weak", StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(item.Strength, "Weak", StringComparison.OrdinalIgnoreCase))
                     {
                         weak++;
                     }                 
-                    else if (string.Equals(item.strength, "Breached", StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(item.Strength, "Breached", StringComparison.OrdinalIgnoreCase))
                     {
                         breached++;
                     }
@@ -527,14 +537,43 @@ namespace Vaultify.Service
 
             return new List<int> { total, strong, weak, breached };
         }
-        public List<string> favData()
+        
+        public bool AddFavourites(string id, bool favourite, string password)
+        {
+            try
+            {
+                using var connection = new SqliteConnection($"Data Source={FPath}");
+                connection.Open();
+
+                string sql = "UPDATE Credential_Data SET Favourite = @newFavourite WHERE Id = @idOfUser";
+                using var command = new SqliteCommand(sql, connection);
+                command.Parameters.AddWithValue("@idOfUser", id);
+                command.Parameters.AddWithValue("@newFavourite", favourite);
+                int rowsAffected = command.ExecuteNonQuery();
+                if (rowsAffected >= 1)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Logger($"{MethodBase.GetCurrentMethod().Name}", ex.Message);
+                return false;
+            }
+        }
+        
+        public List<string> favData(string password)
         {
             List<string> cardData = new();
-            if (isAuth != true) return cardData;
+            if (IsAuth != true) return cardData;
             
-            foreach (var item in global_Data)
+            var data = show_all_data(password, true);
+            Debug.WriteLine(data);
+            foreach (var item in data)
             {
-                if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
+                bool isFavourite = Convert.ToBoolean(item.Favourite);
+                if (isFavourite)
                 {
                     if (item.SiteName != null && cardData.Contains(item.SiteName) != true) cardData.Add(item.SiteName);
                 }
@@ -545,8 +584,8 @@ namespace Vaultify.Service
         public Dictionary<string, int> card_Data()
         {
             Dictionary<string, int> cardData = new();
-            if (isAuth != true) return cardData;
-            foreach (var item in global_Data)
+            if (IsAuth != true) return cardData;
+            foreach (var item in GlobalData)
             {
                 if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -566,7 +605,7 @@ namespace Vaultify.Service
 
         public bool ExportVault(string command, dynamic filePath)
         {
-            if (!isAuth)
+            if (!IsAuth)
             {
                 return false;
             }
@@ -579,7 +618,7 @@ namespace Vaultify.Service
                 using (var writer = new StreamWriter(path))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
-                    csv.WriteRecords(global_Data);
+                    csv.WriteRecords(GlobalData);
                 }
 
                 return true;
@@ -590,7 +629,7 @@ namespace Vaultify.Service
                 {
                     var worksheet = workbook.Worksheets.Add("Vault");
 
-                    worksheet.Cell(1, 1).InsertTable(global_Data);
+                    worksheet.Cell(1, 1).InsertTable(GlobalData);
 
                     workbook.SaveAs(path);
                 }

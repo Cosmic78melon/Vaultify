@@ -45,15 +45,15 @@ namespace Vaultify.ViewModels
                 var data = await Task.Run(() => _appservices.show_all_data(password));
                 foreach (var item in data)
                 {
-                    if (!string.Equals(item.notes, "Nothing", StringComparison.OrdinalIgnoreCase) &&
-                        !string.Equals(item.notes, "null", StringComparison.OrdinalIgnoreCase) &&
-                        !string.Equals(item.notes, "Unknown", StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(item.Notes, "Nothing", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(item.Notes, "null", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(item.Notes, "Unknown", StringComparison.OrdinalIgnoreCase))
                     {
                         SecureNotes.Add(new SecurityNote
                         {
                             Id = item.Id,
-                            Description = item.notes,
-                            Date = item.createdAt
+                            Description = item.Notes,
+                            Date = item.CreatedAt
                         });
                     }
                 }

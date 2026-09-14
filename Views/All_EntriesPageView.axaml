@@ -260,10 +260,6 @@
                 <ListBox.ContextMenu>
                     <ContextMenu>
 
-                        <MenuItem
-                            Command="{Binding DeleteItemCommand}"
-                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
-                            Header="Delete" />
 
                         <MenuItem
                             Command="{Binding CopyUsernameCommand}"
@@ -274,6 +270,16 @@
                             Command="{Binding CopyPasswordCommand}"
                             CommandParameter="{Binding $parent[ListBox].SelectedItem}"
                             Header="Copy Password" />
+
+                        <MenuItem
+                            Command="{Binding AddToFavCommand}"
+                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            Header="Add To Favourites" />
+
+                        <MenuItem
+                            Command="{Binding DeleteItemCommand}"
+                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            Header="Delete" />
 
                     </ContextMenu>
                 </ListBox.ContextMenu>

@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -569,7 +568,6 @@ namespace Vaultify.Service
             if (IsAuth != true) return cardData;
             
             var data = show_all_data(password, true);
-            Debug.WriteLine(data);
             foreach (var item in data)
             {
                 bool isFavourite = Convert.ToBoolean(item.Favourite);

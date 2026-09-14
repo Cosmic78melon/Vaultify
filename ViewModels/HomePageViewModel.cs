@@ -7,7 +7,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Vaultify.Service;
 using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 
 
@@ -69,7 +68,6 @@ namespace Vaultify.ViewModels
             // Subscribe to favourites changes
             WeakReferenceMessenger.Default.Register<FavouritesChangedMessage>(this, (r, m) =>
             {
-                Debug.WriteLine("Favourite Message Received");
                 FavouriteData(MasterPass);
             });
         }
@@ -207,7 +205,6 @@ namespace Vaultify.ViewModels
             FavData.Clear();
             
             var rawData = _appServices.favData(password);
-            Debug.WriteLine($"Favourite Count: {rawData.Count}");
             foreach(string name in rawData)
             {
                 FavData.Add( new FavDataTitle

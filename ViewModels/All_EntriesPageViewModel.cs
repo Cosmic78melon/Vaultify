@@ -5,10 +5,7 @@ using Vaultify.Service;
 using System;
 using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Globalization;
 using System.Threading.Tasks;
-using Avalonia.Data.Converters;
 
 namespace Vaultify.ViewModels
 {
@@ -327,9 +324,7 @@ namespace Vaultify.ViewModels
                 success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
                 if (success)
                 {
-                    Debug.WriteLine("Favourite Message Sending");
                     WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
-                    Debug.WriteLine("Favourite Message Sent");
                 }
             }
             else
@@ -338,9 +333,7 @@ namespace Vaultify.ViewModels
                 success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
                 if (success)
                 {
-                    Debug.WriteLine("Favourite Message Sending");
                     WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
-                    Debug.WriteLine("Favourite Message Sent");
                 }
             }
             

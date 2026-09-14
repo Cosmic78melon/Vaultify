@@ -274,7 +274,7 @@
                         <MenuItem
                             Command="{Binding AddToFavCommand}"
                             CommandParameter="{Binding $parent[ListBox].SelectedItem}"
-                            Header="Add To Favourites" />
+                            Header="{Binding FavouriteText}" />
 
                         <MenuItem
                             Command="{Binding DeleteItemCommand}"

@@ -6,7 +6,9 @@ using System;
 using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
+using Avalonia.Data.Converters;
 
 namespace Vaultify.ViewModels
 {
@@ -30,6 +32,7 @@ namespace Vaultify.ViewModels
         public required string Icons { get; set; }
         
     }
+
     
     public partial class All_EntriesPageViewModel : PageViewModel
     {  
@@ -52,6 +55,7 @@ namespace Vaultify.ViewModels
         [ObservableProperty] private string _selecteduserName;
         [ObservableProperty] private string _selectedpassword;
         [ObservableProperty] private string _selectedcategory;
+        [ObservableProperty] private string _favouriteText = "Add To Favourite";
 
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
@@ -74,8 +78,8 @@ namespace Vaultify.ViewModels
         {
             ApplyFilter();
         }
-        
-        
+
+
         [RelayCommand]
         public void AddnewPopButton()
         {

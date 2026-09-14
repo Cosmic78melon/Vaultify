@@ -150,6 +150,7 @@
                 ItemsSource="{Binding FilteredItems}"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectedItem="{Binding SelectedEntry}"
                 x:Name="ListBoxData">
 
                 <ListBox.ItemTemplate>
@@ -263,22 +264,22 @@
 
                         <MenuItem
                             Command="{Binding CopyUsernameCommand}"
-                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            CommandParameter="{Binding SelectedEntry}"
                             Header="Copy Username" />
 
                         <MenuItem
                             Command="{Binding CopyPasswordCommand}"
-                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            CommandParameter="{Binding SelectedEntry}"
                             Header="Copy Password" />
 
                         <MenuItem
-                            Command="{Binding AddToFavCommand}"
-                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            Command="{Binding AddOrRemoveFavCommand}"
+                            CommandParameter="{Binding SelectedEntry}"
                             Header="{Binding FavouriteText}" />
 
                         <MenuItem
                             Command="{Binding DeleteItemCommand}"
-                            CommandParameter="{Binding $parent[ListBox].SelectedItem}"
+                            CommandParameter="{Binding SelectedEntry}"
                             Header="Delete" />
 
                     </ContextMenu>

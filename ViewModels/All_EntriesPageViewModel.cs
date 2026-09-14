@@ -51,6 +51,7 @@ namespace Vaultify.ViewModels
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
         [ObservableProperty] private FileType _selectedItem;
+        [ObservableProperty] private Entry _selectedEntry;
         [ObservableProperty] private string _selectedwebsite;
         [ObservableProperty] private string _selecteduserName;
         [ObservableProperty] private string _selectedpassword;
@@ -102,11 +103,23 @@ namespace Vaultify.ViewModels
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
-        private ObservableCollection<Entry> _filteredItems;
+        private ObservableCollection<Entry> _filteredItems = new();
         public ObservableCollection<Entry> FilteredItems
         {
             get { return _filteredItems; }
             set { SetProperty(ref _filteredItems, value); }
+        }
+        
+        partial void OnSelectedEntryChanged(Entry? value)
+        {
+            if (value == null) return;
+
+            if (value.isFav) {
+                FavouriteText = "Remove from Favourite";
+            }
+            else {
+                FavouriteText = "Add to Favourite";
+            }
         }
 
         public ObservableCollection<string> websitesNames { get; } = new();
@@ -304,19 +317,33 @@ namespace Vaultify.ViewModels
 
 
         [RelayCommand]
-        private async Task AddToFav(Entry? items)
+        private async Task AddOrRemoveFav(Entry? items)
         {
+            bool success;
             if (items == null) return;
-            if (items.isFav) return;
-            
-            items.isFav = true;
-            bool success = _appServices.AddFavourites(items.Id, items.isFav, HomepagePassword);
-            if (success)
+            if (items.isFav)
             {
-                Debug.WriteLine("Favourite Message Sending");
-                WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
-                Debug.WriteLine("Favourite Message Sent");
+                items.isFav = false;
+                success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
+                if (success)
+                {
+                    Debug.WriteLine("Favourite Message Sending");
+                    WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
+                    Debug.WriteLine("Favourite Message Sent");
+                }
             }
+            else
+            {
+                items.isFav = true;
+                success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
+                if (success)
+                {
+                    Debug.WriteLine("Favourite Message Sending");
+                    WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
+                    Debug.WriteLine("Favourite Message Sent");
+                }
+            }
+            
         }
         
         [RelayCommand]

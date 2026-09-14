@@ -14,7 +14,7 @@ namespace Vaultify.Service
         public Task<(bool isAdded, string Id, string strength, string time)> addCredentials(string masterpassword, string siteName, string userName = "Nothing", string password = "Noting", string message = "unknown", string catagory = "unknown", bool favourite = false);
         public Dictionary<string, int> card_Data();
         public List<string> favData(string password);
-        public bool AddFavourites(string id, bool favourite, string password);
+        public bool AddOrRemoveFavourites(string id, bool favourite, string password);
         public List<int> statusdata();
         public bool ExportVault(string Command, dynamic file_path);
         public Task<bool> remove_data(string Id, string password);

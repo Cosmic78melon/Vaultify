@@ -538,7 +538,7 @@ namespace Vaultify.Service
             return new List<int> { total, strong, weak, breached };
         }
         
-        public bool AddFavourites(string id, bool favourite, string password)
+        public bool AddOrRemoveFavourites(string id, bool favourite, string password)
         {
             try
             {

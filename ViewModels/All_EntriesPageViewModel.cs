@@ -5,22 +5,26 @@ using Vaultify.Service;
 using System;
 using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Vaultify.ViewModels
 {
-    public class Entry
-    {
-        public required string Id { get; set; }
-        public required string Title { get; set; }
-        public required string Password { get; set; }
-        public required string Username { get; set; }
-        public required string Strength { get; set; }
-        public required bool isFav { get; set; }
-        public required string ColorS { get; set; }
-        public required string Category { get; set; }
-        public required string Time { get; set; }
-    }
+    public partial class Entry : ObservableObject  // ← Add ObservableObject
+{
+    public required string Id { get; set; }
+    public required string Title { get; set; }
+    public required string Password { get; set; }
+    public required string Username { get; set; }
+    public required string Strength { get; set; }
+    
+    [ObservableProperty]  // ← Make IsFav observable
+    private bool _IsFav;
+    
+    public required string ColorS { get; set; }
+    public required string Category { get; set; }
+    public required string Time { get; set; }
+}
     
     public class FileType
     {
@@ -48,12 +52,20 @@ namespace Vaultify.ViewModels
         [ObservableProperty] public string _catagory;
         [ObservableProperty] private string _homepagePassword;
         [ObservableProperty] private FileType _selectedItem;
-        [ObservableProperty] private Entry _selectedEntry;
+
+        [ObservableProperty] 
+        [NotifyPropertyChangedFor(nameof(FavouriteText))]
+        private Entry _selectedEntry;
+        
         [ObservableProperty] private string _selectedwebsite;
         [ObservableProperty] private string _selecteduserName;
         [ObservableProperty] private string _selectedpassword;
         [ObservableProperty] private string _selectedcategory;
-        [ObservableProperty] private string _favouriteText = "Add To Favourite";
+        
+        public string FavouriteText =>
+            SelectedEntry?.IsFav == true
+                ? "Remove from Favourite"
+                : "Add to Favourite";
 
         [ObservableProperty] public bool _confimationDialog = false;
         [ObservableProperty] public bool _confirmDelete = false;
@@ -76,6 +88,23 @@ namespace Vaultify.ViewModels
         {
             ApplyFilter();
         }
+        //
+        // partial void OnSelectedEntryChanged(Entry? oldValue, Entry? newValue)
+        // {
+        //     if (oldValue != null)
+        //         oldValue.PropertyChanged -= SelectedEntry_PropertyChanged;
+        //
+        //     if (newValue != null)
+        //         newValue.PropertyChanged += SelectedEntry_PropertyChanged;
+        //
+        //     OnPropertyChanged(nameof(FavouriteText));
+        // }
+        //
+        // private void SelectedEntry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        // {
+        //     if (e.PropertyName == nameof(Entry.IsFav))
+        //         OnPropertyChanged(nameof(FavouriteText));
+        // }
 
 
         [RelayCommand]
@@ -106,18 +135,6 @@ namespace Vaultify.ViewModels
             get { return _filteredItems; }
             set { SetProperty(ref _filteredItems, value); }
         }
-        
-        partial void OnSelectedEntryChanged(Entry? value)
-        {
-            if (value == null) return;
-
-            if (value.isFav) {
-                FavouriteText = "Remove from Favourite";
-            }
-            else {
-                FavouriteText = "Add to Favourite";
-            }
-        }
 
         public ObservableCollection<string> websitesNames { get; } = new();
         public ObservableCollection<string> userName { get; } = new();
@@ -143,7 +160,7 @@ namespace Vaultify.ViewModels
                             Password = item.Password,
                             Strength = item.Strength,
                             ColorS = ((string.Compare(item.Strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            isFav = Convert.ToBoolean(item.Favourite),
+                            IsFav = Convert.ToBoolean(item.Favourite),
                             Category = item.CateGory,
                             Time = item.CreatedAt
                         };
@@ -166,7 +183,7 @@ namespace Vaultify.ViewModels
                     Password = "Nothing",
                     Strength = "Nothing",
                     ColorS = "white",
-                    isFav = false,
+                    IsFav = false,
                     Category = "Nothing",
                     Time = "Loading................"
                 });
@@ -229,7 +246,7 @@ namespace Vaultify.ViewModels
                             Username =  Name,
                             Category = Catagory,
                             ColorS = ((string.Compare(strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            isFav = false,
+                            IsFav = false,
                             Password = Password,
                             Strength = strength,
                             Time = time
@@ -312,31 +329,53 @@ namespace Vaultify.ViewModels
             
         }
 
-
         [RelayCommand]
         private async Task AddOrRemoveFav(Entry? items)
         {
-            bool success;
             if (items == null) return;
-            if (items.isFav)
+        
+            bool success;
+        
+            if (items.IsFav)
             {
-                items.isFav = false;
-                success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
+                items.IsFav = false;
+        
+                success = _appServices.AddOrRemoveFavourites(
+                    items.Id,
+                    items.IsFav,
+                    HomepagePassword);
+        
                 if (success)
                 {
-                    WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
+                    WeakReferenceMessenger.Default.Send(
+                        new FavouritesChangedMessage(items.Title, items.IsFav));
+                }
+                else
+                {
+                    items.IsFav = true;
                 }
             }
             else
             {
-                items.isFav = true;
-                success = _appServices.AddOrRemoveFavourites(items.Id, items.isFav, HomepagePassword);
+                items.IsFav = true;
+        
+                success = _appServices.AddOrRemoveFavourites(
+                    items.Id,
+                    items.IsFav,
+                    HomepagePassword);
+        
                 if (success)
                 {
-                    WeakReferenceMessenger.Default.Send(new FavouritesChangedMessage());
+                    WeakReferenceMessenger.Default.Send(
+                        new FavouritesChangedMessage(items.Title, items.IsFav));
+                    SelectedEntry.IsFav = true;
+                    OnPropertyChanged(nameof(FavouriteText));
+                }
+                else
+                {
+                    items.IsFav = false;
                 }
             }
-            
         }
         
         [RelayCommand]

@@ -30,6 +30,9 @@ namespace Vaultify.Service
         
         private const int KeySize = 32;
         public static bool IsAuth = false;
+
+        public static int dataRead = 0;
+        public static int favdataWrite = 0;
         
         public static List<VaultData> GlobalData = new();
         private static readonly HttpClient Client = new()
@@ -566,9 +569,7 @@ namespace Vaultify.Service
         {
             List<string> cardData = new();
             if (IsAuth != true) return cardData;
-            
-            var data = show_all_data(password, true);
-            foreach (var item in data)
+            foreach (var item in GlobalData)
             {
                 bool isFavourite = Convert.ToBoolean(item.Favourite);
                 if (isFavourite)

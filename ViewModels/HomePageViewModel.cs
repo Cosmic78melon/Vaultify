@@ -66,9 +66,20 @@ namespace Vaultify.ViewModels
             _ = GeneratePassword();
             
             // Subscribe to favourites changes
-            WeakReferenceMessenger.Default.Register<FavouritesChangedMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<FavouritesChangedMessage>(this, (r, messages) =>
             {
-                FavouriteData(MasterPass);
+                if (messages.isFavourite)
+                {
+                    FavData.Add(new FavDataTitle
+                    {
+                        FTitle = messages.SiteName
+                    });
+                }
+                else 
+                {
+                    var item = FavData.FirstOrDefault(f => f.FTitle == messages.SiteName);
+                    if (item != null) FavData.Remove(item);
+                }
             });
         }
 
@@ -80,8 +91,8 @@ namespace Vaultify.ViewModels
         }
         public ObservableCollection<int> Boxes { get; } = new(Enumerable.Range(1, 6));
         partial void OnMasterPassChanged(string? value)
-        {
-            if (value == null) return;
+        { 
+            if (value == null) return; 
             IsLoading = false;
             StatusDataLoad();
             load_data_recent();

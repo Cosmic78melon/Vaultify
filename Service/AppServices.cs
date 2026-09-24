@@ -12,6 +12,7 @@ using Cryptography;
 using CsvHelper;
 using CsvHelper.Excel.EPPlus;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.Data.Sqlite;
 
 namespace Vaultify.Service
@@ -564,19 +565,35 @@ namespace Vaultify.Service
                 return false;
             }
         }
+        public class FavUser
+        {
+            public string Id {get; set;}
+            public string SiteName {get; set;}
+            public bool isFav {get; set;}
+        }
         
         public List<string> favData(string password)
         {
             List<string> cardData = new();
             if (IsAuth != true) return cardData;
+
+            List<FavUser> favuser = new();
             foreach (var item in GlobalData)
             {
                 bool isFavourite = Convert.ToBoolean(item.Favourite);
                 if (isFavourite)
                 {
                     if (item.SiteName != null && cardData.Contains(item.SiteName) != true) cardData.Add(item.SiteName);
+                    favuser.Add(new FavUser
+                    {
+                        Id = item.Id,
+                      SiteName = item.SiteName,
+                      isFav = true
+                    });
                 }
             }
+            string jsonString = JsonSerializer.Serialize(favuser, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(Path.Combine(DPath, "favData.json"), jsonString);
             return cardData;
         }
 

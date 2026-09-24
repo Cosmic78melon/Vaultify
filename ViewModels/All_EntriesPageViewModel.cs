@@ -3,14 +3,17 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Vaultify.Service;
 using System;
+using System.Collections.Generic;
 using Vaultify.ViewModels.Messages;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Vaultify.ViewModels
 {
-    public partial class Entry : ObservableObject  // ← Add ObservableObject
+    public partial class Entry : ObservableObject  
 {
     public required string Id { get; set; }
     public required string Title { get; set; }
@@ -18,9 +21,7 @@ namespace Vaultify.ViewModels
     public required string Username { get; set; }
     public required string Strength { get; set; }
     
-    [ObservableProperty]  // ← Make IsFav observable
-    private bool _IsFav;
-    
+    [ObservableProperty] private bool _isFav;
     public required string ColorS { get; set; }
     public required string Category { get; set; }
     public required string Time { get; set; }
@@ -34,9 +35,18 @@ namespace Vaultify.ViewModels
         
     }
 
+    public class FavUser
+    {
+        public string Id {get; set;}
+        public string SiteName {get; set;}
+        public bool isFav {get; set;}
+    }
     
     public partial class All_EntriesPageViewModel : PageViewModel
     {  
+        private static readonly string DPath =  Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Vaultify");
         [ObservableProperty] private bool _addnewOP = false;
         [ObservableProperty] private bool _addnewPOP = false;
         [ObservableProperty] private bool _shareOP = false;
@@ -75,8 +85,10 @@ namespace Vaultify.ViewModels
         
         public readonly IAppServices _appServices;
         public readonly FilePickerService _filePickerService;
+        
+        [ObservableProperty] public bool _isChecked = false;
 
-        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService, IToastService toastService)
+        public All_EntriesPageViewModel(IAppServices appServices, FilePickerService filePickerService)
         {
             _appServices = appServices;
             _filePickerService = filePickerService;
@@ -88,25 +100,7 @@ namespace Vaultify.ViewModels
         {
             ApplyFilter();
         }
-        //
-        // partial void OnSelectedEntryChanged(Entry? oldValue, Entry? newValue)
-        // {
-        //     if (oldValue != null)
-        //         oldValue.PropertyChanged -= SelectedEntry_PropertyChanged;
-        //
-        //     if (newValue != null)
-        //         newValue.PropertyChanged += SelectedEntry_PropertyChanged;
-        //
-        //     OnPropertyChanged(nameof(FavouriteText));
-        // }
-        //
-        // private void SelectedEntry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        // {
-        //     if (e.PropertyName == nameof(Entry.IsFav))
-        //         OnPropertyChanged(nameof(FavouriteText));
-        // }
-
-
+        
         [RelayCommand]
         public void AddnewPopButton()
         {
@@ -141,56 +135,93 @@ namespace Vaultify.ViewModels
         public ObservableCollection<string> category { get; } = new();
         public ObservableCollection<string> autoCompletepassword { get; } = new();
         public async Task LoadData(string password)
+{
+    try
+    {
+        Items = new ObservableCollection<Entry>();
+        var data = await Task.Run(() => _appServices.show_all_data(password));
+        
+        websitesNames.Clear();
+
+        string filePath = Path.Combine(DPath, "favData.json");
+
+        HashSet<string> favoriteIds = new();
+
+        if (File.Exists(filePath))
         {
             try
             {
-                Items = new ObservableCollection<Entry>();
-                var data = await Task.Run(() => _appServices.show_all_data(password));
-                websitesNames.Clear();
-                foreach (var item in data)
+                string jsonString = File.ReadAllText(filePath);
+                var favList = JsonSerializer.Deserialize<List<FavUser>>(jsonString);
+                
+                if (favList != null)
                 {
-                    if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        if (item.Id == null || item.SiteName == null || item.UserName == null || item.Password == null || item.Strength == null || item.CateGory == null || item.CreatedAt == null) continue;
-                        var entry = new Entry
-                        {
-                            Id =  item.Id,
-                            Title = item.SiteName,
-                            Username = item.UserName,
-                            Password = item.Password,
-                            Strength = item.Strength,
-                            ColorS = ((string.Compare(item.Strength, "Strong", StringComparison.OrdinalIgnoreCase) == 0) ? "ForestGreen":"red"),
-                            IsFav = Convert.ToBoolean(item.Favourite),
-                            Category = item.CateGory,
-                            Time = item.CreatedAt
-                        };
-                        Items.Add(entry);
-                        websitesNames.Add(entry.Title);
-                        userName.Add(entry.Username);
-                        category.Add(entry.Category);
-                        autoCompletepassword.Add(entry.Password);
-                    }
+                    // Get a fast list of IDs that are actually marked as true favorites
+                    favoriteIds = favList
+                        .Where(u => u.isFav && !string.IsNullOrEmpty(u.Id))
+                        .Select(u => u.Id)
+                        .ToHashSet();
                 }
-                ApplyFilter();
             }
-            catch(Exception ex)
+            catch (JsonException)
             {
-                Items.Add(new Entry
-                {
-                    Id =  "Nothing",
-                    Title = "Nothing",
-                    Username = ex.Message,
-                    Password = "Nothing",
-                    Strength = "Nothing",
-                    ColorS = "white",
-                    IsFav = false,
-                    Category = "Nothing",
-                    Time = "Loading................"
-                });
+                favoriteIds = new HashSet<string>();
             }
-            
         }
-        
+
+        foreach (var item in data)
+        {
+            if (!string.Equals(item.SiteName, "null", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (item.Id == null || item.SiteName == null || item.UserName == null || 
+                    item.Password == null || item.Strength == null || item.CateGory == null || 
+                    item.CreatedAt == null) continue;
+
+                // Check if this item's ID exists in our favorites hashset
+                bool isActuallyFavorite = favoriteIds.Contains(item.Id);
+
+                var entry = new Entry
+                {
+                    Id = item.Id,
+                    Title = item.SiteName,
+                    Username = item.UserName,
+                    Password = item.Password,
+                    Strength = item.Strength,
+                    ColorS = string.Equals(item.Strength, "Strong", StringComparison.OrdinalIgnoreCase) ? "ForestGreen" : "red",
+                    
+                    IsFav = isActuallyFavorite,
+                    Category = item.CateGory,
+                    Time = item.CreatedAt
+                };
+
+                Items.Add(entry);
+                websitesNames.Add(entry.Title);
+                userName.Add(entry.Username);
+                category.Add(entry.Category);
+                autoCompletepassword.Add(entry.Password);
+            }
+        }
+
+        ApplyFilter();
+    }
+    catch (Exception ex)
+    {
+        Items.Clear();
+        Items.Add(new Entry
+        {
+            Id = "Nothing",
+            Title = "Nothing",
+            Username = ex.Message,
+            Password = "Nothing",
+            Strength = "Nothing",
+            ColorS = "white",
+            IsFav = false,
+            Category = "Nothing",
+            Time = "Loading................"
+        });
+    }
+}
+
         public ObservableCollection<FileType> Categories { get; } =
         [
             new FileType
@@ -333,22 +364,31 @@ namespace Vaultify.ViewModels
         private async Task AddOrRemoveFav(Entry? items)
         {
             if (items == null) return;
-        
+            string filePath = Path.Combine(DPath, "favData.json");
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
             bool success;
-        
+            items.IsFav = !items.IsFav;
+            
             if (items.IsFav)
             {
                 items.IsFav = false;
-        
                 success = _appServices.AddOrRemoveFavourites(
                     items.Id,
                     items.IsFav,
                     HomepagePassword);
-        
                 if (success)
                 {
                     WeakReferenceMessenger.Default.Send(
                         new FavouritesChangedMessage(items.Title, items.IsFav));
+                    string jsonString = File.ReadAllText(filePath);
+                    List<FavUser> favList = JsonSerializer.Deserialize<List<FavUser>>(jsonString);
+                    favList.RemoveAll(item => item.Id.Equals(items.Id));
+                    string updateJson =
+                        JsonSerializer.Serialize(favList, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(filePath, updateJson);
                 }
                 else
                 {
@@ -358,18 +398,25 @@ namespace Vaultify.ViewModels
             else
             {
                 items.IsFav = true;
-        
                 success = _appServices.AddOrRemoveFavourites(
                     items.Id,
                     items.IsFav,
                     HomepagePassword);
-        
                 if (success)
                 {
                     WeakReferenceMessenger.Default.Send(
                         new FavouritesChangedMessage(items.Title, items.IsFav));
-                    SelectedEntry.IsFav = true;
-                    OnPropertyChanged(nameof(FavouriteText));
+                    string jsonString = File.ReadAllText(filePath);
+                    List<FavUser> favList = JsonSerializer.Deserialize<List<FavUser>>(jsonString);
+                    favList.Add(new FavUser
+                    {
+                        Id = items.Id,
+                        SiteName = items.Title,
+                        isFav = items.IsFav
+                    });
+                    string updateJson =
+                        JsonSerializer.Serialize(favList, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(filePath, updateJson);
                 }
                 else
                 {

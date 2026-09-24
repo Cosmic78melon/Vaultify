@@ -78,6 +78,7 @@
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="#AAAAAA" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="16,0,8,0" />
     </Style>
 
     <!--  Label Fonts Set  -->

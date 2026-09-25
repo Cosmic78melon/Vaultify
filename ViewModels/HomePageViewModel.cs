@@ -20,6 +20,7 @@ namespace Vaultify.ViewModels
     public class FavDataTitle()
     {
         public required string? FTitle { get; set; }
+        public required string? password { get; set; }
     }
     public class StatusData()
     {
@@ -72,7 +73,8 @@ namespace Vaultify.ViewModels
                 {
                     FavData.Add(new FavDataTitle
                     {
-                        FTitle = messages.SiteName
+                        FTitle = messages.SiteName,
+                        password = messages.password
                     });
                 }
                 else 
@@ -215,12 +217,14 @@ namespace Vaultify.ViewModels
             FavData = new ObservableCollection<FavDataTitle>();
             FavData.Clear();
             
-            var rawData = _appServices.favData(password);
-            foreach(string name in rawData)
+            var favSites = _appServices.favData(password);
+            foreach(var site in favSites)
             {
+                // ? There is one that is missed which is "Update" Sqlite record is still not updating so
                 FavData.Add( new FavDataTitle
                 {
-                    FTitle = name
+                    FTitle = site.siteName,
+                    password = site.password
                 });
             }
         }

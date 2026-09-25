@@ -158,8 +158,8 @@ namespace Vaultify.ViewModels
                 {
                     // Get a fast list of IDs that are actually marked as true favorites
                     favoriteIds = favList
-                        .Where(u => u.isFav && !string.IsNullOrEmpty(u.Id))
-                        .Select(u => u.Id)
+                        .Where(s => s.isFav && !string.IsNullOrEmpty(s.Id))
+                        .Select(s => s.Id)
                         .ToHashSet();
                 }
             }
@@ -382,7 +382,7 @@ namespace Vaultify.ViewModels
                 if (success)
                 {
                     WeakReferenceMessenger.Default.Send(
-                        new FavouritesChangedMessage(items.Title, items.IsFav));
+                        new FavouritesChangedMessage(items.Title, items.Password, items.IsFav));
                     string jsonString = File.ReadAllText(filePath);
                     List<FavUser> favList = JsonSerializer.Deserialize<List<FavUser>>(jsonString);
                     favList.RemoveAll(item => item.Id.Equals(items.Id));
@@ -405,7 +405,7 @@ namespace Vaultify.ViewModels
                 if (success)
                 {
                     WeakReferenceMessenger.Default.Send(
-                        new FavouritesChangedMessage(items.Title, items.IsFav));
+                        new FavouritesChangedMessage(items.Title, items.Password, items.IsFav));
                     string jsonString = File.ReadAllText(filePath);
                     List<FavUser> favList = JsonSerializer.Deserialize<List<FavUser>>(jsonString);
                     favList.Add(new FavUser

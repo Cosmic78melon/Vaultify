@@ -209,11 +209,23 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel>
-                                            <TextBlock
-                                                Foreground="#D4D4D4"
-                                                Margin="0,8"
-                                                Text="{Binding FTitle}"
-                                                TextTrimming="CharacterEllipsis" />
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <SelectableTextBlock
+                                                    FontSize="25"
+                                                    Foreground="#D4D4D4"
+                                                    Grid.Column="0"
+                                                    Margin="0,8"
+                                                    Text="{Binding FTitle}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                                <SelectableTextBlock
+                                                    FontSize="25"
+                                                    Foreground="#D4D4D4"
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="8,5"
+                                                    Text="{Binding password}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                            </Grid>
                                             <Separator Classes="CardSep" Opacity="0.35" />
                                         </StackPanel>
                                     </DataTemplate>

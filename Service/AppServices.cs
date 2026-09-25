@@ -571,10 +571,16 @@ namespace Vaultify.Service
             public string SiteName {get; set;}
             public bool isFav {get; set;}
         }
-        
-        public List<string> favData(string password)
+
+        public class cardDataFav
         {
-            List<string> cardData = new();
+            public string siteName {get; set;}
+            public string password {get; set;}
+        }
+        
+        public List<cardDataFav> favData(string password)
+        {
+            List<cardDataFav> cardData = new ();
             if (IsAuth != true) return cardData;
 
             List<FavUser> favuser = new();
@@ -583,13 +589,20 @@ namespace Vaultify.Service
                 bool isFavourite = Convert.ToBoolean(item.Favourite);
                 if (isFavourite)
                 {
-                    if (item.SiteName != null && cardData.Contains(item.SiteName) != true) cardData.Add(item.SiteName);
-                    favuser.Add(new FavUser
+                    if (item.SiteName != null && cardData.Any(u => u.siteName.Equals(item.SiteName)) != true)
                     {
-                        Id = item.Id,
-                      SiteName = item.SiteName,
-                      isFav = true
-                    });
+                        cardData.Add(new cardDataFav
+                        {
+                            siteName = item.SiteName,
+                            password =  item.Password
+                        });
+                        favuser.Add(new FavUser
+                        {
+                            Id = item.Id,
+                            SiteName = item.SiteName,
+                            isFav = true
+                        });
+                    }
                 }
             }
             string jsonString = JsonSerializer.Serialize(favuser, new JsonSerializerOptions { WriteIndented = true });
